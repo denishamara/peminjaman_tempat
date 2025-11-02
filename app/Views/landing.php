@@ -134,7 +134,7 @@
     <h1>Selamat Datang di <span class="text-primary">SmartRoom</span></h1>
     <p>Kelola peminjaman ruang dengan mudah, cepat, dan efisien — kapan saja dan di mana saja.</p>
     <div class="mt-4">
-      <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-glow me-3">
+      <a href="<?= base_url('jadwal/public') ?>" class="btn btn-glow me-3">
         <i class="bi bi-calendar-event"></i> Lihat Jadwal
       </a>
       <a href="<?= base_url('auth/login') ?>" class="btn btn-outline-light rounded-pill px-4">

@@ -36,87 +36,110 @@ class PeminjamanController extends BaseController
 
     // 🚀 Proses pengajuan
     public function submit()
-    {
-        $validation = \Config\Services::validation();
+{
+    $validation = \Config\Services::validation();
 
-        $rules = [
-            'id_room'         => 'required|numeric',
-            'tanggal_mulai'   => 'required',
-            'tanggal_selesai' => 'required',
-            'keterangan'      => 'permit_empty|max_length[255]',
-        ];
+    $rules = [
+        'id_room'         => 'required|numeric',
+        'tanggal_mulai'   => 'required',
+        'tanggal_selesai' => 'required',
+        'keterangan'      => 'permit_empty|max_length[255]',
+    ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
-
-        $idRoom         = $this->request->getPost('id_room');
-        $tanggalMulai   = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_mulai')));
-        $tanggalSelesai = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_selesai')));
-
-        // 🛑 Cegah waktu sebelum sekarang
-        if (strtotime($tanggalMulai) < time()) {
-            return redirect()->back()->withInput()->with('errors', [
-                'Tanggal mulai tidak boleh sebelum waktu sekarang.'
-            ]);
-        }
-
-        // 🛑 Cegah tanggal selesai sebelum tanggal mulai
-        if (strtotime($tanggalSelesai) <= strtotime($tanggalMulai)) {
-            return redirect()->back()->withInput()->with('errors', [
-                'Tanggal selesai harus lebih besar dari tanggal mulai.'
-            ]);
-        }
-
-        // ✅ Pastikan user login
-        $user = session()->get('user');
-        if (!$user) {
-            return redirect()->to('/auth/login');
-        }
-
-        // 🚫 Cek bentrok dengan booking lain
-        $conflict = $this->bookingModel
-            ->where('id_room', $idRoom)
-            ->where('status !=', 'Ditolak')
-            ->where("NOT (tanggal_selesai <= '$tanggalMulai' OR tanggal_mulai >= '$tanggalSelesai')")
-            ->first();
-
-        if ($conflict) {
-            return redirect()->back()->withInput()->with('errors', [
-                'Waktu yang dipilih bentrok dengan peminjaman lain di ruangan tersebut.'
-            ]);
-        }
-
-        // 🚫 Cek bentrok dengan jadwal reguler
-        if ($this->jadwalModel->isTimeConflict([
-            'id_room'         => $idRoom,
-            'tanggal_mulai'   => $tanggalMulai,
-            'tanggal_selesai' => $tanggalSelesai,
-        ])) {
-            return redirect()->back()->withInput()->with('errors', [
-                'Ruangan sudah digunakan pada waktu tersebut (jadwal reguler).'
-            ]);
-        }
-
-        // 💾 Simpan ke database
-        $data = [
-            'id_user'         => $user['id_user'],
-            'id_room'         => $idRoom,
-            'tanggal_mulai'   => $tanggalMulai,
-            'tanggal_selesai' => $tanggalSelesai,
-            'status'          => 'Proses',
-            'keterangan'      => $this->request->getPost('keterangan'),
-        ];
-
-        try {
-            $this->bookingModel->insert($data);
-            return redirect()->to('/dashboard')->with('success', 'Pengajuan peminjaman berhasil dikirim.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('errors', [
-                'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
-            ]);
-        }
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
     }
+
+    $idRoom         = $this->request->getPost('id_room');
+    $tanggalMulai   = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_mulai')));
+    $tanggalSelesai = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_selesai')));
+
+    // 🛑 Cegah waktu sebelum sekarang
+    if (strtotime($tanggalMulai) < time()) {
+        return redirect()->back()->withInput()->with('errors', [
+            'Tanggal mulai tidak boleh sebelum waktu sekarang.'
+        ]);
+    }
+
+    // 🛑 Cegah tanggal selesai sebelum tanggal mulai
+    if (strtotime($tanggalSelesai) <= strtotime($tanggalMulai)) {
+        return redirect()->back()->withInput()->with('errors', [
+            'Tanggal selesai harus lebih besar dari tanggal mulai.'
+        ]);
+    }
+
+    // ✅ Pastikan user login
+    $user = session()->get('user');
+    if (!$user) {
+        return redirect()->to('/auth/login');
+    }
+
+    // 🚫 Cek bentrok dengan booking lain (masih aktif)
+    $conflict = $this->bookingModel
+        ->where('id_room', $idRoom)
+        ->where('status !=', 'Ditolak')
+        ->where("NOT (tanggal_selesai <= '$tanggalMulai' OR tanggal_mulai >= '$tanggalSelesai')")
+        ->first();
+
+    if ($conflict) {
+        return redirect()->back()->withInput()->with('errors', [
+            'Waktu yang dipilih bentrok dengan peminjaman lain di ruangan tersebut.'
+        ]);
+    }
+
+    // ⚠️ Cek bentrok dengan jadwal reguler — tapi tetap izinkan lanjut
+    $keterangan = $this->request->getPost('keterangan');
+    $bentrokJadwal = $this->jadwalModel->getTimeConflicts([
+        'id_room'         => $idRoom,
+        'tanggal_mulai'   => $tanggalMulai,
+        'tanggal_selesai' => $tanggalSelesai,
+    ]);
+
+    if (!empty($bentrokJadwal)) {
+        $infoBentrok = [];
+
+        foreach ($bentrokJadwal as $jadwal) {
+            // Ambil info jadwal yang bentrok
+            $nama = $jadwal['nama_reguler'] ?? 'Jadwal Tidak Diketahui';
+            $mulai = date('d M Y H:i', strtotime($jadwal['tanggal_mulai']));
+            $selesai = date('d M Y H:i', strtotime($jadwal['tanggal_selesai']));
+            $infoBentrok[] = "$nama ($mulai - $selesai)";
+        }
+
+        // Gabungkan semua jadwal bentrok
+        $detailBentrok = implode(', ', $infoBentrok);
+
+        // Tambahkan keterangan lengkap
+        $keterangan = trim(($keterangan ? $keterangan . ' | ' : '') . "Bentrok dengan jadwal reguler: $detailBentrok");
+    }
+
+    // 💾 Simpan ke database
+    $data = [
+        'id_user'         => $user['id_user'],
+        'id_room'         => $idRoom,
+        'tanggal_mulai'   => $tanggalMulai,
+        'tanggal_selesai' => $tanggalSelesai,
+        'status'          => 'Proses',
+        'keterangan'      => $keterangan,
+    ];
+
+    try {
+        $this->bookingModel->insert($data);
+
+        if (!empty($bentrokJadwal)) {
+            return redirect()->to('/dashboard')->with(
+                'success',
+                'Pengajuan berhasil dikirim (⚠ Bentrok dengan jadwal reguler: ' . $detailBentrok . ').'
+            );
+        }
+
+        return redirect()->to('/dashboard')->with('success', 'Pengajuan peminjaman berhasil dikirim.');
+    } catch (\Exception $e) {
+        return redirect()->back()->withInput()->with('errors', [
+            'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
+        ]);
+    }
+}
 
     // 🧾 Daftar peminjaman aktif (otomatis sembunyikan yang sudah selesai)
     // 🧾 Daftar peminjaman aktif (otomatis sembunyikan yang sudah selesai)

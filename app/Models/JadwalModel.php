@@ -38,4 +38,22 @@ class JadwalModel extends Model
 
         return $builder->first() ? true : false;
     }
+
+    /**
+     * Ambil daftar jadwal reguler yang bentrok dengan waktu tertentu
+     *
+     * @param array $data ['id_room', 'tanggal_mulai', 'tanggal_selesai']
+     * @return array daftar jadwal yang bentrok
+     */
+    public function getTimeConflicts($data)
+    {
+        $idRoom = $data['id_room'];
+        $tanggalMulai = $data['tanggal_mulai'];
+        $tanggalSelesai = $data['tanggal_selesai'];
+
+        // Ambil semua jadwal reguler yang bentrok
+        return $this->where('id_room', $idRoom)
+            ->where("NOT (tanggal_selesai <= '$tanggalMulai' OR tanggal_mulai >= '$tanggalSelesai')")
+            ->findAll();
+    }
 }

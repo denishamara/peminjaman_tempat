@@ -9,9 +9,9 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::landing'); // atau sesuai controller kamu
 $routes->get('landing', 'Home::landing');
 
+// Jadwal publik (tanpa login)
+$routes->get('jadwal/public', 'JadwalController::publicIndex');
 
-// Homepage dan dashboard (butuh login)
-$routes->get('/', 'Dashboard::index', ['filter' => 'auth']);
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
 

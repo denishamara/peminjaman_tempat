@@ -25,6 +25,7 @@
     <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
     <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
     <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
+    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
 
       <?php elseif($user['role'] === 'petugas'): ?>
     <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>

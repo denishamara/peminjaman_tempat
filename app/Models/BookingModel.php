@@ -39,20 +39,18 @@ class BookingModel extends Model
     }
 
     /**
-     * Update otomatis semua booking yang waktunya sudah lewat menjadi 'selesai'.
-     * Hanya update jika status saat ini bukan 'selesai' atau 'ditolak'.
+     * Update otomatis semua booking yang waktunya sudah lewat menjadi 'Selesai'.
+     * Hanya update jika status saat ini bukan 'Selesai' atau 'Ditolak'.
      */
     public function updateFinishedBookings(): void
     {
-    date_default_timezone_set('Asia/Jakarta'); // Pastikan waktu lokal Indonesia
-    $now = date('Y-m-d H:i:s');
+        date_default_timezone_set('Asia/Jakarta'); // Pastikan waktu lokal Indonesia
+        $now = date('Y-m-d H:i:s');
 
-    // Tes debugging
-    // echo "Sekarang: $now"; exit;
-
-    $this->set('status', 'Selesai')
-        ->whereNotIn('status', ['Selesai', 'Ditolak'])
-        ->where('tanggal_selesai <', $now)
-        ->update();
+        $this->set('status', 'Selesai')
+            ->whereNotIn('status', ['Selesai', 'Ditolak'])
+            ->where('tanggal_selesai <', $now)
+            ->update();
     }
+    
 }

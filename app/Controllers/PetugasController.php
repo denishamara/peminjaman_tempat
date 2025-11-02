@@ -70,31 +70,34 @@ class PetugasController extends BaseController
         return redirect()->to('/auth/login')->with('error', 'Silakan login terlebih dahulu.');
     }
 
-    // 🔹 Cek apakah user sudah ada di tabel petugas
+    // 🔹 Pastikan petugas sudah ada atau buat otomatis
     $petugas = $this->petugasModel->where('id_user', $user['id_user'])->first();
-
-    // 🔹 Kalau belum ada, buat otomatis
     if (!$petugas) {
         $this->petugasModel->insert([
             'id_user' => $user['id_user'],
             'nama_petugas' => $user['username']
         ]);
-        // Ambil ulang data petugas yang baru dibuat
         $petugas = $this->petugasModel->where('id_user', $user['id_user'])->first();
     }
 
-    // 🔹 Lanjut proses peminjaman
+    // 🔹 Ambil data booking
     $booking = $this->peminjamanModel->find($id);
     if (!$booking) {
         return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan');
     }
 
+    // 🧹 Bersihkan teks bentrok dari keterangan
+    $newKeterangan = preg_replace('/\|?\s*Bentrok dengan jadwal reguler.*$/i', '', $booking['keterangan']);
+    $newKeterangan = trim($newKeterangan, " |");
+
+    // 🔹 Update status & keterangan bersih
     $this->peminjamanModel->update($id, [
         'status'     => 'Diterima',
-        'id_petugas' => $petugas['id_petugas']
+        'id_petugas' => $petugas['id_petugas'],
+        'keterangan' => $newKeterangan ?: 'Peminjaman disetujui'
     ]);
 
-    // ✅ Tambahkan ke jadwal_reguler jika belum ada
+    // 🔹 Tambahkan ke jadwal_reguler jika belum ada
     $isExist = $this->jadwalModel->where([
         'id_room'         => $booking['id_room'],
         'tanggal_mulai'   => $booking['tanggal_mulai'],
@@ -108,12 +111,12 @@ class PetugasController extends BaseController
             'id_user'         => $booking['id_user'],
             'tanggal_mulai'   => $booking['tanggal_mulai'],
             'tanggal_selesai' => $booking['tanggal_selesai'],
-            'keterangan'      => $booking['keterangan'] ?? 'Peminjaman disetujui'
+            'keterangan'      => $newKeterangan ?: 'Peminjaman disetujui'
         ]);
     }
 
     return redirect()->to('/petugas/peminjaman_daftar')
-                     ->with('success', 'Peminjaman berhasil disetujui dan ditambahkan ke jadwal.');
+                     ->with('success', 'Peminjaman berhasil disetujui dan jadwal diperbarui.');
 }
 
 

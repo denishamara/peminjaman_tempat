@@ -20,7 +20,7 @@
             width: 100%;
             padding: 60px 80px;
             display: flex;
-            justify-content: flex-start; /* biar mulai dari kiri */
+            justify-content: flex-start;
         }
 
         .profile-card {
@@ -118,7 +118,6 @@
             <hr>
 
             <p><strong>ID:</strong> <?= esc($user['id_user']) ?></p>
-            <p><strong>Bergabung sejak:</strong> <?= esc($user['created_at'] ?? '-') ?></p>
 
             <a href="<?= base_url('/profile/edit') ?>" class="btn btn-edit mt-2">Edit Profil</a>
         </div>

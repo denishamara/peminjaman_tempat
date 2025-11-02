@@ -56,6 +56,30 @@
   </div>
 </main>
 
+<!-- 🔹 MODAL DETAIL EVENT -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="eventModalLabel">Detail Jadwal</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Nama Jadwal:</strong> <span id="modalNama"></span></p>
+        <p><strong>Ruangan:</strong> <span id="modalRuang"></span></p>
+        <p><strong>Peminjam:</strong> <span id="modalUser"></span></p>
+        <p><strong>Mulai:</strong> <span id="modalMulai"></span></p>
+        <p><strong>Selesai:</strong> <span id="modalSelesai"></span></p>
+        <p><strong>Keterangan:</strong> <span id="modalKet"></span></p>
+        <p><strong>Status:</strong> <span id="modalStatus" class="badge"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const calendarEl = document.getElementById('calendar');
@@ -66,22 +90,61 @@ document.addEventListener('DOMContentLoaded', function() {
     locale: 'id',
     height: 'auto',
     events: '<?= base_url("jadwal/getKalenderData") ?>',
-    eventDisplay: 'block',
-    eventTextColor: '#fff',
+    eventDisplay: 'block', // 🟩 biar muncul kotak warna
+    eventTextColor: '#fff', // teks putih di dalam kotak
+
     eventDidMount: function(info) {
-      // Tooltip keterangan tambahan
+      // Tooltip cepat (judul aja)
       new bootstrap.Tooltip(info.el, {
         title: info.event.title,
         placement: 'top',
         trigger: 'hover',
         container: 'body'
       });
+    },
+
+    // 📋 klik event -> tampilkan modal detail
+    eventClick: function(info) {
+      const e = info.event.extendedProps;
+      const start = new Date(info.event.start).toLocaleString('id-ID');
+      const end = new Date(info.event.end).toLocaleString('id-ID');
+
+      const html = `
+        <div class="modal fade" id="detailModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold">Detail Jadwal</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>Nama Jadwal:</strong> ${info.event.title}</p>
+                <p><strong>Ruangan:</strong> ${e.nama_ruang ?? '-'}</p>
+                <p><strong>Peminjam:</strong> ${e.peminjam ?? '-'}</p>
+                <p><strong>Mulai:</strong> ${start}</p>
+                <p><strong>Selesai:</strong> ${end}</p>
+                <p><strong>Keterangan:</strong> ${e.keterangan ?? '-'}</p>
+                <p><strong>Status:</strong> <span class="badge bg-secondary">${e.status ?? '-'}</span></p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', html);
+      const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+      modal.show();
+      document.getElementById('detailModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+      });
     }
   });
 
   calendar.render();
 
-  // Ketika dropdown ruang diganti
+  // 🔄 ganti ruangan
   ruangSelect.addEventListener('change', function() {
     const ruangId = this.value;
     let url = '<?= base_url("jadwal/getKalenderData") ?>';

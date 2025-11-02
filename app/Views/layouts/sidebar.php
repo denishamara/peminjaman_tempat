@@ -9,8 +9,9 @@
     </div>
 
     <nav class="sidebar-menu mt-4">
-        <a href="<?= base_url('/') ?>" 
-           class="sidebar-link <?= service('uri')->getSegment(1) === '' ? 'active' : '' ?>">🏠 Home</a>
+        <a href="<?= base_url('dashboard') ?>" 
+   class="sidebar-link <?= service('uri')->getSegment(1) === 'dashboard' ? 'active' : '' ?>">🏠 Home</a>
+
 
         <?php if($user && $user['role'] === 'administrator'): ?>
             <a href="<?= base_url('administrator/users/index') ?>" 
