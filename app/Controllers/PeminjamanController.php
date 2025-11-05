@@ -185,4 +185,23 @@ public function daftar()
     ]);
 }
 
+// 🗑️ Hapus riwayat peminjaman
+public function delete($id_booking)
+{
+    $peminjamanModel = new \App\Models\PeminjamanModel();
+
+    $peminjaman = $peminjamanModel->find($id_booking);
+
+    if (!$peminjaman) {
+        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan.');
+    }
+
+    try {
+        $peminjamanModel->delete($id_booking);
+        return redirect()->to('/peminjaman/history')->with('success', 'Riwayat peminjaman berhasil dihapus.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal menghapus riwayat: ' . $e->getMessage());
+    }
+}
+
 }

@@ -57,7 +57,9 @@ $routes->group('peminjaman', ['filter' => 'auth:peminjam'], function($routes) {
     $routes->get('daftar', 'PeminjamanController::daftar');
     $routes->get('detail/(:num)', 'PeminjamanController::detail/$1');
     $routes->get('history', 'PeminjamanController::history');
-});
+}); 
+
+$routes->post('peminjaman/riwayat/delete/(:num)', 'PeminjamanController::delete/$1');
 
 $routes->group('petugas', function($routes) {
     $routes->get('peminjaman_daftar', 'PetugasController::peminjaman_daftar');
@@ -75,8 +77,15 @@ $routes->group('laporan', ['filter' => 'auth'], function($routes) {
     // Generate laporan PDF
     $routes->post('generate', 'LaporanController::generate');
 });
+// 📞 Halaman kontak untuk semua user
+$routes->get('kontak', 'KontakController::index');
 
-$routes->get('/kontak', 'KontakController::index');
+// 📞 Hanya admin yang boleh edit/update
+$routes->group('administrator', ['filter' => 'auth:administrator'], function($routes) {
+    $routes->get('kontak', 'KontakController::index');
+    $routes->get('kontak/edit/(:num)', 'KontakController::edit/$1');
+    $routes->post('kontak/update/(:num)', 'KontakController::update/$1');
+});
 
 // ================= PROFILE =================
 $routes->get('/profile', 'ProfileController::index');
@@ -85,7 +94,6 @@ $routes->post('/profile/update', 'ProfileController::update');
 
 $routes->get('jadwal/kalender', 'JadwalController::kalender');
 $routes->get('jadwal/getKalenderData', 'JadwalController::getKalenderData');
-
 
 
 

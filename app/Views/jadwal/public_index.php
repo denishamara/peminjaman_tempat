@@ -1,45 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jadwal Reguler | SmartRoom</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  <style>
-    body {
-      background-color: #f8fafc;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .navbar {
-      background: #0f172a;
-    }
-
-    .navbar-brand {
-      color: #fff !important;
-      font-weight: 600;
-    }
-
-    .table thead {
-      background: #0f172a;
-      color: #fff;
-    }
-
-    .btn-primary {
-      background: #2563eb;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background: #1e40af;
-    }
-  </style>
-</head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark">
+    <meta charset="UTF-8">
+    <title>Jadwal Ruangan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
       <a class="navbar-brand" href="<?= base_url('/') ?>">SmartRoom</a>
       <div class="collapse navbar-collapse">
@@ -51,59 +16,84 @@
       </div>
     </div>
   </nav>
-
-  <div class="container py-5">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+        }
+        .filter-btn.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <?= view('layouts/sidebar') ?>
+    <div class="main-content">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">📅 Jadwal Ruangan</h4>
+                <div class="btn-group">
+                    <a href="?filter=all" class="btn btn-outline-light filter-btn <?= (isset($filter) && $filter == 'all') ? 'active' : '' ?>">Gabungan</a>
+                    <a href="?filter=reguler" class="btn btn-outline-light filter-btn <?= (isset($filter) && $filter == 'reguler') ? 'active' : '' ?>">Reguler</a>
+                    <a href="?filter=booking" class="btn btn-outline-light filter-btn <?= (isset($filter) && $filter == 'booking') ? 'active' : '' ?>">Booking</a>
+                </div>
+            </div>
+        <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-bold">📅 Jadwal Reguler & Booking</h3>
       <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-primary">
         <i class="bi bi-calendar3"></i> Lihat Kalender
       </a>
     </div>
+            <div class="card-body">
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+                <?php elseif (session()->getFlashdata('error')): ?>
+                    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+                <?php endif; ?>
 
-    <?php if (!empty($jadwal)): ?>
-      <div class="table-responsive shadow-sm">
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama Ruang</th>
-              <th>Kegiatan</th>
-              <th>Hari</th>
-              <th>Jam Mulai</th>
-              <th>Jam Selesai</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php $no = 1; foreach ($jadwal as $item): ?>
-              <tr>
-                <td><?= $no++ ?></td>
-                <td><?= esc($item['nama_ruang']) ?></td>
-                <td><?= esc($item['nama_kegiatan']) ?></td>
-                <td><?= esc($item['hari']) ?></td>
-                <td><?= esc($item['jam_mulai']) ?></td>
-                <td><?= esc($item['jam_selesai']) ?></td>
-                <td>
-                  <?php if ($item['status'] == 'proses'): ?>
-                    <span class="badge bg-warning text-dark">Proses</span>
-                  <?php elseif ($item['status'] == 'disetujui'): ?>
-                    <span class="badge bg-success">Disetujui</span>
-                  <?php else: ?>
-                    <span class="badge bg-secondary">Reguler</span>
-                  <?php endif; ?>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
-    <?php else: ?>
-      <div class="alert alert-info text-center">Belum ada jadwal terdaftar.</div>
-    <?php endif; ?>
-  </div>
-
-  <footer class="text-center text-muted py-3">
-    <small>© <?= date('Y') ?> SmartRoom</small>
-  </footer>
+                <table class="table table-bordered table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th>Ruangan</th>
+                            <th>Nama Kegiatan</th>
+                            <th>Hari</th>
+                            <th>Jam Mulai</th>
+                            <th>Jam Selesai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($jadwal) && !empty($jadwal)): ?>
+                            <?php foreach ($jadwal as $j): ?>
+                                <tr class="<?= (isset($j['status']) && strtolower($j['status']) == 'reguler') ? 'table-primary' : 'table-warning' ?>">
+                                    <td><?= esc($j['nama_ruang'] ?? '-') ?></td>
+                                    <td><?= esc($j['nama_kegiatan'] ?? '-') ?></td>
+                                    <td><?= esc($j['hari'] ?? '-') ?></td>
+                                    <td><?= esc($j['jam_mulai'] ?? '-') ?></td>
+                                    <td><?= esc($j['jam_selesai'] ?? '-') ?></td>
+                                    <td class="text-capitalize"><?= esc($j['status'] ?? '-') ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">Tidak ada jadwal ditemukan.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

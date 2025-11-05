@@ -7,6 +7,6 @@ class UserModel extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'id_user';
-    protected $allowedFields = ['username', 'password', 'role', 'foto']; // ✅ tambahkan foto
+    protected $allowedFields = ['username', 'password', 'telepon', 'role', 'foto']; // ✅ tambahkan foto
     protected $returnType = 'array';
 }

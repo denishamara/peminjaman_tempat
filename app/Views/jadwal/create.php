@@ -9,13 +9,10 @@
         body {
             background-color: #f8f9fa;
         }
-
-        /* 🌐 Atur posisi agar tidak nabrak sidebar */
         .main-content {
-            margin-left: 260px; /* sesuaikan dengan lebar sidebar kamu */
+            margin-left: 260px;
             padding: 30px;
         }
-
         @media (max-width: 991.98px) {
             .main-content {
                 margin-left: 0;
@@ -33,7 +30,6 @@
                 <h4 class="mb-0">Tambah Jadwal Reguler</h4>
             </div>
             <div class="card-body">
-                <!-- Alert Error -->
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         ⚠️ <?= session()->getFlashdata('error') ?>
@@ -41,7 +37,6 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Alert Success -->
                 <?php if (session()->getFlashdata('success')): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         ✅ <?= session()->getFlashdata('success') ?>
@@ -51,8 +46,6 @@
 
                 <form method="post" action="<?= base_url('/jadwal/store') ?>">
                     <?= csrf_field() ?>
-
-                    <?php $now = date('Y-m-d\TH:i'); ?>
 
                     <div class="mb-3">
                         <label class="form-label">Nama Jadwal</label>
@@ -79,30 +72,41 @@
                         </select>
                     </div>
 
+                    <!-- 📅 Pilih tanggal -->
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Mulai</label>
-                        <input 
-                            type="datetime-local" 
-                            name="tanggal_mulai" 
-                            id="tanggal_mulai"
-                            class="form-control" 
-                            required 
-                            min="<?= $now ?>" 
-                        >
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="tanggal" id="tanggal" class="form-control" required>
                     </div>
 
+                    <!-- 🕒 Pilih beberapa sesi -->
                     <div class="mb-3">
-                        <label class="form-label">Tanggal Selesai</label>
-                        <input 
-                            type="datetime-local" 
-                            name="tanggal_selesai" 
-                            id="tanggal_selesai"
-                            class="form-control" 
-                            required
-                        >
+                        <label class="form-label">Pilih Sesi</label>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="1" id="sesi1">
+                            <label class="form-check-label" for="sesi1">Sesi 1 (07:00 - 09:00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="2" id="sesi2">
+                            <label class="form-check-label" for="sesi2">Sesi 2 (09:30 - 11:00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="3" id="sesi3">
+                            <label class="form-check-label" for="sesi3">Sesi 3 (11:15 - 12:45)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="4" id="sesi4">
+                            <label class="form-check-label" for="sesi4">Sesi 4 (13:00 - 15:00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="5" id="sesi5">
+                            <label class="form-check-label" for="sesi5">Sesi 5 (15:15 - 17:00)</label>
+                        </div>
                     </div>
 
-                    <!-- 🔁 Tambahan: Repeat Mingguan -->
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
+                    <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
+
                     <div class="mb-3">
                         <label class="form-label">Ulangi setiap minggu selama</label>
                         <div class="input-group">
@@ -112,7 +116,6 @@
                         <small class="text-muted">Isi 0 jika tidak ingin diulang otomatis.</small>
                     </div>
 
-                    <!-- otomatis jadwal reguler -->
                     <input type="hidden" name="keterangan" value="Reguler">
 
                     <div class="d-flex justify-content-between">
@@ -125,15 +128,37 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    const tanggalInput = document.getElementById('tanggal');
     const mulaiInput = document.getElementById('tanggal_mulai');
     const selesaiInput = document.getElementById('tanggal_selesai');
+    const sesiCheckboxes = document.querySelectorAll('.sesi-check');
 
-    mulaiInput.addEventListener('change', () => {
-        selesaiInput.min = mulaiInput.value;
-        if (selesaiInput.value && selesaiInput.value < mulaiInput.value) {
-            selesaiInput.value = '';
-        }
-    });
+    const sesiWaktu = {
+        1: { start: "07:00", end: "09:00" },
+        2: { start: "09:30", end: "11:00" },
+        3: { start: "11:15", end: "12:45" },
+        4: { start: "13:00", end: "15:00" },
+        5: { start: "15:15", end: "17:00" }
+    };
+
+    sesiCheckboxes.forEach(cb => cb.addEventListener('change', updateDateTime));
+    tanggalInput.addEventListener('change', updateDateTime);
+
+    function updateDateTime() {
+        const tanggal = tanggalInput.value;
+        const selected = Array.from(sesiCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => parseInt(cb.value))
+            .sort((a, b) => a - b);
+
+        if (!tanggal || selected.length === 0) return;
+
+        const first = sesiWaktu[selected[0]];
+        const last = sesiWaktu[selected[selected.length - 1]];
+
+        mulaiInput.value = `${tanggal}T${first.start}`;
+        selesaiInput.value = `${tanggal}T${last.end}`;
+    }
     </script>
 </body>
 </html>

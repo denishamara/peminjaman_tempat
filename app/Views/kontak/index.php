@@ -1,39 +1,86 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title><?= esc($title ?? 'Kontak Petugas') ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title><?= esc($title) ?></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    /* Area konten utama agar tidak nabrak sidebar */
+    .main-content {
+      margin-left: 260px; /* sesuaikan dengan lebar sidebar kamu */
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    @media (max-width: 991.98px) {
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
+  <?= view('layouts/sidebar') ?>
 
-<div class="container mt-5">
-    <div class="text-center mb-4">
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="text-center mb-4">
         <h2 class="fw-bold text-danger"><?= esc($title) ?></h2>
-        <p class="text-muted">Hubungi petugas berikut jika terjadi keadaan mendesak seperti kunci hilang atau jadwal bentrok.</p>
-    </div>
+        <p class="text-muted">Hubungi petugas atau admin jika terjadi keadaan mendesak.</p>
+      </div>
 
-    <div class="row justify-content-center">
-        <?php foreach ($petugas as $p): ?>
-            <div class="col-md-5 mb-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h5 class="card-title text-primary fw-bold"><?= esc($p['nama']) ?></h5>
-                        <p class="card-text text-muted mb-1"><?= esc($p['jabatan']) ?></p>
-                        <p><strong>Shift:</strong> <?= esc($p['shift']) ?></p>
-                        <p><strong>Telepon:</strong> <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $p['telepon']) ?>" target="_blank" class="text-success text-decoration-none"><?= esc($p['telepon']) ?></a></p>
-                        <p><strong>Email:</strong> <a href="mailto:<?= esc($p['email']) ?>" class="text-decoration-none"><?= esc($p['email']) ?></a></p>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
+      <?php if(session()->getFlashdata('success')): ?>
+        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+      <?php elseif(session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+      <?php endif; ?>
 
-    <div class="text-center mt-4">
-        <a href="<?= base_url('/dashboard') ?>" class="btn btn-secondary">Kembali ke Dashboard</a>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle text-center shadow-sm bg-white">
+          <thead class="table-dark">
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Role</th>
+              <th>Nomor Telepon</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php $no = 1; foreach($petugas as $p): ?>
+            <tr>
+              <td><?= $no++ ?></td>
+              <td><?= esc($p['username']) ?></td>
+              <td><?= esc(ucfirst($p['role'])) ?></td>
+              <td>
+                <?php if(!empty($p['telepon'])): ?>
+                  <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $p['telepon']) ?>" 
+                     target="_blank" class="text-success text-decoration-none">
+                    <?= esc($p['telepon']) ?> 💬
+                  </a>
+                <?php else: ?>
+                  <span class="text-muted">Belum ada</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (session()->get('user')['role'] === 'administrator'): ?>
+                  <a href="<?= base_url('administrator/kontak/edit/' . $p['id_user']) ?>" class="btn btn-warning btn-sm">Edit</a>
+                <?php else: ?>
+                  <span class="text-muted">-</span>
+                <?php endif; ?>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
 </body>
 </html>

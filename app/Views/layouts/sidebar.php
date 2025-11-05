@@ -9,40 +9,29 @@
     </div>
 
     <nav class="sidebar-menu mt-4">
-        <a href="<?= base_url('dashboard') ?>" 
-   class="sidebar-link <?= service('uri')->getSegment(1) === 'dashboard' ? 'active' : '' ?>">🏠 Home</a>
+      <a href="<?= base_url('dashboard') ?>" class="sidebar-link">🏠 Home</a>
 
+      <?php if($user['role'] === 'administrator'): ?>
+    <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link">👥 Manajemen User</a>
+    <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
+    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
+    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
+    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
 
-        <?php if($user && $user['role'] === 'administrator'): ?>
-            <a href="<?= base_url('administrator/users/index') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(2) === 'users' ? 'active' : '' ?>">👥 Manajemen User</a>
-            <a href="<?= base_url('ruang/index') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(1) === 'ruang' ? 'active' : '' ?>">🏫 Manajemen Ruang</a>
-            <a href="<?= base_url('laporan') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(1) === 'laporan' ? 'active' : '' ?>">📄 Generate Laporan</a>
-            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
+      <?php elseif($user['role'] === 'petugas'): ?>
+    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
+    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
+    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
 
-        <?php elseif($user && $user['role'] === 'petugas'): ?>
-            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(2) === 'peminjaman_daftar' ? 'active' : '' ?>">📋 Daftar Peminjaman</a>
-            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-            <a href="<?= base_url('laporan') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(1) === 'laporan' ? 'active' : '' ?>">📄 Generate Laporan</a>
+      <?php elseif($user['role'] === 'peminjam'): ?>
+    <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
+      <?php endif; ?>
 
-        <?php elseif($user && $user['role'] === 'peminjam'): ?>
-            <a href="<?= base_url('peminjaman/ajukan') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(2) === 'ajukan' ? 'active' : '' ?>">📝 Pengajuan Peminjaman</a>
-        <?php endif; ?>
-
-        <a href="<?= base_url('jadwal/index') ?>" 
-           class="sidebar-link <?= service('uri')->getSegment(1) === 'jadwal' ? 'active' : '' ?>">📅 Jadwal Ruang</a>
-
+      <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link">📅 Jadwal Ruang</a>
+      <!-- 🔹 Tambahan menu Profile -->
         <a href="<?= base_url('profile') ?>" 
            class="sidebar-link <?= service('uri')->getSegment(1) === 'profile' ? 'active' : '' ?>">👤 Profile</a>
-
-        <a href="<?= base_url('kontak') ?>" 
-           class="sidebar-link text-danger fw-semibold <?= service('uri')->getSegment(1) === 'kontak' ? 'active' : '' ?>">📞 Kontak Petugas</a>
+      <a href="<?= base_url('kontak') ?>" class="sidebar-link text-danger fw-semibold">📞 Kontak Petugas</a>
     </nav>
 
     <?php if($user): ?>
