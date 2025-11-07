@@ -41,6 +41,7 @@
         <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
       <?php endif; ?>
 
+      <?php $user = session()->get('user'); ?>
       <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle text-center shadow-sm bg-white">
           <thead class="table-dark">
@@ -49,33 +50,34 @@
               <th>Nama</th>
               <th>Role</th>
               <th>Nomor Telepon</th>
-              <th>Aksi</th>
+              <?php if ($user && $user['role'] === 'administrator'): ?>
+                <th>Aksi</th>
+              <?php endif; ?>
             </tr>
           </thead>
           <tbody>
             <?php $no = 1; foreach($petugas as $p): ?>
-            <tr>
-              <td><?= $no++ ?></td>
-              <td><?= esc($p['username']) ?></td>
-              <td><?= esc(ucfirst($p['role'])) ?></td>
-              <td>
-                <?php if(!empty($p['telepon'])): ?>
-                  <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $p['telepon']) ?>" 
-                     target="_blank" class="text-success text-decoration-none">
-                    <?= esc($p['telepon']) ?> 💬
-                  </a>
-                <?php else: ?>
-                  <span class="text-muted">Belum ada</span>
+              <tr>
+                <td><?= $no++ ?></td>
+                <td><?= esc($p['username']) ?></td>
+                <td><?= esc(ucfirst($p['role'])) ?></td>
+                <td>
+                  <?php if(!empty($p['telepon'])): ?>
+                    <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $p['telepon']) ?>" 
+                       target="_blank" class="text-success text-decoration-none">
+                      <?= esc($p['telepon']) ?> 💬
+                    </a>
+                  <?php else: ?>
+                    <span class="text-muted">Belum ada</span>
+                  <?php endif; ?>
+                </td>
+
+                <?php if ($user && $user['role'] === 'administrator'): ?>
+                  <td>
+                    <a href="<?= base_url('administrator/kontak/edit/' . $p['id_user']) ?>" class="btn btn-warning btn-sm">Edit</a>
+                  </td>
                 <?php endif; ?>
-              </td>
-              <td>
-                <?php if (session()->get('user')['role'] === 'administrator'): ?>
-                  <a href="<?= base_url('administrator/kontak/edit/' . $p['id_user']) ?>" class="btn btn-warning btn-sm">Edit</a>
-                <?php else: ?>
-                  <span class="text-muted">-</span>
-                <?php endif; ?>
-              </td>
-            </tr>
+              </tr>
             <?php endforeach; ?>
           </tbody>
         </table>

@@ -2,51 +2,58 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
 
-<?php $user = session()->get('user'); ?>
+<?php
+// Tambahkan ini di baris paling atas file sidebar.php
+$user = isset($user) ? $user : session()->get('user');
+?>
 <aside class="sidebar">
     <div class="sidebar-header">
         <h4 class="fw-bold text-primary mb-0">🏫 Sistem Peminjaman</h4>
     </div>
 
     <nav class="sidebar-menu mt-4">
-      <a href="<?= base_url('dashboard') ?>" class="sidebar-link">🏠 Home</a>
+        <a href="<?= base_url('dashboard') ?>" class="sidebar-link">🏠 Home</a>
 
-      <?php if($user['role'] === 'administrator'): ?>
-    <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link">👥 Manajemen User</a>
-    <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
-    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
-    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
+        <?php if (isset($user) && $user['role'] === 'administrator'): ?>
+            <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link">👥 Manajemen User</a>
+            <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
+            <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
+            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
+            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
 
-      <?php elseif($user['role'] === 'petugas'): ?>
-    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
-    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
+        <?php elseif (isset($user) && $user['role'] === 'petugas'): ?>
+            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
+            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
+            <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
 
-      <?php elseif($user['role'] === 'peminjam'): ?>
-    <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
-      <?php endif; ?>
+        <?php elseif (isset($user) && $user['role'] === 'peminjam'): ?>
+            <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
+        <?php endif; ?>
 
-      <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link">📅 Jadwal Ruang</a>
-      <!-- 🔹 Tambahan menu Profile -->
-        <a href="<?= base_url('profile') ?>" 
-           class="sidebar-link <?= service('uri')->getSegment(1) === 'profile' ? 'active' : '' ?>">👤 Profile</a>
-      <a href="<?= base_url('kontak') ?>" class="sidebar-link text-danger fw-semibold">📞 Kontak Petugas</a>
+        <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link">📅 Jadwal Ruang</a>
+
+        <!-- 🔹 Tampilkan menu Profil hanya kalau SUDAH login -->
+        <?php if ($user): ?>
+            <a href="<?= base_url('profile') ?>"
+               class="sidebar-link <?= service('uri')->getSegment(1) === 'profile' ? 'active' : '' ?>">👤 Profile</a>
+        <?php endif; ?>
+
+        <a href="<?= base_url('kontak') ?>" class="sidebar-link text-danger fw-semibold">📞 Kontak Petugas</a>
     </nav>
 
-    <?php if($user): ?>
-    <div class="sidebar-footer mt-auto pt-4 text-center">
-        <!-- 🔹 Tambahkan Foto Profil di sini -->
-        <div class="profile-img-container mb-2">
-            <img src="<?= base_url('images/profile/' . ($user['foto'] ?? 'default.jpeg')) ?>" 
-                 alt="Foto Profil" 
-                 class="sidebar-profile-img"
-                 onerror="this.src='<?= base_url('images/profile/default.jpeg') ?>'">
-        </div>
+    <!-- 🔹 Footer hanya muncul kalau SUDAH login -->
+    <?php if ($user): ?>
+        <div class="sidebar-footer mt-auto pt-4 text-center">
+            <div class="profile-img-container mb-2">
+                <img src="<?= base_url('images/profile/' . ($user['foto'] ?? 'default.jpeg')) ?>"
+                     alt="Foto Profil"
+                     class="sidebar-profile-img"
+                     onerror="this.src='<?= base_url('images/profile/default.jpeg') ?>'">
+            </div>
 
-        <div class="fw-semibold text-dark small mb-1"><?= esc($user['username']) ?></div>
-        <div class="text-muted small mb-2">(<?= esc($user['role']) ?>)</div>
-        <a href="<?= base_url('auth/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">Logout</a>
-    </div>
+            <div class="fw-semibold text-dark small mb-1"><?= esc($user['username']) ?></div>
+            <div class="text-muted small mb-2">(<?= esc($user['role']) ?>)</div>
+            <a href="<?= base_url('auth/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">Logout</a>
+        </div>
     <?php endif; ?>
 </aside>

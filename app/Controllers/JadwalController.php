@@ -1,4 +1,6 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use App\Models\JadwalModel;
 use App\Models\RuangModel;
@@ -27,77 +29,91 @@ class JadwalController extends BaseController
         return null;
     }
 
-    // 📋 Daftar jadwal reguler
+    // 📋 Daftar jadwal reguler + booking
     public function index()
-{
-    $filter = $this->request->getGet('filter') ?? 'all';
-    $jadwalModel = new \App\Models\JadwalModel();
-    $peminjamanModel = new \App\Models\PeminjamanModel();
+    {
+        $filter = $this->request->getGet('filter') ?? 'all';
+        $jadwalModel = new \App\Models\JadwalModel();
+        $peminjamanModel = new \App\Models\PeminjamanModel();
 
-    // Ambil jadwal reguler
-    $jadwals = $jadwalModel
-    ->select('jadwal_reguler.*, room.nama_room')
-    ->join('room', 'room.id_room = jadwal_reguler.id_room', 'left')
-    ->where('jadwal_reguler.tanggal_selesai >=', date('Y-m-d H:i:s')) // hanya yang belum lewat
-    ->where('jadwal_reguler.nama_reguler NOT LIKE', 'Booking-%') // 🚫 skip data hasil booking
-    ->orderBy('jadwal_reguler.tanggal_mulai', 'ASC')
-    ->findAll();
+        // 🔹 Ambil jadwal reguler (HINDARI yang dibuat dari booking: nama_reguler LIKE 'Booking-%')
+        $jadwals = $jadwalModel
+            ->select('jadwal_reguler.* , room.nama_room')
+            ->join('room', 'room.id_room = jadwal_reguler.id_room', 'left')
+            ->where('jadwal_reguler.tanggal_selesai >=', date('Y-m-d H:i:s'))
+            ->where("jadwal_reguler.nama_reguler NOT LIKE 'Booking-%'") // skip entry hasil booking
+            ->orderBy('jadwal_reguler.tanggal_mulai', 'ASC')
+            ->findAll();
 
-    // Ambil data booking aktif
-    $peminjamans = $peminjamanModel
-        ->select('booking.*, room.nama_room, user.username')
-        ->join('room', 'room.id_room = booking.id_room', 'left')
-        ->join('user', 'user.id_user = booking.id_user', 'left')
-        ->whereNotIn('booking.status', ['Ditolak', 'Selesai'])
-        ->where('booking.tanggal_selesai >=', date('Y-m-d H:i:s'))
-        ->findAll();
+        // 🔹 Ambil booking aktif (HANYA yg disetujui) — include various capitalization
+        $acceptedStatuses = [
+            'Disetujui','disetujui',
+            'Diterima','diterima',
+            'Approve','approve',
+            'Approved','approved',
+            'Acc','acc'
+        ];
 
-    $gabungan = [];
+        $peminjamans = $peminjamanModel
+            ->select('booking.* , room.nama_room, user.username')
+            ->join('room', 'room.id_room = booking.id_room', 'left')
+            ->join('user', 'user.id_user = booking.id_user', 'left')
+            ->whereIn('booking.status', $acceptedStatuses)
+            ->where('booking.tanggal_selesai >=', date('Y-m-d H:i:s'))
+            ->orderBy('booking.tanggal_mulai', 'ASC')
+            ->findAll();
 
-    // 🔵 Tambahkan jadwal reguler
-    if ($filter === 'all' || $filter === 'reguler') {
-        foreach ($jadwals as $j) {
-            $gabungan[] = [
-                'nama_ruang'     => $j['nama_room'],
-                'nama_kegiatan'  => $j['nama_reguler'],
-                'hari'           => date('l', strtotime($j['tanggal_mulai'])),
-                'tanggal'        => date('Y-m-d', strtotime($j['tanggal_mulai'])),
-                'jam_mulai'      => date('H:i', strtotime($j['tanggal_mulai'])),
-                'jam_selesai'    => date('H:i', strtotime($j['tanggal_selesai'])),
-                'status'         => 'Reguler',
-                'id_booking'     => null,
-                'keterangan'     => $j['keterangan'] ?? null
-            ];
+        $gabungan = [];
+
+        // 🔵 Tambahkan jadwal reguler (sertakan id + raw tanggal)
+        if ($filter === 'all' || $filter === 'reguler') {
+            foreach ($jadwals as $j) {
+                $gabungan[] = [
+                    'id'             => $j['id_reguler'],
+                    'nama_ruang'     => $j['nama_room'] ?? '-',
+                    'nama_kegiatan'  => $j['nama_reguler'] ?? '-',
+                    'tanggal'        => date('Y-m-d', strtotime($j['tanggal_mulai'])),
+                    'tanggal_mulai'  => $j['tanggal_mulai'],
+                    'tanggal_selesai'=> $j['tanggal_selesai'],
+                    'jam_mulai'      => date('H:i', strtotime($j['tanggal_mulai'])),
+                    'jam_selesai'    => date('H:i', strtotime($j['tanggal_selesai'])),
+                    'status'         => 'Reguler',
+                    'keterangan'     => $j['keterangan'] ?? null
+                ];
+            }
         }
-    }
 
-    // 🟡 Tambahkan jadwal booking
-    if ($filter === 'all' || $filter === 'booking') {
-        foreach ($peminjamans as $p) {
-            $gabungan[] = [
-                'nama_ruang'     => $p['nama_room'],
-                'nama_kegiatan'  => $p['keterangan'] ?? 'Booking Ruangan',
-                'hari'           => date('l', strtotime($p['tanggal_mulai'])),
-                'tanggal'        => date('Y-m-d', strtotime($p['tanggal_mulai'])),
-                'jam_mulai'      => date('H:i', strtotime($p['tanggal_mulai'])),
-                'jam_selesai'    => date('H:i', strtotime($p['tanggal_selesai'])),
-                'status'         => 'Booking',
-                'id_booking'     => $p['id_booking'],
-                'keterangan'     => $p['keterangan'] ?? '-'
-            ];
+        // 🟢 Tambahkan jadwal booking (yang disetujui) — sertakan id_booking
+        if ($filter === 'all' || $filter === 'booking') {
+            foreach ($peminjamans as $p) {
+                $gabungan[] = [
+                    'id'             => $p['id_booking'],
+                    'nama_ruang'     => $p['nama_room'] ?? '-',
+                    'nama_kegiatan'  => $p['keterangan'] ?? 'Booking Ruangan',
+                    'tanggal'        => date('Y-m-d', strtotime($p['tanggal_mulai'])),
+                    'tanggal_mulai'  => $p['tanggal_mulai'],
+                    'tanggal_selesai'=> $p['tanggal_selesai'],
+                    'jam_mulai'      => date('H:i', strtotime($p['tanggal_mulai'])),
+                    'jam_selesai'    => date('H:i', strtotime($p['tanggal_selesai'])),
+                    'status'         => 'Booking',
+                    'keterangan'     => $p['keterangan'] ?? '-'
+                ];
+            }
         }
+
+        // Urutkan berdasarkan tanggal + jam mulai (pakai raw tanggal supaya konsisten)
+        usort($gabungan, function ($a, $b) {
+            $ta = strtotime(($a['tanggal'] ?? '') . ' ' . ($a['jam_mulai'] ?? '00:00'));
+            $tb = strtotime(($b['tanggal'] ?? '') . ' ' . ($b['jam_mulai'] ?? '00:00'));
+            return $ta <=> $tb;
+        });
+
+        return view('jadwal/index', [
+            'jadwal' => $gabungan,
+            'filter' => $filter,
+            'user'   => session()->get('user'),
+        ]);
     }
-
-    // Urutkan berdasarkan tanggal
-    usort($gabungan, function ($a, $b) {
-        return strtotime($a['tanggal'] . ' ' . $a['jam_mulai']) <=> strtotime($b['tanggal'] . ' ' . $b['jam_mulai']);
-    });
-
-    return view('jadwal/index', [
-        'jadwal' => $gabungan,
-        'filter' => $filter
-    ]);
-}
 
     // ➕ Form tambah jadwal
     public function create()
@@ -172,42 +188,67 @@ class JadwalController extends BaseController
 
     // 🔁 Update jadwal
     public function update($id)
-    {
-        if ($res = $this->onlyNonPeminjam()) return $res;
+{
+    if ($res = $this->onlyNonPeminjam()) return $res;
 
-        $data = [
-            'nama_reguler'    => $this->request->getPost('nama_reguler'),
-            'id_room'         => $this->request->getPost('id_room'),
-            'id_user'         => $this->request->getPost('id_user'),
-            'tanggal_mulai'   => $this->request->getPost('tanggal_mulai'),
-            'tanggal_selesai' => $this->request->getPost('tanggal_selesai'),
-            'keterangan'      => $this->request->getPost('keterangan'),
-        ];
+    $tipe = $this->request->getPost('tipe') ?? 'reguler';
+    $namaKegiatan = $this->request->getPost('nama_kegiatan');
 
-        // Cek bentrok dengan jadwal lain
-        if ($this->jadwalModel->isTimeConflict($data, $id)) {
-            return redirect()->back()->withInput()->with('error', 'Jadwal bentrok dengan jadwal reguler lain.');
-        }
+    // data umum tanggal/jam/ruang/user
+    $dataCommon = [
+        'id_room'         => $this->request->getPost('id_room'),
+        'id_user'         => $this->request->getPost('id_user'),
+        'tanggal_mulai'   => $this->request->getPost('tanggal_mulai'),
+        'tanggal_selesai' => $this->request->getPost('tanggal_selesai'),
+    ];
 
+    if ($tipe === 'reguler') {
+        // update jadwal_reguler
+        $data = $dataCommon;
+        $data['nama_reguler'] = $namaKegiatan;
+        $data['keterangan'] = $this->request->getPost('keterangan');
         $this->jadwalModel->update($id, $data);
-        return redirect()->to('/jadwal/index')->with('success', 'Jadwal reguler berhasil diperbarui.');
+    } else {
+        // update booking (peminjaman)
+        $peminjamanModel = new \App\Models\PeminjamanModel();
+        $data = $dataCommon;
+        // booking menyimpan nama kegiatan di kolom 'keterangan'
+        $data['keterangan'] = $namaKegiatan;
+        // jangan lupa update juga status jika ada field status di form (opsional)
+        if ($this->request->getPost('status') !== null) {
+            $data['status'] = $this->request->getPost('status');
+        }
+        $peminjamanModel->update($id, $data);
     }
+
+    return redirect()->to('/jadwal/index')->with('success', 'Jadwal berhasil diperbarui.');
+}
 
     public function edit($id)
-    {
-        $res = $this->onlyNonPeminjam();
-        if ($res) return $res;
+{
+    // cari di jadwal reguler dulu
+    $jadwal = $this->jadwalModel->find($id);
+    $tipe = 'reguler';
 
-        $data['jadwal'] = $this->jadwalModel->find($id);
-        if (!$data['jadwal']) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Data tidak ditemukan");
-        }
-
-        $data['ruangs'] = $this->ruangModel->findAll();
-        $data['users']  = $this->userModel->findAll();
-
-        return view('jadwal/edit', $data);
+    // kalau gak ketemu, coba di booking (peminjaman)
+    if (!$jadwal) {
+        $peminjamanModel = new \App\Models\PeminjamanModel();
+        $jadwal = $peminjamanModel->find($id);
+        $tipe = 'booking';
     }
+
+    if (!$jadwal) {
+        return redirect()->to('/jadwal/index')->with('error', 'Data tidak ditemukan.');
+    }
+
+    return view('jadwal/edit', [
+        'title'  => 'Edit Jadwal',
+        'jadwal' => $jadwal,
+        'tipe'   => $tipe,
+        'ruangs' => $this->ruangModel->findAll(),
+        'users'  => $this->userModel->findAll(),
+    ]);
+}
 
     // 🗑️ Hapus satu jadwal
     public function delete($id)
@@ -218,16 +259,6 @@ class JadwalController extends BaseController
         return redirect()->to('/jadwal/index')->with('success', 'Jadwal berhasil dihapus.');
     }
 
-    // 🗑️ Hapus semua jadwal dalam satu grup (jadwal berulang)
-    public function deleteGroup($group_id)
-    {
-        if ($res = $this->onlyNonPeminjam()) return $res;
-
-        $this->jadwalModel->where('group_id', $group_id)->delete();
-        return redirect()->to('/jadwal/index')->with('success', 'Semua jadwal dalam grup ini berhasil dihapus.');
-    }
-
-    // 📅 Halaman Kalender
     public function kalender($id_room = null)
     {
         $ruangs = $this->ruangModel->findAll();
@@ -317,8 +348,7 @@ $peminjamans = $peminjamans->findAll();
 
     return $this->response->setJSON($events);
 }
-
-    // 🌐 Jadwal publik
+    // ... kalender & getKalenderData tetap seperti sebelumnya (jika ada)
     public function publicIndex()
 {
     $filter = $this->request->getGet('filter') ?? 'all';
@@ -327,53 +357,85 @@ $peminjamans = $peminjamans->findAll();
 
     $now = date('Y-m-d H:i:s');
 
-    // Ambil semua jadwal reguler yang belum lewat
+    // Ambil jadwal reguler
     $jadwals = $jadwalModel
-        ->select('jadwal_reguler.*, room.nama_room')
+        ->select('jadwal_reguler.id_reguler, jadwal_reguler.id_room, jadwal_reguler.nama_reguler, jadwal_reguler.tanggal_mulai, jadwal_reguler.tanggal_selesai, room.nama_room')
         ->join('room', 'room.id_room = jadwal_reguler.id_room', 'left')
         ->where('jadwal_reguler.tanggal_selesai >=', $now)
         ->findAll();
 
-    // Ambil semua booking aktif
+    // Ambil peminjaman aktif
     $peminjamans = $peminjamanModel
-        ->select('booking.*, room.nama_room')
+        ->select('booking.id_booking, booking.id_room, booking.keterangan, booking.tanggal_mulai, booking.tanggal_selesai, booking.status, room.nama_room')
         ->join('room', 'room.id_room = booking.id_room', 'left')
         ->whereNotIn('booking.status', ['Ditolak', 'Selesai'])
         ->where('booking.tanggal_selesai >=', $now)
         ->findAll();
 
     $gabungan = [];
+    $terbooking = [];
 
-    // Jadwal reguler
+    // Tandai ruangan yang sudah dibooking (tiap hari dalam rentang booking)
+    foreach ($peminjamans as $b) {
+        $mulai = new \DateTime($b['tanggal_mulai']);
+        $selesai = new \DateTime($b['tanggal_selesai']);
+        for ($d = clone $mulai; $d <= $selesai; $d->modify('+1 day')) {
+            $tglKey = $b['id_room'] . '_' . $d->format('Y-m-d');
+            $terbooking[$tglKey] = true;
+        }
+    }
+
+    // Tambah jadwal reguler
     if ($filter == 'all' || $filter == 'reguler') {
         foreach ($jadwals as $j) {
-            $gabungan[] = [
-                'nama_ruang'   => $j['nama_room'],
-                'nama_kegiatan'=> $j['nama_reguler'],
-                'hari'         => date('l', strtotime($j['tanggal_mulai'])),
-                'jam_mulai'    => date('H:i', strtotime($j['tanggal_mulai'])),
-                'jam_selesai'  => date('H:i', strtotime($j['tanggal_selesai'])),
-                'status'       => 'Reguler'
-            ];
+            $tgl = date('Y-m-d', strtotime($j['tanggal_mulai']));
+            $key = $j['id_room'] . '_' . $tgl;
+
+            if (!isset($terbooking[$key])) {
+                $gabungan[] = [
+                    'nama_ruang'    => $j['nama_room'] ?? '-',
+                    'nama_kegiatan' => $j['nama_reguler'] ?? '-',
+                    'tanggal'       => date('d-m-Y', strtotime($j['tanggal_mulai'])),
+                    'jam_mulai'     => date('H:i', strtotime($j['tanggal_mulai'])),
+                    'jam_selesai'   => date('H:i', strtotime($j['tanggal_selesai'])),
+                    'status'        => 'Reguler'
+                ];
+            }
         }
     }
 
-    // Booking
+    // Tambah booking aktif (rentang tanggal kalau lebih dari 1 hari)
     if ($filter == 'all' || $filter == 'booking') {
         foreach ($peminjamans as $p) {
+            $mulai = date('d-m-Y', strtotime($p['tanggal_mulai']));
+            $selesai = date('d-m-Y', strtotime($p['tanggal_selesai']));
+            $rentangTanggal = ($mulai === $selesai) ? $mulai : "$mulai s/d $selesai";
+
             $gabungan[] = [
-                'nama_ruang'   => $p['nama_room'],
-                'nama_kegiatan'=> $p['keterangan'],
-                'hari'         => date('l', strtotime($p['tanggal_mulai'])),
-                'jam_mulai'    => date('H:i', strtotime($p['tanggal_mulai'])),
-                'jam_selesai'  => date('H:i', strtotime($p['tanggal_selesai'])),
-                'status'       => ucfirst(strtolower($p['status']))
+                'nama_ruang'    => $p['nama_room'] ?? '-',
+                'nama_kegiatan' => $p['keterangan'] ?? '-',
+                'tanggal'       => $rentangTanggal,
+                'jam_mulai'     => date('H:i', strtotime($p['tanggal_mulai'])),
+                'jam_selesai'   => date('H:i', strtotime($p['tanggal_selesai'])),
+                'status'        => ucfirst(strtolower($p['status'] ?? 'Booking'))
             ];
         }
     }
 
-    // Urutkan berdasarkan tanggal mulai
-    usort($gabungan, fn($a, $b) => strcmp($a['jam_mulai'], $b['jam_mulai']));
+    // Jika kosong
+    if (empty($gabungan)) {
+        $gabungan[] = [
+            'nama_ruang'    => '-',
+            'nama_kegiatan' => 'Tidak ada jadwal aktif',
+            'tanggal'       => date('d-m-Y'),
+            'jam_mulai'     => '-',
+            'jam_selesai'   => '-',
+            'status'        => '-'
+        ];
+    }
+
+    // Urutkan berdasarkan tanggal dan jam
+    usort($gabungan, fn($a, $b) => strcmp($a['tanggal'], $b['tanggal']) ?: strcmp($a['jam_mulai'], $b['jam_mulai']));
 
     return view('jadwal/public_index', [
         'jadwal' => $gabungan,

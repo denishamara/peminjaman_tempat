@@ -18,42 +18,44 @@ class JadwalModel extends Model
     ];
 
     /**
-     * Cek apakah jadwal bentrok dengan yang sudah ada
+     * ✅ Cek apakah jadwal bentrok dengan yang sudah ada (jadwal aktif)
      *
      * @param array $data ['id_room', 'tanggal_mulai', 'tanggal_selesai']
-     * @param int|null $ignoreId (dipakai saat edit jadwal agar tidak bentrok dengan dirinya sendiri)
+     * @param int|null $ignoreId (untuk edit supaya tidak bentrok dengan dirinya sendiri)
      * @return bool True jika bentrok, false jika tidak
      */
     public function isTimeConflict(array $data, $ignoreId = null): bool
     {
         $builder = $this->where('id_room', $data['id_room'])
+            // Hanya cek jadwal yang belum lewat
+            ->where('tanggal_selesai >=', date('Y-m-d H:i:s'))
             ->groupStart()
-                ->where('tanggal_selesai >', $data['tanggal_mulai'])
                 ->where('tanggal_mulai <', $data['tanggal_selesai'])
+                ->where('tanggal_selesai >', $data['tanggal_mulai'])
             ->groupEnd();
 
-        if ($ignoreId) {
+        if (!is_null($ignoreId)) {
             $builder->where($this->primaryKey . ' !=', $ignoreId);
         }
 
-        return $builder->first() ? true : false;
+        return (bool) $builder->first();
     }
 
     /**
-     * Ambil daftar jadwal reguler yang bentrok dengan waktu tertentu
+     * ✅ Ambil semua jadwal reguler aktif yang bentrok dengan waktu tertentu
      *
      * @param array $data ['id_room', 'tanggal_mulai', 'tanggal_selesai']
      * @return array daftar jadwal yang bentrok
      */
-    public function getTimeConflicts($data)
+    public function getTimeConflicts(array $data): array
     {
-        $idRoom = $data['id_room'];
-        $tanggalMulai = $data['tanggal_mulai'];
-        $tanggalSelesai = $data['tanggal_selesai'];
-
-        // Ambil semua jadwal reguler yang bentrok
-        return $this->where('id_room', $idRoom)
-            ->where("NOT (tanggal_selesai <= '$tanggalMulai' OR tanggal_mulai >= '$tanggalSelesai')")
+        return $this->where('id_room', $data['id_room'])
+            // Hanya ambil jadwal yang masih aktif
+            ->where('tanggal_selesai >=', date('Y-m-d H:i:s'))
+            ->groupStart()
+                ->where('tanggal_mulai <', $data['tanggal_selesai'])
+                ->where('tanggal_selesai >', $data['tanggal_mulai'])
+            ->groupEnd()
             ->findAll();
     }
 }

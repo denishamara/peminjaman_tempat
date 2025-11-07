@@ -18,21 +18,39 @@ class LaporanController extends BaseController
         $session = session();
         $user = $session->get('user');
 
-        // Ambil filter tanggal dari GET (jika ada)
-        $tanggalMulai = $this->request->getGet('tanggal_mulai') ?? '';
+        // Ambil filter dari GET
+        $tanggalMulai   = $this->request->getGet('tanggal_mulai') ?? '';
         $tanggalSelesai = $this->request->getGet('tanggal_selesai') ?? '';
+        $hari            = $this->request->getGet('hari') ?? '';
+        $bulan           = $this->request->getGet('bulan') ?? '';
+        $tahun           = $this->request->getGet('tahun') ?? '';
 
-        // Ambil semua data dulu
+        // Query dasar
         $query = $this->bookingModel
             ->select('booking.*, user.username, room.nama_room')
             ->join('user', 'user.id_user = booking.id_user')
             ->join('room', 'room.id_room = booking.id_room')
             ->orderBy('booking.id_booking', 'DESC');
 
-        // Kalau ada filter tanggal, baru disaring
+        // Filter tanggal
         if (!empty($tanggalMulai) && !empty($tanggalSelesai)) {
             $query->where('tanggal_mulai >=', $tanggalMulai)
                   ->where('tanggal_selesai <=', $tanggalSelesai);
+        }
+
+        // Filter hari (Senin–Minggu)
+        if (!empty($hari)) {
+            $query->where('DAYNAME(tanggal_mulai)', $this->convertToEnglishDay($hari));
+        }
+
+        // Filter bulan
+        if (!empty($bulan)) {
+            $query->where('MONTH(tanggal_mulai)', $bulan);
+        }
+
+        // Filter tahun
+        if (!empty($tahun)) {
+            $query->where('YEAR(tanggal_mulai)', $tahun);
         }
 
         $bookings = $query->findAll();
@@ -41,6 +59,9 @@ class LaporanController extends BaseController
             'user' => $user,
             'tanggalMulai' => $tanggalMulai,
             'tanggalSelesai' => $tanggalSelesai,
+            'hari' => $hari,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
             'bookings' => $bookings
         ]);
     }
@@ -50,15 +71,34 @@ class LaporanController extends BaseController
     {
         $tanggalMulai   = $this->request->getPost('tanggal_mulai');
         $tanggalSelesai = $this->request->getPost('tanggal_selesai');
+        $hari            = $this->request->getPost('hari');
+        $bulan           = $this->request->getPost('bulan');
+        $tahun           = $this->request->getPost('tahun');
 
         $query = $this->bookingModel
             ->select('booking.*, user.username, room.nama_room')
             ->join('user', 'user.id_user = booking.id_user')
             ->join('room', 'room.id_room = booking.id_room');
 
+        // Filter tanggal
         if (!empty($tanggalMulai) && !empty($tanggalSelesai)) {
             $query->where('tanggal_mulai >=', $tanggalMulai)
                   ->where('tanggal_selesai <=', $tanggalSelesai);
+        }
+
+        // Filter hari
+        if (!empty($hari)) {
+            $query->where('DAYNAME(tanggal_mulai)', $this->convertToEnglishDay($hari));
+        }
+
+        // Filter bulan
+        if (!empty($bulan)) {
+            $query->where('MONTH(tanggal_mulai)', $bulan);
+        }
+
+        // Filter tahun
+        if (!empty($tahun)) {
+            $query->where('YEAR(tanggal_mulai)', $tahun);
         }
 
         $bookings = $query->orderBy('booking.id_booking', 'DESC')->findAll();
@@ -70,6 +110,9 @@ class LaporanController extends BaseController
             'bookings' => $bookings,
             'tanggalMulai' => $tanggalMulai,
             'tanggalSelesai' => $tanggalSelesai,
+            'hari' => $hari,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
             'user' => $user
         ]);
 
@@ -78,5 +121,20 @@ class LaporanController extends BaseController
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
         $dompdf->stream("laporan_peminjaman.pdf", ["Attachment" => true]);
+    }
+
+    // 🔤 Konversi hari Indonesia → Inggris (untuk query MySQL DAYNAME)
+    private function convertToEnglishDay($day)
+    {
+        $map = [
+            'Senin'  => 'Monday',
+            'Selasa' => 'Tuesday',
+            'Rabu'   => 'Wednesday',
+            'Kamis'  => 'Thursday',
+            'Jumat'  => 'Friday',
+            'Sabtu'  => 'Saturday',
+            'Minggu' => 'Sunday',
+        ];
+        return $map[$day] ?? $day;
     }
 }
