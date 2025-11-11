@@ -20,12 +20,9 @@
     <?php endif; ?>
 
     <?php
-        // Deteksi tipe data
         $isReguler = isset($jadwal['id_reguler']);
         $id = $isReguler ? $jadwal['id_reguler'] : $jadwal['id_booking'];
         $tipe = $isReguler ? 'reguler' : 'booking';
-
-        // Nama kegiatan diambil dari kolom berbeda
         $namaKegiatan = $isReguler
             ? ($jadwal['nama_reguler'] ?? '')
             : ($jadwal['keterangan'] ?? '');
@@ -70,12 +67,9 @@
         <textarea name="keterangan"><?= esc($jadwal['keterangan'] ?? '') ?></textarea>
 
         <?php if (!$isReguler): ?>
-            <label>Status Booking</label>
-            <select name="status" required>
-                <option value="Proses" <?= ($jadwal['status'] ?? '') == 'Proses' ? 'selected' : '' ?>>Proses</option>
-                <option value="Diterima" <?= ($jadwal['status'] ?? '') == 'Diterima' ? 'selected' : '' ?>>Diterima</option>
-                <option value="Ditolak" <?= ($jadwal['status'] ?? '') == 'Ditolak' ? 'selected' : '' ?>>Ditolak</option>
-            </select>
+            <!-- Jadwal hasil booking -->
+            <input type="hidden" name="status" value="Diterima">
+            <p><strong>Status:</strong> <span class="badge bg-success">Diterima (Otomatis dari peminjaman)</span></p>
         <?php endif; ?>
 
         <div style="margin-top: 15px; display: flex; justify-content: space-between;">

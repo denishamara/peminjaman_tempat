@@ -80,7 +80,6 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-              <a href="<?= base_url('ruang/index') ?>" class="btn btn-secondary">⬅️ Kembali</a>
               <button type="submit" class="btn btn-success">💾 Simpan Ruang</button>
             </div>
           </form>

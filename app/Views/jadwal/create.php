@@ -83,23 +83,43 @@
                         <label class="form-label">Pilih Sesi</label>
                         <div class="form-check">
                             <input class="form-check-input sesi-check" type="checkbox" value="1" id="sesi1">
-                            <label class="form-check-label" for="sesi1">Sesi 1 (07:00 - 09:00)</label>
+                            <label class="form-check-label" for="sesi1">Sesi 1 (07:15 - 08:00)</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input sesi-check" type="checkbox" value="2" id="sesi2">
-                            <label class="form-check-label" for="sesi2">Sesi 2 (09:30 - 11:00)</label>
+                            <label class="form-check-label" for="sesi2">Sesi 2 (08:05 - 08:50)</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input sesi-check" type="checkbox" value="3" id="sesi3">
-                            <label class="form-check-label" for="sesi3">Sesi 3 (11:15 - 12:45)</label>
+                            <label class="form-check-label" for="sesi3">Sesi 3 (08:55 - 09:40)</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input sesi-check" type="checkbox" value="4" id="sesi4">
-                            <label class="form-check-label" for="sesi4">Sesi 4 (13:00 - 15:00)</label>
+                            <label class="form-check-label" for="sesi4">Sesi 4 (09:45 - 10:30)</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input sesi-check" type="checkbox" value="5" id="sesi5">
-                            <label class="form-check-label" for="sesi5">Sesi 5 (15:15 - 17:00)</label>
+                            <label class="form-check-label" for="sesi5">Sesi 5 (10:35 - 11:20)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="6" id="sesi5">
+                            <label class="form-check-label" for="sesi6">Sesi 6 (11:25 - 12:10)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="7" id="sesi5">
+                            <label class="form-check-label" for="sesi7">Sesi 7 (12:15 - 13:00)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="8" id="sesi5">
+                            <label class="form-check-label" for="sesi8">Sesi 8 (13:05 - 13:50)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="9" id="sesi5">
+                            <label class="form-check-label" for="sesi9">Sesi 9 (13:55 - 14:40)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input sesi-check" type="checkbox" value="10" id="sesi5">
+                            <label class="form-check-label" for="sesi10">Sesi 10 (14:45 - 15:30)</label>
                         </div>
                     </div>
 
@@ -134,11 +154,15 @@
     const sesiCheckboxes = document.querySelectorAll('.sesi-check');
 
     const sesiWaktu = {
-        1: { start: "07:00", end: "09:00" },
-        2: { start: "09:30", end: "11:00" },
-        3: { start: "11:15", end: "12:45" },
-        4: { start: "13:00", end: "15:00" },
-        5: { start: "15:15", end: "17:00" }
+        1: { start: "07:15", end: "08:00" },
+        2: { start: "08:05", end: "08:50" },
+        3: { start: "08:55", end: "09:40" },
+        4: { start: "10:35", end: "11:20" },
+        6: { start: "11:25", end: "12:10" },
+        7: { start: "12:15", end: "13:00" },
+        8: { start: "13:05", end: "13:50" },
+        9: { start: "13:55", end: "14:40" },
+        10: { start: "14:45", end: "15:30" }
     };
 
     sesiCheckboxes.forEach(cb => cb.addEventListener('change', updateDateTime));

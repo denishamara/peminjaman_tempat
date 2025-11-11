@@ -24,13 +24,11 @@ class Dashboard extends BaseController
 
     public function index()
     {
-        // 🔒 Cek session user
         $user = session()->get('user');
         if (!$user) {
             return redirect()->to('/auth/login');
         }
 
-        // 🔁 Update otomatis semua status booking yang sudah lewat
         $this->bookingModel->updateFinishedBookings();
 
         $data = ['user' => $user];
@@ -38,27 +36,56 @@ class Dashboard extends BaseController
 
         switch ($role) {
             case 'administrator':
-                // === Statistik dasar ===
+                // Statistik dasar
                 $data['totalUsers']      = $this->userModel->countAllResults(false);
                 $data['totalRuang']      = $this->ruangModel->countAllResults(false);
                 $data['totalPeminjaman'] = $this->bookingModel->countAllResults(false);
 
-                // === Peminjaman terbaru ===
+                // Peminjaman terbaru
                 $data['recentPeminjaman'] = $this->bookingModel
                     ->select('booking.*, user.username, room.nama_room')
                     ->join('user', 'user.id_user = booking.id_user')
                     ->join('room', 'room.id_room = booking.id_room')
                     ->orderBy('booking.tanggal_mulai', 'DESC')
                     ->findAll(5);
+
+                // 📊 Statistik per bulan (6 bulan terakhir)
+                $bulanData = [];
+                $jumlahData = [];
+                $result = $this->bookingModel
+                    ->select("DATE_FORMAT(tanggal_mulai, '%b %Y') AS bulan, COUNT(*) AS jumlah")
+                    ->where('tanggal_mulai >=', date('Y-m-01', strtotime('-5 months')))
+                    ->groupBy("DATE_FORMAT(tanggal_mulai, '%Y-%m')")
+                    ->orderBy("MIN(tanggal_mulai)", 'ASC')
+                    ->findAll();
+                foreach ($result as $r) {
+                    $bulanData[] = $r['bulan'];
+                    $jumlahData[] = $r['jumlah'];
+                }
+
+                // 📊 Statistik status peminjaman
+                $statusLabels = [];
+                $statusCounts = [];
+                $statusData = $this->bookingModel
+                    ->select("status, COUNT(*) AS total")
+                    ->groupBy('status')
+                    ->findAll();
+                foreach ($statusData as $s) {
+                    $statusLabels[] = ucfirst($s['status']);
+                    $statusCounts[] = $s['total'];
+                }
+
+                $data['bulanData']     = json_encode($bulanData);
+                $data['jumlahData']    = json_encode($jumlahData);
+                $data['statusLabels']  = json_encode($statusLabels);
+                $data['statusCounts']  = json_encode($statusCounts);
                 break;
 
             case 'petugas':
-                // === Hitung peminjaman berstatus "proses" ===
                 $data['totalPeminjamanPending'] = $this->bookingModel
                     ->where('status', 'proses')
                     ->countAllResults(false);
 
-                // === Ambil jadwal lengkap ===
                 $data['jadwalRuang'] = $this->bookingModel
                     ->select('booking.*, user.username, room.nama_room')
                     ->join('user', 'user.id_user = booking.id_user')
@@ -68,7 +95,6 @@ class Dashboard extends BaseController
                 break;
 
             case 'peminjam':
-                // === Ambil semua peminjaman milik user ini ===
                 $data['myPeminjaman'] = $this->bookingModel
                     ->select('booking.*, room.nama_room')
                     ->join('room', 'room.id_room = booking.id_room')
@@ -76,7 +102,6 @@ class Dashboard extends BaseController
                     ->orderBy('booking.tanggal_mulai', 'DESC')
                     ->findAll();
 
-                // === Jadwal umum (semua booking) ===
                 $data['jadwalRuang'] = $this->bookingModel
                     ->select('booking.*, room.nama_room')
                     ->join('room', 'room.id_room = booking.id_room')

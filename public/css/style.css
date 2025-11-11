@@ -10,31 +10,217 @@ body { font-family: "Poppins", sans-serif; color: #1e293b; min-height: 100vh; ba
 /* ===================================================== */
 /* ==== FIX LOGIN & REGISTER POSISI DAN BACKGROUND ====== */
 /* ===================================================== */
-
-/* ===== BODY LOGIN ===== */
-body.login-body {
+/* ===== BODY LOGIN & REGISTER ===== */
+body.login-body,
+body.register-body {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   background: radial-gradient(circle at top left, #0a58ca, #0f172a);
   font-family: "Poppins", sans-serif;
   overflow-x: hidden;
+  box-sizing: border-box;
+  padding-top: 3rem; /* ruang untuk navbar */
 }
 
+/* ===== NAVBAR ===== */
+.login-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.login-navbar .brand {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.login-navbar .btn-landing {
+  background: #2563eb;
+  color: #fff;
+  padding: 0.45rem 1rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.login-navbar .btn-landing:hover {
+  background: #1d4ed8;
+}
+
+/* ===== CARD LOGIN & REGISTER ===== */
+body.login-body .container,
+body.register-body .register-container {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  margin-top: -2rem; /* 🟢 Naik sedikit dari -4 ke -2 (biar pas di tengah desktop) */
+}
+
+/* ===== TITLE ===== */
+body.login-body h2,
+body.register-body h2 {
+  color: #0066ff;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
+}
+
+/* ===== FORM ===== */
+body.login-body form,
+body.register-body form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+body.login-body label,
+body.register-body label {
+  display: block;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+body.login-body input,
+body.register-body input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+  transition: border 0.3s ease;
+}
+body.login-body input:focus,
+body.register-body input:focus {
+  border-color: #2563eb;
+}
+
+/* ===== BUTTON ===== */
+body.login-body button,
+body.register-body button {
+  background: linear-gradient(90deg, #0066ff, #6610f2);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  padding: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+body.login-body button:hover,
+body.register-body button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(102,16,242,0.5);
+}
+
+/* ===== LINK LOGIN / REGISTER ===== */
+body.login-body .login-link,
+body.register-body .login-link {
+  text-align: center;
+  margin-top: 1.2rem;
+}
+body.login-body .login-link a,
+body.register-body .login-link a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+body.login-body .login-link a:hover,
+body.register-body .login-link a:hover {
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE HP ===== */
+@media (max-width: 480px) {
+  body.login-body,
+  body.register-body {
+    justify-content: flex-start;
+    padding-top: 11rem; /* 🔵 dari 8.5rem → 11rem biar lebih turun di HP */
+  }
+
+  body.login-body .container,
+  body.register-body .register-container {
+    padding: 1.8rem;
+    margin-top: 5rem; /* 🔵 dari 3.5rem → 5rem biar turun pas tengah layar HP */
+    max-width: 90%;
+  }
+
+  .login-navbar {
+    padding: 0.6rem 1rem;
+  }
+
+  .login-navbar .brand {
+    font-size: 1rem;
+  }
+
+  .login-navbar .btn-landing {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  body.login-body .login-link,
+  body.register-body .login-link {
+    text-align: center;
+  }
+}
+
+/* ===== ALERT (NOTIFIKASI) ===== */
+.alert {
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.alert-danger {
+  background: #ffe5e5;
+  border: 1px solid #ff8a8a;
+  color: #b30000;
+}
+.alert-success {
+  background: #e6ffe6;
+  border: 1px solid #85e085;
+  color: #1f7a1f;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== BODY LOGIN & REGISTER ===== */
+body.login-body,
 body.register-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* supaya bisa diatur jarak dari navbar */
+  justify-content: flex-start;
   min-height: 100vh;
   background: radial-gradient(circle at top left, #0a58ca, #0f172a);
   font-family: "Poppins", sans-serif;
   overflow-x: hidden;
 }
 
-/* ===== NAVBAR (atas login) ===== */
+/* ===== NAVBAR ===== */
 .login-navbar {
   position: fixed;
   top: 0;
@@ -72,7 +258,7 @@ body.register-body {
 
 /* ===== CARD LOGIN ===== */
 body.login-body .container {
-  margin-top: 6rem; /* biar gak ketutupan navbar */
+  margin-top: 6rem;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 20px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2);
@@ -82,8 +268,9 @@ body.login-body .container {
   text-align: center;
 }
 
+/* ===== CARD REGISTER ===== */
 body.register-body .register-container {
-  margin-top: 10rem; /* geser sedikit ke bawah dari navbar */
+  margin-top: 7rem;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 20px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2);
@@ -109,14 +296,18 @@ body.register-body form {
   gap: 1.2rem;
 }
 
+/* Pastikan label di atas input */
 body.login-body label,
 body.register-body label {
+  display: block;
   text-align: left;
   font-weight: 600;
   color: #334155;
   font-size: 0.9rem;
+  margin-bottom: 0.4rem; /* jarak label ke input */
 }
 
+/* ===== INPUT ===== */
 body.login-body input,
 body.register-body input {
   padding: 0.8rem 1rem;
@@ -124,9 +315,9 @@ body.register-body input {
   border-radius: 10px;
   font-size: 1rem;
   outline: none;
+  width: 100%;
   transition: border 0.3s ease;
 }
-
 body.login-body input:focus,
 body.register-body input:focus {
   border-color: #2563eb;
@@ -150,27 +341,32 @@ body.register-body button:hover {
   box-shadow: 0 0 15px rgba(102,16,242,0.5);
 }
 
-/* ===== LINK REGISTER / LOGIN ===== */
-body.login-body .btn-secondary,
+/* ===== LINK LOGIN / REGISTER ===== */
+body.login-body .login-link,
+body.register-body .login-link {
+  text-align: center;
+  margin-top: 1.2rem;
+}
+body.login-body .login-link a,
 body.register-body .login-link a {
-  display: inline-block;
-  margin-top: 1rem;
   color: #2563eb;
   text-decoration: none;
   font-weight: 600;
 }
-body.login-body .btn-secondary:hover,
+body.login-body .login-link a:hover,
 body.register-body .login-link a:hover {
   text-decoration: underline;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
-  body.login-body .container {
+  body.login-body .container,
+  body.register-body .register-container {
     padding: 1.8rem;
-    margin-top: 5rem;
+    margin-top: 1.5rem;
     max-width: 90%;
   }
+
   .login-navbar {
     padding: 0.6rem 1rem;
   }
@@ -183,24 +379,22 @@ body.register-body .login-link a:hover {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
   }
+
+  /* Biar teks tetap tengah di HP */
+  body.login-body .login-link,
+  body.register-body .login-link {
+    text-align: center;
+    margin-top: 1rem;
+  }
 }
 
-/* supaya form tetap tengah secara vertikal di layar besar */
+/* ===== VERTICAL ALIGN UNTUK LAYAR TINGGI ===== */
 @media (min-height: 900px) {
   body.register-body {
     justify-content: center;
   }
   body.register-body .register-container {
-    margin-top: 6rem;
-  }
-}
-
-/* responsive biar tetap rapi di HP */
-@media (max-width: 480px) {
-  body.register-body .register-container {
-    padding: 1.8rem;
-    margin-top: 5.5rem;
-    max-width: 90%;
+    margin-top: 3rem;
   }
 }
 
@@ -299,12 +493,14 @@ body.daftar-peminjaman-body {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   box-shadow: none; 
+  margin-top: 0px; /* 🟢 dari 60px → 40px biar gak terlalu jauh */
 }
 
 /* Header agar rapi dan seimbang */
 .daftar-peminjaman-container h2 {
   font-weight: 700;
   color: #2563eb;
+  margin-top: 0.25rem; /* biar sejajar sempurna */
 }
 
 /* Tabel */
@@ -345,6 +541,7 @@ body.daftar-peminjaman-body {
     margin-left: 200px;
     width: calc(100% - 200px);
     padding: 1.5rem;
+    margin-top: 45px; /* 🟢 sedikit aja jaraknya */
   }
 }
 
@@ -369,66 +566,6 @@ body.daftar-peminjaman-body {
 /* ===================================================== */
 body.modern-dashboard { display: flex; min-height: 100vh; overflow-x: hidden; background: #f6f7fb; }
 
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(0,0,0,0.05);
-  padding: 1.8rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  height: 100vh;
-  left: 0; top: 0;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.05);
-  overflow-y: auto;         /* aktifkan scroll vertikal */
-  overflow-x: hidden;       /* jangan sampai bisa geser ke samping */
-  scrollbar-width: thin;    /* scroll tipis (Firefox) */
-  scrollbar-color: rgba(0,0,0,0.2) transparent; /* warna lembut */
-}
-
-.sidebar-header h4 { font-weight: 700; color: #0d6efd; margin-bottom: 1.2rem; text-align: center; }
-.sidebar-menu { display: flex; flex-direction: column; gap: 0.6rem; }
-.sidebar-link { color: #334155; padding: 0.7rem 1rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; text-decoration: none; }
-.sidebar-link:hover, .sidebar-link.active { background: rgba(13,110,253,0.12); color: #0d6efd; transform: translateX(6px); }
-.sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.08); text-align: center; }
-
-/* === Sidebar Profile Image === */
-.profile-img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.sidebar-profile-img {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: 2px solid #0d6efd;
-  object-fit: cover;
-  background-color: #f8f9fa;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sidebar-profile-img:hover {
-  transform: scale(1.08);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-/* Scrollbar (Chrome, Edge, Safari) */
-.sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
 /* Main Content */
 .main-content { margin-left: 260px; padding: 2rem; width: calc(100% - 260px); transition: all 0.3s ease; }
 
@@ -573,6 +710,8 @@ body.edit-jadwal-body {
 @media (max-width: 991px) {
   body.edit-jadwal-body {
     padding-left: 0;
+    margin-top: 30px;
+    margin-bottom: 0px;
   }
 }
 
@@ -620,33 +759,26 @@ body.edit-jadwal-body {
 /* ===================== HALAMAN PROFIL ================= */
 /* ===================================================== */
 
-/* ==============================
-   STYLE HALAMAN PROFIL
-   ============================== */
+
 body.profile-body {
-  display: flex;
   min-height: 100vh;
   background: url('/images/bg.jpeg') no-repeat center center fixed;
   background-size: cover;
   font-family: "Poppins", sans-serif;
   margin: 0;
-  overflow-x: hidden;
+  display: flex;
 }
 
 /* Container utama profil */
 .profile-container {
-  margin-left: 250px;
-  width: calc(100% - 250px);
-  padding: 3rem 2.5rem;
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-
-  /* Hilangkan kotak putihnya */
+  align-items: flex-start; /* bukan center lagi */
+  margin-left: 250px;
+  height: 100vh;
   background: transparent;
-  box-shadow: none;
-  border-radius: 0;
+  padding-top: 3rem; /* naikkan sedikit */
 }
 
 /* Kartu profil */
@@ -743,6 +875,7 @@ body.profile-body {
     padding: 2rem 1rem;
   }
 }
+
 
 /* === Dashboard Stat Boxes === */
 .stat-box {
@@ -1026,6 +1159,7 @@ body.history-body {
     margin-left: 200px;
     width: calc(100% - 200px);
     padding: 1.5rem;
+    margin-top: 65px; /* 🟢 Tambahan buat tablet juga */
   }
 }
 
@@ -1035,6 +1169,7 @@ body.history-body {
     width: 100%;
     border-radius: 0;
     padding: 1rem;
+    margin-top: 60px; /* 🟢 Tambahan: beri jarak dari atas supaya judul gak ketimpa */
   }
 
   .history-container td.keterangan {
@@ -1043,6 +1178,7 @@ body.history-body {
 
   .history-container h2 {
     font-size: 1.2rem;
+    margin-top: 0.5rem; /* biar rapi */
   }
 }
 

@@ -11,54 +11,7 @@
 </head>
 
 <body class="modern-dashboard">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h4 class="fw-bold text-primary mb-0">🏫 Sistem Peminjaman</h4>
-    </div>
-    <nav class="sidebar-menu mt-4">
-      <a href="<?= base_url('/') ?>" class="sidebar-link">🏠 Home</a>
-
-      <?php if($user['role'] === 'administrator'): ?>
-    <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link">👥 Manajemen User</a>
-    <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
-    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
-    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
-
-      <?php elseif($user['role'] === 'petugas'): ?>
-    <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
-    <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-    <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
-
-      <?php elseif($user['role'] === 'peminjam'): ?>
-    <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
-      <?php endif; ?>
-
-      <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link">📅 Jadwal Ruang</a>
-      <!-- 🔹 Tambahan menu Profile -->
-        <a href="<?= base_url('profile') ?>" 
-           class="sidebar-link <?= service('uri')->getSegment(1) === 'profile' ? 'active' : '' ?>">👤 Profile</a>
-      <a href="<?= base_url('kontak') ?>" class="sidebar-link text-danger fw-semibold">📞 Kontak Petugas</a>
-    </nav>
-
-    <?php if($user): ?>
-    <div class="sidebar-footer mt-auto pt-4 text-center">
-        <!-- 🔹 Tambahkan Foto Profil di sini -->
-        <div class="profile-img-container mb-2">
-            <img src="<?= base_url('images/profile/' . ($user['foto'] ?? 'default.jpeg')) ?>" 
-                 alt="Foto Profil" 
-                 class="sidebar-profile-img"
-                 onerror="this.src='<?= base_url('images/profile/default.jpeg') ?>'">
-        </div>
-
-        <div class="fw-semibold text-dark small mb-1"><?= esc($user['username']) ?></div>
-        <div class="text-muted small mb-2">(<?= esc($user['role']) ?>)</div>
-        <a href="<?= base_url('auth/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">Logout</a>
-    </div>
-    <?php endif; ?>
-  </aside>
+<?= view('layouts/sidebar') ?>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -70,12 +23,30 @@
       <h4 class="fw-bold mb-4 text-secondary">Selamat datang, <?= esc($user['username']) ?> 👋</h4>
 
       <?php if($user['role'] === 'administrator'): ?>
+        <!-- Statistik Boxes -->
         <div class="row g-3 mb-4">
           <div class="col-md-4"><div class="stat-box bg-gradient-primary">👤 Total Users: <?= esc($totalUsers) ?></div></div>
           <div class="col-md-4"><div class="stat-box bg-gradient-success">🏢 Total Ruang: <?= esc($totalRuang) ?></div></div>
           <div class="col-md-4"><div class="stat-box bg-gradient-warning text-dark">📘 Total Peminjaman: <?= esc($totalPeminjaman) ?></div></div>
         </div>
 
+        <!-- 📊 Statistik Diagram -->
+<div class="row mb-4">
+  <div class="col-lg-7">
+    <div class="glass-card p-4 shadow-sm">
+      <h5 class="fw-bold text-primary mb-3">📈 Jumlah Peminjaman per Bulan</h5>
+      <canvas id="chartPeminjaman" height="140"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="glass-card p-4 shadow-sm">
+      <h5 class="fw-bold text-primary mb-3">📊 Distribusi Status Peminjaman</h5>
+      <canvas id="chartStatus" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+        <!-- Peminjaman Terbaru -->
         <div class="glass-card p-4">
           <h5 class="fw-bold mb-3">📅 Peminjaman Terbaru</h5>
           <div class="table-responsive">
@@ -107,9 +78,10 @@
         </div>
 
       <?php elseif($user['role'] === 'petugas'): ?>
+        <!-- Dashboard Petugas -->
         <div class="glass-card p-4">
           <div class="info-summary">
-          <p><strong>Total Peminjaman Pending:</strong> <?= esc($totalPeminjamanPending) ?></p>
+            <p><strong>Total Peminjaman Pending:</strong> <?= esc($totalPeminjamanPending) ?></p>
           </div>
           <h5 class="fw-bold mb-3 text-primary">📋 Jadwal Ruangan</h5>
           <div class="table-responsive">
@@ -139,6 +111,7 @@
         </div>
 
       <?php elseif($user['role'] === 'peminjam'): ?>
+        <!-- Dashboard Peminjam -->
         <div class="glass-card p-4">
           <h5 class="fw-bold mb-3 text-primary">📑 Pengajuan Peminjaman Saya</h5>
           <div class="table-responsive">
@@ -170,6 +143,66 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+<?php if($user['role'] === 'administrator'): ?>
+const gradientBar = (ctx) => {
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+  gradient.addColorStop(1, 'rgba(56, 189, 248, 0.4)');
+  return gradient;
+};
+
+const ctx1 = document.getElementById('chartPeminjaman').getContext('2d');
+new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: <?= $bulanData ?? '[]' ?>,
+    datasets: [{
+      label: 'Jumlah Peminjaman',
+      data: <?= $jumlahData ?? '[]' ?>,
+      backgroundColor: gradientBar(ctx1),
+      borderRadius: 10,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#4B5563', font: { weight: 'bold' } } },
+      y: { beginAtZero: true, ticks: { color: '#4B5563' } }
+    }
+  }
+});
+
+const ctx2 = document.getElementById('chartStatus');
+new Chart(ctx2, {
+  type: 'doughnut',
+  data: {
+    labels: <?= $statusLabels ?? '[]' ?>,
+    datasets: [{
+      data: <?= $statusCounts ?? '[]' ?>,
+      backgroundColor: [
+        'rgba(99, 102, 241, 0.8)', // indigo
+        'rgba(34, 197, 94, 0.7)',  // green
+        'rgba(249, 115, 22, 0.7)', // orange
+        'rgba(239, 68, 68, 0.7)'   // red
+      ],
+      borderColor: 'rgba(255, 255, 255, 0.6)',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#4B5563', font: { weight: '500' } }
+      }
+    },
+    cutout: '70%'
+  }
+});
+<?php endif; ?>
+</script>
 </body>
 </html>

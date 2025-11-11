@@ -9,11 +9,39 @@
         body {
             background-color: #f8f9fa;
         }
-        /* Tambahkan margin kiri agar tidak nabrak sidebar */
+
+        /* Ruang utama menyesuaikan sidebar */
         .main-content {
-            margin-left: 260px; /* sesuaikan dengan lebar sidebar kamu */
+            margin-left: 260px;
             padding: 30px;
         }
+
+        /* Tombol aksi biar seragam dan sejajar */
+        .action-btn {
+            min-width: 130px;
+            padding: 10px 18px;
+            font-weight: 600;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-btn i {
+            margin-right: 6px;
+        }
+
+        /* Warna tombol diseragamkan */
+        .btn-success { background-color: #28a745; border: none; }
+        .btn-danger { background-color: #dc3545; border: none; }
+        .btn-warning { background-color: #ffc107; border: none; color: #000; }
+
+        .btn-success:hover { background-color: #218838; }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-warning:hover { background-color: #e0a800; color: #000; }
+
         @media (max-width: 991.98px) {
             .main-content {
                 margin-left: 0;
@@ -81,15 +109,18 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-4">
+        <!-- Tombol Aksi -->
+        <div class="mt-4 d-flex flex-wrap gap-3">
             <?php if (in_array(strtolower($peminjaman['status']), ['pending','proses'])): ?>
-                <a href="<?= base_url('petugas/setuju/'.$peminjaman['id_booking']) ?>" class="btn btn-success me-2">✔ Setujui</a>
-                <a href="<?= base_url('petugas/tolak/'.$peminjaman['id_booking']) ?>" class="btn btn-danger me-2">✖ Tolak</a>
+                <a href="<?= base_url('petugas/setuju/'.$peminjaman['id_booking']) ?>" 
+                   class="btn btn-success action-btn">✔ Setujui</a>
+                <a href="<?= base_url('petugas/tolak/'.$peminjaman['id_booking']) ?>" 
+                   class="btn btn-danger action-btn">✖ Tolak</a>
             <?php endif; ?>
+            
             <a href="<?= base_url('petugas/hapus/'.$peminjaman['id_booking']) ?>" 
-            onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')" 
-            class="btn btn-warning">🗑 Hapus</a>
+               onclick="return confirm('Apakah Anda yakin ingin menghapus peminjaman ini?')" 
+               class="btn btn-warning action-btn">🗑 Hapus</a>
         </div>
     </div>
 

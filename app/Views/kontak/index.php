@@ -63,9 +63,22 @@
                 <td><?= esc(ucfirst($p['role'])) ?></td>
                 <td>
                   <?php if(!empty($p['telepon'])): ?>
-                    <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $p['telepon']) ?>" 
-                       target="_blank" class="text-success text-decoration-none">
-                      <?= esc($p['telepon']) ?> 💬
+                    <?php
+                      // ambil angka aja
+                      $nomor = preg_replace('/[^0-9]/', '', $p['telepon']);
+
+                      // jika nomor diawali 0, ubah jadi 62
+                      if (substr($nomor, 0, 1) === '0') {
+                          $nomor = '62' . substr($nomor, 1);
+                      }
+
+                      // isi pesan otomatis
+                      $pesan = urlencode("Halo {$p['username']}, saya mau bertanya tentang peminjaman ruang.");
+                    ?>
+                    <a href="https://wa.me/<?= $nomor ?>?text=<?= $pesan ?>" 
+                       target="_blank" 
+                       class="text-success text-decoration-none">
+                       <?= esc($p['telepon']) ?> 💬
                     </a>
                   <?php else: ?>
                     <span class="text-muted">Belum ada</span>

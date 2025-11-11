@@ -22,27 +22,23 @@ class Auth extends BaseController
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
 
-        // Cari user berdasarkan username
         $user = (new UserModel())->where('username', $username)->first();
 
         if (!$user) {
             return redirect()->back()->with('error', 'Username tidak ditemukan');
         }
 
-        // Cek password
         if (!password_verify($password, $user['password'])) {
             return redirect()->back()->with('error', 'Password salah');
         }
 
-        // ✅ Jika login berhasil, set session user
         session()->set('user', [
             'id_user'  => $user['id_user'],
             'username' => $user['username'],
-            'role'     => $user['role'], // string seperti: 'admin', 'petugas', 'peminjam'
-            'foto' => $user['foto'] ?? 'default.jpeg'
+            'role'     => $user['role'],
+            'foto'     => $user['foto'] ?? 'default.jpeg'
         ]);
 
-        // Redirect ke dashboard
         return redirect()->to('/dashboard');
     }
 
@@ -59,16 +55,36 @@ class Auth extends BaseController
     // ------------------------
     public function registerPost()
     {
+        helper(['form']);
         $validation = \Config\Services::validation();
 
         $rules = [
-            'username' => 'required|is_unique[user.username]',
-            'password' => 'required|min_length[6]',
-            'role'     => 'required|in_list[peminjam]', // ⬅️ Tambahkan validasi role
+            'username' => [
+                'rules'  => 'required|min_length[4]|is_unique[user.username]',
+                'errors' => [
+                    'required'   => 'Username wajib diisi.',
+                    'min_length' => 'Username minimal 4 karakter.',
+                    'is_unique'  => 'Username sudah digunakan, silakan pilih yang lain.'
+                ]
+            ],
+            'password' => [
+                'rules'  => 'required|min_length[6]',
+                'errors' => [
+                    'required'   => 'Password wajib diisi.',
+                    'min_length' => 'Password minimal 6 karakter.'
+                ]
+            ],
+            'role' => [
+                'rules'  => 'required|in_list[peminjam]',
+                'errors' => [
+                    'required' => 'Role wajib diisi.',
+                    'in_list'  => 'Role tidak valid.'
+                ]
+            ]
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $userModel = new UserModel();
@@ -79,15 +95,15 @@ class Auth extends BaseController
             'role'     => $this->request->getPost('role'),
         ]);
 
-        return redirect()->to('/auth/login')->with('success', 'Registrasi berhasil. Silakan login.');
+        return redirect()->to('/auth/login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
     // ------------------------
     // 🚪 LOGOUT
     // ------------------------
     public function logout()
-{
-    session()->destroy();
-    return redirect()->to(base_url('landing'));
-}
+    {
+        session()->destroy();
+        return redirect()->to(base_url('landing'));
+    }
 }

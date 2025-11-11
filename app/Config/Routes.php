@@ -91,6 +91,7 @@ $routes->group('administrator', ['filter' => 'auth:administrator'], function($ro
 $routes->get('/profile', 'ProfileController::index');
 $routes->get('/profile/edit', 'ProfileController::edit');
 $routes->post('/profile/update', 'ProfileController::update');
+$routes->get('/profile/deletePhoto', 'ProfileController::deletePhoto');
 
 $routes->get('jadwal/kalender', 'JadwalController::kalender');
 $routes->get('jadwal/getKalenderData', 'JadwalController::getKalenderData');

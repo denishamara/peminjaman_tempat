@@ -46,12 +46,20 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Foto Profil</label><br>
-                <img src="<?= base_url('images/profile/' . ($user['foto'] ?? 'default.jpeg')) ?>" 
-                     alt="Foto Sekarang" class="rounded mb-2 border" 
-                     style="width: 100px; height: 100px; object-fit: cover;">
-                <input type="file" name="foto" class="form-control mt-2" accept="image/*">
-            </div>
+    <label class="form-label">Foto Profil</label><br>
+    <img src="<?= base_url('images/profile/' . ($user['foto'] ?? 'default.jpeg')) ?>" 
+         alt="Foto Sekarang" class="rounded mb-2 border" 
+         style="width: 100px; height: 100px; object-fit: cover;">
+    <input type="file" name="foto" class="form-control mt-2" accept="image/*">
+
+    <?php if (!empty($user['foto']) && $user['foto'] !== 'default.jpeg'): ?>
+        <a href="<?= base_url('/profile/deletePhoto') ?>" 
+           class="btn btn-danger btn-sm mt-2"
+           onclick="return confirm('Yakin ingin menghapus foto profil dan kembali ke default?')">
+            Hapus Foto
+        </a>
+    <?php endif; ?>
+</div>
 
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">Simpan</button>

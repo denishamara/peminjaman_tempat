@@ -2,59 +2,106 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Jadwal Ruangan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jadwal Reguler & Booking | SmartRoom</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
+    :root {
+      --primary-color: #0066ff;
+      --bg-dark: #0f172a;
+    }
+
     body {
-      background: url('<?= base_url('images/bg.jpeg') ?>') no-repeat center center fixed;
-      background-size: cover;
-      font-family: "Poppins", sans-serif;
-      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f1f5f9;
       color: #1e293b;
     }
-    .navbar { font-weight: 600; }
-    .main-content {
-      max-width: 1100px;
-      margin: 50px auto;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-      padding: 2rem 2.5rem;
+
+    /* Navbar gaya landing */
+    .navbar {
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
-    .filter-btn.active { background-color: #0d6efd !important; color: white !important; }
-    table {
-      border-radius: 10px;
-      overflow: hidden;
-      background-color: white;
+
+    .navbar.scrolled {
+      background: rgba(15, 23, 42, 0.95);
     }
-    th {
-      background-color: #0d6efd !important;
+
+    .navbar-brand {
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .nav-link {
+      color: #e2e8f0 !important;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: var(--primary-color) !important;
+    }
+
+    /* Konten utama */
+    .main-content {
+      padding-top: 100px;
+      padding-bottom: 60px;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .table-responsive {
+      border-radius: 12px;
+      overflow-x: auto;
+      padding: 0.5rem 0.5rem;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary-color) !important;
       color: white !important;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    td { vertical-align: middle; }
-    .table-primary { background-color: #dbeafe !important; }
-    .table-warning { background-color: #fef9c3 !important; }
-    .alert { border-radius: 10px; text-align: center; }
+
+    footer {
+      text-align: center;
+      padding: 20px 0;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    /* Responsif tambahan */
     @media (max-width: 768px) {
-      .main-content { margin: 20px; padding: 1.5rem; }
+      .main-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      h3 { font-size: 1.2rem; }
     }
   </style>
 </head>
 
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="<?= base_url('/') ?>">🏫 SmartRoom</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <a class="navbar-brand" href="<?= base_url('/') ?>">SmartRoom</a>
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="<?= base_url('/') ?>">Beranda</a></li>
           <li class="nav-item"><a class="nav-link active" href="#">Jadwal</a></li>
           <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/login') ?>">Masuk</a></li>
@@ -63,10 +110,10 @@
     </div>
   </nav>
 
-  <!-- ISI HALAMAN -->
+  <!-- Konten utama -->
   <div class="main-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-bold text-primary">📅 Jadwal Reguler & Booking</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h3 class="fw-bold text-primary mb-0">📅 Jadwal Reguler & Booking</h3>
       <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-primary">
         <i class="bi bi-calendar3"></i> Lihat Kalender
       </a>
@@ -81,11 +128,12 @@
 
     <!-- Table -->
     <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
+      <table class="table table-bordered table-hover align-middle mb-0">
         <thead class="text-center">
           <tr>
             <th>Ruangan</th>
             <th>Nama Kegiatan</th>
+            <th>Peminjam</th>
             <th>Tanggal</th>
             <th>Jam Mulai</th>
             <th>Jam Selesai</th>
@@ -93,50 +141,42 @@
           </tr>
         </thead>
         <tbody>
-  <?php if (!empty($jadwal)): ?>
-    <?php foreach ($jadwal as $j): ?>
-      <?php
-        $status = strtolower($j['status'] ?? 'reguler');
-        $rowClass = $status === 'reguler' ? 'table-primary' : 'table-warning';
-
-        // Ambil tanggal mulai & selesai
-        $tglMulai   = $j['tanggal_mulai'] ?? $j['tgl_pinjam'] ?? $j['tgl_booking'] ?? null;
-        $tglSelesai = $j['tanggal_selesai'] ?? null;
-
-        // Format tanggal
-        if ($tglMulai && $tglSelesai) {
-          $hari = (date('Y-m-d', strtotime($tglMulai)) === date('Y-m-d', strtotime($tglSelesai)))
-            ? date('d-m-Y', strtotime($tglMulai))
-            : date('d-m-Y', strtotime($tglMulai)) . ' s.d. ' . date('d-m-Y', strtotime($tglSelesai));
-        } elseif ($tglMulai) {
-          $hari = date('d-m-Y', strtotime($tglMulai));
-        } else {
-          $hari = '-';
-        }
-
-        // Jam
-        $jamMulai = $j['jam_mulai'] ?? (!empty($tglMulai) ? date('H:i', strtotime($tglMulai)) : '-');
-        $jamSelesai = $j['jam_selesai'] ?? (!empty($tglSelesai) ? date('H:i', strtotime($tglSelesai)) : '-');
-      ?>
-      <tr class="<?= esc($rowClass) ?>">
-        <td><?= esc($j['nama_ruang'] ?? '-') ?></td>
-        <td><?= esc($j['nama_kegiatan'] ?? $j['nama_reguler'] ?? $j['keterangan'] ?? '-') ?></td>
-        <td><?= esc($hari) ?></td>
-        <td><?= esc($jamMulai) ?></td>
-        <td><?= esc($jamSelesai) ?></td>
-        <td class="text-center text-capitalize fw-semibold"><?= esc($j['status'] ?? '-') ?></td>
-      </tr>
-    <?php endforeach; ?>
-  <?php else: ?>
-    <tr>
-      <td colspan="6" class="text-center text-muted py-3">Tidak ada jadwal ditemukan.</td>
-    </tr>
-  <?php endif; ?>
-</tbody>
+          <?php if (!empty($jadwal)): ?>
+            <?php foreach ($jadwal as $j): ?>
+              <?php
+                $status = strtolower($j['status'] ?? 'reguler');
+                $rowClass = $status === 'reguler' ? 'table-primary' : 'table-warning';
+              ?>
+              <tr class="<?= esc($rowClass) ?>">
+                <td><?= esc($j['nama_ruang'] ?? '-') ?></td>
+                <td><?= esc($j['nama_kegiatan'] ?? '-') ?></td>
+                <td><?= esc($j['peminjam'] ?? '-') ?></td>
+                <td><?= esc($j['tanggal'] ?? '-') ?></td>
+                <td><?= esc($j['jam_mulai'] ?? '-') ?></td>
+                <td><?= esc($j['jam_selesai'] ?? '-') ?></td>
+                <td class="text-center text-capitalize fw-semibold"><?= esc($j['status'] ?? '-') ?></td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="7" class="text-center text-muted py-3">Tidak ada jadwal ditemukan.</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
       </table>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <footer>
+    © <?= date('Y') ?> SmartRoom — Sistem Peminjaman Ruang.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // efek navbar scroll
+    window.addEventListener('scroll', () => {
+      document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
 </body>
 </html>
