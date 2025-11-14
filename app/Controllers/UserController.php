@@ -16,20 +16,32 @@ class UserController extends BaseController
         $this->petugasModel = new PetugasModel();
     }
 
-    // Halaman daftar user
+    // ===============================
+    // 📋 Halaman daftar user
+    // ===============================
     public function index()
     {
         $users = $this->userModel->findAll();
-        return view('administrator/users/index', ['users' => $users]);
+        $currentUser = session()->get('user');
+
+        return view('administrator/users/index', [
+            'users' => $users,
+            'user'  => $currentUser // untuk sidebar
+        ]);
     }
 
-    // Form tambah user
+    // ===============================
+    // ➕ Form tambah user
+    // ===============================
     public function createForm()
     {
-        return view('administrator/users/create');
+        $currentUser = session()->get('user');
+        return view('administrator/users/create', ['user' => $currentUser]);
     }
 
-    // Proses tambah user
+    // ===============================
+    // 💾 Proses tambah user
+    // ===============================
     public function create()
     {
         $rules = [
@@ -62,31 +74,38 @@ class UserController extends BaseController
         return redirect()->to('/administrator/users')->with('success', 'User berhasil ditambahkan');
     }
 
-    // Form edit user
+    // ===============================
+    // ✏️ Form edit user
+    // ===============================
     public function edit($id)
     {
-        $user = $this->userModel->find($id);
-        if (!$user) {
+        $userToEdit = $this->userModel->find($id);
+        if (!$userToEdit) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('User tidak ditemukan');
         }
 
         $namaPetugas = null;
-        if ($user['role'] === 'petugas') {
+        if ($userToEdit['role'] === 'petugas') {
             $petugas = $this->petugasModel->where('id_user', $id)->first();
             $namaPetugas = $petugas['nama_petugas'] ?? null;
         }
 
+        $currentUser = session()->get('user'); // user login
+
         return view('administrator/users/edit', [
-            'user' => $user,
+            'user' => $currentUser,        // untuk sidebar
+            'userToEdit' => $userToEdit,   // untuk form edit
             'nama_petugas' => $namaPetugas
         ]);
     }
 
-    // Proses update user
+    // ===============================
+    // 🔄 Proses update user
+    // ===============================
     public function update($id)
     {
-        $user = $this->userModel->find($id);
-        if (!$user) {
+        $userToEdit = $this->userModel->find($id);
+        if (!$userToEdit) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('User tidak ditemukan');
         }
 
@@ -136,7 +155,9 @@ class UserController extends BaseController
         return redirect()->to('/administrator/users')->with('success', 'User berhasil diperbarui');
     }
 
-    // Hapus user
+    // ===============================
+    // ❌ Hapus user
+    // ===============================
     public function delete($id)
     {
         $this->petugasModel->where('id_user', $id)->delete();

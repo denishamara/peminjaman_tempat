@@ -7,16 +7,21 @@ use App\Models\UserModel;
 class Auth extends BaseController
 {
     // ------------------------
-    // ⛔ TAMPILKAN FORM LOGIN
+    // ⛔ FORM LOGIN
     // ------------------------
     public function login()
     {
+        // Jika sudah login → langsung dashboard
+        if (session()->has('user')) {
+            echo "<script>window.location.replace('" . base_url('dashboard') . "');</script>";
+            exit;
+        }
         return view('auth/login');
     }
 
-    // ----------------------------
-    // ✅ PROSES LOGIN (POST)
-    // ----------------------------
+    // ------------------------
+    // ✅ PROSES LOGIN
+    // ------------------------
     public function loginPost()
     {
         $username = $this->request->getPost('username');
@@ -32,6 +37,7 @@ class Auth extends BaseController
             return redirect()->back()->with('error', 'Password salah');
         }
 
+        // Simpan session
         session()->set('user', [
             'id_user'  => $user['id_user'],
             'username' => $user['username'],
@@ -39,20 +45,26 @@ class Auth extends BaseController
             'foto'     => $user['foto'] ?? 'default.jpeg'
         ]);
 
-        return redirect()->to('/dashboard');
+        // Ganti assign -> replace biar halaman login tidak tersimpan di history
+        echo "<script>
+        window.location.assign('" . base_url('dashboard') . "');
+            </script>";
+        exit;
     }
 
     // ------------------------
-    // 📝 TAMPILKAN FORM REGISTER
+    // 📝 REGISTER
     // ------------------------
     public function register()
     {
+        if (session()->has('user')) {
+            echo "<script>window.location.replace('" . base_url('dashboard') . "');</script>";
+            exit;
+        }
+        
         return view('auth/register');
     }
 
-    // ------------------------
-    // ✅ PROSES REGISTER (POST)
-    // ------------------------
     public function registerPost()
     {
         helper(['form']);
@@ -64,7 +76,7 @@ class Auth extends BaseController
                 'errors' => [
                     'required'   => 'Username wajib diisi.',
                     'min_length' => 'Username minimal 4 karakter.',
-                    'is_unique'  => 'Username sudah digunakan, silakan pilih yang lain.'
+                    'is_unique'  => 'Username sudah digunakan.'
                 ]
             ],
             'password' => [
@@ -87,9 +99,7 @@ class Auth extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $userModel = new UserModel();
-
-        $userModel->insert([
+        (new UserModel())->insert([
             'username' => $this->request->getPost('username'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role'     => $this->request->getPost('role'),
@@ -103,7 +113,12 @@ class Auth extends BaseController
     // ------------------------
     public function logout()
     {
-        session()->destroy();
-        return redirect()->to(base_url('landing'));
+    session()->destroy();
+    return redirect()->to(base_url('landing'));
     }
+
+    // ------------------------
+    // 🧹 Fungsi bantu: hapus cache browser
+    // ------------------------
+
 }

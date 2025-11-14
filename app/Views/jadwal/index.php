@@ -158,15 +158,15 @@
                                class="btn btn-warning btn-sm">
                               <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <form action="<?= base_url('jadwal/delete/' . $id) ?>" 
-                                  method="post" style="display:inline;">
-                              <?= csrf_field() ?>
-                              <input type="hidden" name="_method" value="DELETE">
-                              <button type="submit" class="btn btn-danger btn-sm"
-                                      onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                <i class="bi bi-trash"></i> Hapus
-                              </button>
-                            </form>
+                            <form action="<?= base_url('jadwal/delete/' . $id) ?>" method="post" style="display:inline;">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="tipe" value="<?= strtolower($j['status'] ?? 'reguler') ?>">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
+                              <i class="bi bi-trash"></i> Hapus
+                            </button>
+                          </form>
                           </div>
                         <?php else: ?>
                           <span class="text-muted">-</span>

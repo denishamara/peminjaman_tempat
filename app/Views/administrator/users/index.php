@@ -121,7 +121,11 @@
                   </td>
                   <td>
                     <a href="<?= base_url('administrator/users/edit/' . $user['id_user']) ?>" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="<?= base_url('administrator/users/delete/' . $user['id_user']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus user ini?')">Hapus</a>
+                    <form action="<?= base_url('administrator/users/delete/' . $user['id_user']) ?>" method="post" style="display:inline;">
+                      <?= csrf_field() ?>
+                      <input type="hidden" name="_method" value="DELETE">
+                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus user ini?')">Hapus</button>
+                  </form>
                   </td>
                 </tr>
               <?php endforeach; ?>

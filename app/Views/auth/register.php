@@ -51,7 +51,7 @@
             </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('auth/register') ?>">
+        <form method="post" action="<?= base_url('auth/registerPost') ?>">
             <?= csrf_field() ?>
 
             <div class="form-group">

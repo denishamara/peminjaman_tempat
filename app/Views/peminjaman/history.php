@@ -28,7 +28,9 @@
             <th>Tanggal Selesai</th>
             <th>Status</th>
             <th>Keterangan</th>
-            <th>Aksi</th>
+            <?php if (session()->get('user')['role'] === 'administrator'): ?>
+              <th>Aksi</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +44,8 @@
               <td><?= date('d-m-Y H:i', strtotime($r['tanggal_selesai'])) ?></td>
               <td class="text-center"><span class="badge bg-success">Selesai</span></td>
               <td class="keterangan"><?= esc($r['keterangan']) ?></td>
+
+              <?php if (session()->get('user')['role'] === 'administrator'): ?>
               <td class="text-center">
                 <form action="<?= base_url('peminjaman/riwayat/delete/' . $r['id_booking']) ?>" method="post" onsubmit="return confirm('Yakin ingin menghapus riwayat ini?');">
                   <?= csrf_field() ?>
@@ -50,6 +54,7 @@
                   </button>
                 </form>
               </td>
+              <?php endif; ?>
             </tr>
           <?php endforeach; ?>
         </tbody>

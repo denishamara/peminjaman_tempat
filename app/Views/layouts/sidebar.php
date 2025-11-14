@@ -206,6 +206,7 @@ $user = isset($user) ? $user : session()->get('user');
             <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
 
         <?php elseif (isset($user) && $user['role'] === 'peminjam'): ?>
+            <a href="<?= base_url('ruang') ?>" class="sidebar-link">🏫 Daftar Ruang</a>
             <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
         <?php endif; ?>
 

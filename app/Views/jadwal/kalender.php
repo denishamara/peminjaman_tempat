@@ -70,7 +70,6 @@
         <p><strong>Peminjam:</strong> <span id="modalUser"></span></p>
         <p><strong>Mulai:</strong> <span id="modalMulai"></span></p>
         <p><strong>Selesai:</strong> <span id="modalSelesai"></span></p>
-        <p><strong>Keterangan:</strong> <span id="modalKet"></span></p>
         <p><strong>Status:</strong> <span id="modalStatus" class="badge"></span></p>
       </div>
       <div class="modal-footer">
@@ -123,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p><strong>Peminjam:</strong> ${e.peminjam ?? '-'}</p>
                 <p><strong>Mulai:</strong> ${start}</p>
                 <p><strong>Selesai:</strong> ${end}</p>
-                <p><strong>Keterangan:</strong> ${e.keterangan ?? '-'}</p>
                 <p><strong>Status:</strong> <span class="badge bg-secondary">${e.status ?? '-'}</span></p>
               </div>
               <div class="modal-footer">

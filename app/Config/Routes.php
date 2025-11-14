@@ -12,25 +12,30 @@ $routes->get('landing', 'Home::landing');
 // Jadwal publik (tanpa login)
 $routes->get('jadwal/public', 'JadwalController::publicIndex');
 
-$routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
+// Hanya user login yang bisa akses dashboard
+$routes->group('', ['filter' => 'auth'], function($routes) {
+    $routes->get('dashboard', 'Dashboard::index');
+    // tambahkan route lain yang butuh login di sini
+});
+
+// Hanya user belum login yang bisa akses login/register
+$routes->group('auth', ['filter' => 'guest'], function($routes) {
+    $routes->get('login', 'Auth::login');
+    $routes->post('loginPost', 'Auth::loginPost');
+    $routes->get('register', 'Auth::register');
+    $routes->post('registerPost', 'Auth::registerPost');
+});
 
 
-// Auth Routes
-$routes->get('auth/login', 'Auth::login');
-$routes->post('auth/login', 'Auth::loginPost');
+$routes->get('auth/logout', 'Auth::logout', ['filter' => 'auth']);
 
-$routes->get('auth/register', 'Auth::register');
-$routes->post('auth/register', 'Auth::registerPost');
-
-$routes->get('auth/logout', 'Auth::logout');
-
-// Ruang routes
-$routes->get('ruang/index', 'RuangController::index');
-$routes->get('ruang/create', 'RuangController::create');
-$routes->post('ruang/store', 'RuangController::store');
-$routes->get('ruang/edit/(:num)', 'RuangController::edit/$1');
-$routes->post('ruang/update/(:num)', 'RuangController::update/$1');
-$routes->delete('ruang/delete/(:num)', 'RuangController::delete/$1');
+$routes->get('ruang', 'RuangController::index'); // untuk peminjam & default
+$routes->get('ruang/index', 'RuangController::index', ['filter' => 'auth:']); // admin/petugas
+$routes->get('ruang/create', 'RuangController::create', ['filter' => 'auth:administrator,petugas']);
+$routes->post('ruang/store', 'RuangController::store', ['filter' => 'auth:administrator,petugas']);
+$routes->get('ruang/edit/(:num)', 'RuangController::edit/$1', ['filter' => 'auth:administrator,petugas']);
+$routes->post('ruang/update/(:num)', 'RuangController::update/$1', ['filter' => 'auth:administrator,petugas']);
+$routes->delete('ruang/delete/(:num)', 'RuangController::delete/$1', ['filter' => 'auth:administrator,petugas']);
 
 // Jadwal routes
 $routes->get('jadwal/index', 'JadwalController::index');

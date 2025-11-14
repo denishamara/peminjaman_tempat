@@ -31,7 +31,7 @@ class KontakController extends Controller
 
     // 🔹 Halaman edit (khusus admin)
     public function edit($id_user)
-{
+    {
     $user = session()->get('user');
     if (!$user || $user['role'] !== 'administrator') {
         return redirect()->to(base_url('kontak'))->with('error', 'Akses ditolak!');
@@ -50,7 +50,7 @@ class KontakController extends Controller
     ];
 
     return view('kontak/edit', $data);
-}
+    }
 
 public function update($id_user)
 {

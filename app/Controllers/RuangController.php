@@ -1,6 +1,10 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use App\Models\RuangModel;
+use App\Models\JadwalModel;
+use App\Models\BookingModel;
 
 class RuangController extends BaseController
 {
@@ -11,32 +15,55 @@ class RuangController extends BaseController
         $this->ruangModel = new RuangModel();
     }
 
-    // ✅ Helper untuk ambil data user dari session
-
-    // 📋 Tampilkan daftar ruang
+    // 📋 Daftar ruang + status & keterangan
     public function index()
     {
-        $data = [
-            'ruangs' => $this->ruangModel->findAll(),
-        ];
-        return view('ruang/index', $data);
+        $ruangs = $this->ruangModel->getRuangWithStatus();
+        
+        $ruangModel   = new RuangModel();
+        $jadwalModel  = new JadwalModel(); // jadwal reguler
+        $bookingModel = new BookingModel(); // peminjaman / booking
+
+        $ruangs = $ruangModel->findAll();
+        $today  = date('Y-m-d H:i:s');
+
+        foreach ($ruangs as &$r) {
+            $id_room = $r['id_room'];
+
+            // 🔹 Cek apakah ruangan ini sedang dibooking
+            $bookingAktif = $bookingModel
+                ->where('id_room', $id_room)
+                ->where('status !=', 'Selesai')
+                ->where('tanggal_selesai >=', $today)
+                ->first();
+
+            // 🔹 Cek apakah ruangan ini punya jadwal reguler aktif
+            $jadwalAktif = $jadwalModel
+                ->where('id_room', $id_room)
+                ->where('tanggal_selesai >=', $today)
+                ->first();
+
+            if ($bookingAktif) {
+                $r['status'] = 'Tidak Tersedia';
+            } elseif ($jadwalAktif) {
+                $r['status'] = 'Terpakai (Reguler)';
+            } else {
+                $r['status'] = 'Tersedia';
+            }
+        }
+
+        return view('ruang/index', [
+            'ruangs' => $ruangs
+        ]);
     }
 
-    // ➕ Form tambah ruang
+    // ➕ Tambah ruang
     public function create()
     {
-        $ruangModel = new \App\Models\RuangModel();
-        $userModel  = new \App\Models\UserModel();
-
-        $data = [
-            'rooms' => $ruangModel->findAll(),
-            'users' => $userModel->findAll(),
-        ];
-
-        return view('ruang/create', $data);
+        return view('ruang/create');
     }
 
-    // 💾 Simpan data ruang baru
+    // 💾 Simpan ruang
     public function store()
     {
         $data = [
@@ -50,7 +77,7 @@ class RuangController extends BaseController
         return redirect()->to('/ruang/index')->with('success', 'Data ruang berhasil ditambahkan');
     }
 
-    // ✏️ Form edit ruang
+    // ✏️ Edit ruang
     public function edit($id)
     {
         $ruang = $this->ruangModel->find($id);
@@ -58,14 +85,10 @@ class RuangController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Data ruang tidak ditemukan");
         }
 
-        $data = [
-            'ruang' => $ruang,
-        ];
-
-        return view('ruang/edit', $data);
+        return view('ruang/edit', ['ruang' => $ruang]);
     }
 
-    // 🔄 Update data ruang
+    // 🔄 Update ruang
     public function update($id)
     {
         $data = [
@@ -85,4 +108,5 @@ class RuangController extends BaseController
         $this->ruangModel->delete($id);
         return redirect()->to('/ruang/index')->with('success', 'Data ruang berhasil dihapus');
     }
+
 }

@@ -191,29 +191,56 @@ class JadwalController extends BaseController
 {
     $tipe = $this->request->getPost('tipe');
 
-    $data = [
-        'id_room'         => $this->request->getPost('id_room'),
-        'id_user'         => $this->request->getPost('id_user'),
-        'tanggal_mulai'   => $this->request->getPost('tanggal_mulai'),
-        'tanggal_selesai' => $this->request->getPost('tanggal_selesai'),
-        'keterangan'      => $this->request->getPost('keterangan'),
-    ];
-
-    // ✅ Kalau jadwal reguler (manual input)
     if ($tipe === 'reguler') {
-        $data['nama_reguler'] = $this->request->getPost('nama_kegiatan');
-        $data['status'] = $this->request->getPost('status'); // boleh ubah status
+        $data = [
+            'id_room' => $this->request->getPost('id_room'),
+            'id_user' => $this->request->getPost('id_user'),
+            'nama_reguler' => $this->request->getPost('nama_kegiatan'),
+            'status' => $this->request->getPost('status') ?? 'Aktif',
+        ];
+
+        // Ambil sesi yang dicentang
+        $sesi = $this->request->getPost('sesi'); // array sesi[]
+        if (!empty($sesi)) {
+            sort($sesi);
+            $sesiWaktu = [
+                1 => ['07:15','08:00'], 2 => ['08:05','08:50'], 3 => ['08:55','09:40'],
+                4 => ['09:45','10:30'], 5 => ['10:35','11:20'], 6 => ['11:25','12:10'],
+                7 => ['12:15','13:00'], 8 => ['13:05','13:50'], 9 => ['13:55','14:40'],
+                10=> ['14:45','15:30']
+            ];
+            $tanggal = $this->request->getPost('tanggal');
+            $first = $sesiWaktu[$sesi[0]];
+            $last  = $sesiWaktu[end($sesi)];
+            $data['tanggal_mulai'] = $tanggal . ' ' . $first[0];
+            $data['tanggal_selesai'] = $tanggal . ' ' . $last[1];
+        }
+
         $this->jadwalModel->update($id, $data);
 
-    // ✅ Kalau jadwal dari booking (hasil persetujuan peminjaman)
     } else {
-        $data['keterangan'] = $this->request->getPost('keterangan');
-        $data['status'] = 'Diterima'; // pastikan status tetap diterima
-        $this->bookingModel->update($id, $data);
+        if($tipe === 'booking'){
+    $mulaiTgl = $this->request->getPost('tanggal_mulai_tgl');
+    $selesaiTgl = $this->request->getPost('tanggal_selesai_tgl');
+    $mulaiJam = $this->request->getPost('jam_mulai') ?? '00:00';
+    $selesaiJam = $this->request->getPost('jam_selesai') ?? '23:59';
+
+    $data = [
+        'id_room' => $this->request->getPost('id_room'),
+        'id_user' => $this->request->getPost('id_user'),
+        'tanggal_mulai' => date('Y-m-d H:i:s', strtotime("$mulaiTgl $mulaiJam")),
+        'tanggal_selesai' => date('Y-m-d H:i:s', strtotime("$selesaiTgl $selesaiJam")),
+        'keterangan' => $this->request->getPost('nama_kegiatan') ?? '',
+        'status' => 'Diterima',
+    ];
+
+    $this->bookingModel->update($id, $data);
+}
     }
 
     return redirect()->to('/jadwal/index')->with('success', 'Jadwal berhasil diperbarui.');
 }
+
 
     public function edit($id)
 {
@@ -245,23 +272,15 @@ class JadwalController extends BaseController
 {
     if ($res = $this->onlyNonPeminjam()) return $res;
 
-    // Coba cari di jadwal_reguler
-    $jadwal = $this->jadwalModel->find($id);
-    if ($jadwal) {
+    $tipe = $this->request->getPost('tipe') ?? 'reguler';
+
+    if($tipe === 'reguler') {
         $this->jadwalModel->delete($id);
         return redirect()->to('/jadwal/index')->with('success', 'Jadwal reguler berhasil dihapus.');
-    }
-
-    // Kalau gak ada, coba cari di booking
-    $peminjamanModel = new \App\Models\PeminjamanModel();
-    $peminjaman = $peminjamanModel->find($id);
-    if ($peminjaman) {
-        $peminjamanModel->delete($id);
+    } else {
+        $this->bookingModel->delete($id);
         return redirect()->to('/jadwal/index')->with('success', 'Jadwal booking berhasil dihapus.');
     }
-
-    // Kalau dua-duanya gak ketemu
-    return redirect()->to('/jadwal/index')->with('error', 'Data tidak ditemukan.');
 }
 
     public function kalender($id_room = null)

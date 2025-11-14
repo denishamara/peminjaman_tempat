@@ -1,187 +1,5 @@
-/* ===================================================== */
-/* =============== RESET DAN STYLE UMUM ================= */
-/* ===================================================== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: "Poppins", sans-serif; color: #1e293b; min-height: 100vh; background: #f6f7fb; }
-
-/* ===================================================== */
-/* =============== FORM STYLE (LOGIN, REGISTER, DLL) ==== */
-/* ===================================================== */
-/* ===================================================== */
-/* ==== FIX LOGIN & REGISTER POSISI DAN BACKGROUND ====== */
-/* ===================================================== */
-/* ===== BODY LOGIN & REGISTER ===== */
-body.login-body,
-body.register-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, #0a58ca, #0f172a);
-  font-family: "Poppins", sans-serif;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  padding-top: 3rem; /* ruang untuk navbar */
-}
-
-/* ===== NAVBAR ===== */
-.login-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 2rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-}
-
-.login-navbar .brand {
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.2rem;
-  text-decoration: none;
-}
-
-.login-navbar .btn-landing {
-  background: #2563eb;
-  color: #fff;
-  padding: 0.45rem 1rem;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: 0.3s;
-}
-.login-navbar .btn-landing:hover {
-  background: #1d4ed8;
-}
-
-/* ===== CARD LOGIN & REGISTER ===== */
-body.login-body .container,
-body.register-body .register-container {
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 460px;
-  text-align: center;
-  margin-top: -2rem; /* 🟢 Naik sedikit dari -4 ke -2 (biar pas di tengah desktop) */
-}
-
-/* ===== TITLE ===== */
-body.login-body h2,
-body.register-body h2 {
-  color: #0066ff;
-  font-weight: 700;
-  margin-bottom: 1.8rem;
-}
-
-/* ===== FORM ===== */
-body.login-body form,
-body.register-body form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-body.login-body label,
-body.register-body label {
-  display: block;
-  text-align: left;
-  font-weight: 600;
-  color: #334155;
-  font-size: 0.9rem;
-  margin-bottom: 0.4rem;
-}
-
-body.login-body input,
-body.register-body input {
-  padding: 0.8rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 1rem;
-  outline: none;
-  width: 100%;
-  transition: border 0.3s ease;
-}
-body.login-body input:focus,
-body.register-body input:focus {
-  border-color: #2563eb;
-}
-
-/* ===== BUTTON ===== */
-body.login-body button,
-body.register-body button {
-  background: linear-gradient(90deg, #0066ff, #6610f2);
-  border: none;
-  border-radius: 10px;
-  color: white;
-  padding: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-body.login-body button:hover,
-body.register-body button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 15px rgba(102,16,242,0.5);
-}
-
-/* ===== LINK LOGIN / REGISTER ===== */
-body.login-body .login-link,
-body.register-body .login-link {
-  text-align: center;
-  margin-top: 1.2rem;
-}
-body.login-body .login-link a,
-body.register-body .login-link a {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-body.login-body .login-link a:hover,
-body.register-body .login-link a:hover {
-  text-decoration: underline;
-}
-
-/* ===== RESPONSIVE HP ===== */
-@media (max-width: 480px) {
-  body.login-body,
-  body.register-body {
-    justify-content: flex-start;
-    padding-top: 11rem; /* 🔵 dari 8.5rem → 11rem biar lebih turun di HP */
-  }
-
-  body.login-body .container,
-  body.register-body .register-container {
-    padding: 1.8rem;
-    margin-top: 5rem; /* 🔵 dari 3.5rem → 5rem biar turun pas tengah layar HP */
-    max-width: 90%;
-  }
-
-  .login-navbar {
-    padding: 0.6rem 1rem;
-  }
-
-  .login-navbar .brand {
-    font-size: 1rem;
-  }
-
-  .login-navbar .btn-landing {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-  }
-
-  body.login-body .login-link,
-  body.register-body .login-link {
-    text-align: center;
-  }
-}
 
 /* ===== ALERT (NOTIFIKASI) ===== */
 .alert {
@@ -410,63 +228,6 @@ body.register-body .login-link a:hover {
 /* ========== Layout dengan Sidebar Umum ========== */
 .has-sidebar {
     display: flex;
-}
-
-/* ========== Khusus halaman Ajukan Peminjaman ========== */
-.peminjaman-container {
-    margin-left: 250px; /* sesuaikan lebar sidebar */
-    width: calc(100% - 250px);
-    padding: 40px;
-    background-color: #ffffff;
-    min-height: 100vh;
-}
-
-/* Supaya di layar kecil tetap rapih */
-@media (max-width: 992px) {
-    .peminjaman-container {
-        margin-left: 200px;
-        width: calc(100% - 200px);
-        padding: 30px;
-    }
-}
-
-/* Form styling */
-.peminjaman-container form {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.peminjaman-container label {
-    display: block;
-    font-weight: 600;
-    margin-top: 15px;
-    margin-bottom: 5px;
-}
-
-.peminjaman-container input,
-.peminjaman-container select,
-.peminjaman-container textarea {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-.peminjaman-container button {
-    margin-top: 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.peminjaman-container button:hover {
-    background-color: #0056b3;
 }
 
 /* ===================================================== */
@@ -940,51 +701,60 @@ body.kalender-body {
 
 /* FullCalendar styling */
 #calendar {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100% !important;
+  min-width: unset !important; /* biar fleksibel */
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 10px !important;
+  padding: 0.8rem !important;
+}
+
+.fc-daygrid-day-frame {
+  min-height: 75px !important;
 }
 
 .fc .fc-toolbar-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #0d6efd;
-    }
-    .fc .fc-daygrid-event {
-      border-radius: 6px;
-      padding: 3px 5px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-    .legend {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .legend-color {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      display: inline-block;
-    }
+  font-size: 1rem !important;
+  font-weight: 600;
+  color: #0d6efd;
+}
 
+/* Event tetap kebaca */
+.fc .fc-daygrid-event {
+  font-size: 0.75rem !important;
+  white-space: normal !important;
+  padding: 3px 4px !important;
+  border-radius: 6px !important;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Tombol */
 .fc-button-primary {
   background-color: #2563eb !important;
   border: none !important;
   border-radius: 6px !important;
   transition: background 0.3s ease;
 }
-
 .fc-button-primary:hover {
   background-color: #1d4ed8 !important;
 }
@@ -1010,22 +780,81 @@ body.kalender-body {
   white-space: normal !important;
 }
 
-/* Tambahan halus untuk dropdown kalender */
-.kalender-container select.form-select {
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+.fc-toolbar-chunk button {
+  font-size: 0.8rem !important;
+  padding: 4px 6px !important;
 }
 
+/* Dropdown kalender */
+.kalender-container select.form-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 0.9rem !important;
+  padding: 0.6rem 0.75rem !important;
+  box-sizing: border-box;
+}
 
-/* Responsif */
+/* ========================== */
+/* ====== RESPONSIVE ======== */
+/* ========================== */
+
+/* Tablet dan bawah */
 @media (max-width: 992px) {
   .kalender-container {
-    margin-left: 0;
-    width: 100%;
-    border-radius: 0;
-    padding: 1.5rem;
+    margin-left: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    padding: 1.5rem !important;
+  }
+}
+
+/* HP (<=576px) */
+@media (max-width: 576px) {
+  body.kalender-body {
+    flex-direction: column;
+    align-items: center;
+    background-attachment: scroll;
+  }
+
+  .kalender-container {
+    margin: 1.2rem auto !important;
+    width: 92% !important;
+    padding: 1.2rem 1rem !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .kalender-container select.form-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+
+  #calendar {
+    width: 100% !important;
+    overflow-x: auto !important;
+    background: #fff;
+    border-radius: 10px;
+    padding: 0.8rem !important;
+  }
+
+  .kalender-container h2 {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+    text-align: center;
+  }
+
+  .fc .fc-toolbar {
+    flex-direction: column !important;
+    gap: 0.4rem;
+  }
+
+  .legend {
+    flex-direction: column !important;
+    align-items: flex-start;
+    gap: 0.4rem;
   }
 }
 
@@ -1180,6 +1009,7 @@ body.history-body {
     font-size: 1.2rem;
     margin-top: 0.5rem; /* biar rapi */
   }
+
 }
 
 
