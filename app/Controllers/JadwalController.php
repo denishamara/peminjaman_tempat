@@ -387,87 +387,65 @@ public function getKalenderData()
 
     $now = date('Y-m-d H:i:s');
 
-    // --- Ambil jadwal reguler (yang belum lewat) ---
+    // 🔹 Ambil jadwal reguler yang belum lewat, nama_reguler bukan 'Booking-%'
     $jadwals = $jadwalModel
         ->select('jadwal_reguler.*, room.nama_room, user.username')
-        ->join('user', 'user.id_user = jadwal_reguler.id_user', 'left')
         ->join('room', 'room.id_room = jadwal_reguler.id_room', 'left')
+        ->join('user', 'user.id_user = jadwal_reguler.id_user', 'left')
         ->where('jadwal_reguler.tanggal_selesai >=', $now)
+        ->where("jadwal_reguler.nama_reguler NOT LIKE 'Booking-%'")
+        ->orderBy('jadwal_reguler.tanggal_mulai', 'ASC')
         ->findAll();
 
-    // --- Ambil peminjaman aktif (belum ditolak / selesai / lewat) ---
+    // 🔹 Ambil booking aktif (yang disetujui)
+    $acceptedStatuses = ['Disetujui','disetujui','Diterima','diterima','Approve','approve','Approved','approved','Acc','acc'];
+
     $peminjamans = $peminjamanModel
         ->select('booking.*, room.nama_room, user.username')
         ->join('room', 'room.id_room = booking.id_room', 'left')
         ->join('user', 'user.id_user = booking.id_user', 'left')
-        ->whereNotIn('booking.status', ['Ditolak', 'Selesai'])
+        ->whereIn('booking.status', $acceptedStatuses)
         ->where('booking.tanggal_selesai >=', $now)
+        ->orderBy('booking.tanggal_mulai', 'ASC')
         ->findAll();
 
     $gabungan = [];
-    $terbooking = [];
 
-    // 🔹 tandai ruangan yang dibooking tiap tanggal
-    foreach ($peminjamans as $b) {
-        if (empty($b['tanggal_mulai']) || empty($b['tanggal_selesai'])) continue;
-        $mulai = new \DateTime($b['tanggal_mulai']);
-        $selesai = new \DateTime($b['tanggal_selesai']);
-        for ($d = clone $mulai; $d <= $selesai; $d->modify('+1 day')) {
-            $tglKey = $b['id_room'] . '_' . $d->format('Y-m-d');
-            $terbooking[$tglKey] = true;
-        }
-    }
-
-    // 🔹 tambah jadwal reguler
-    if ($filter == 'all' || $filter == 'reguler') {
+    // 🔵 Tambahkan jadwal reguler
+    if ($filter === 'all' || $filter === 'reguler') {
         foreach ($jadwals as $j) {
-            if (empty($j['tanggal_mulai']) || empty($j['tanggal_selesai'])) continue;
-
-            $tglMulai = new \DateTime($j['tanggal_mulai']);
-            $tglSelesai = new \DateTime($j['tanggal_selesai']);
-            $tglKey = $j['id_room'] . '_' . $tglMulai->format('Y-m-d');
-
-            if (!isset($terbooking[$tglKey]) && $tglSelesai->format('Y-m-d H:i:s') >= $now) {
-                $gabungan[] = [
-                    'nama_ruang'    => $j['nama_room'] ?? '-',
-                    'nama_kegiatan' => $j['nama_reguler'] ?? '-',
-                    'peminjam'      => $j['username'] ?? '(Reguler)',
-                    'tanggal'       => $tglMulai->format('Y-m-d'),
-                    'jam_mulai'     => date('H:i', strtotime($j['tanggal_mulai'])),
-                    'jam_selesai'   => date('H:i', strtotime($j['tanggal_selesai'])),
-                    'status'        => 'Reguler'
-                ];
-            }
+            $gabungan[] = [
+                'nama_ruang'    => $j['nama_room'] ?? '-',
+                'nama_kegiatan' => $j['nama_reguler'] ?? '-',
+                'peminjam'      => $j['username'] ?? '(Reguler)',
+                'tanggal'       => date('Y-m-d', strtotime($j['tanggal_mulai'])),
+                'jam_mulai'     => date('H:i', strtotime($j['tanggal_mulai'])),
+                'jam_selesai'   => date('H:i', strtotime($j['tanggal_selesai'])),
+                'status'        => 'Reguler'
+            ];
         }
     }
 
-    // 🔹 tambah booking aktif
-    if ($filter == 'all' || $filter == 'booking') {
+    // 🟢 Tambahkan booking
+    if ($filter === 'all' || $filter === 'booking') {
         foreach ($peminjamans as $p) {
-            if (empty($p['tanggal_mulai']) || empty($p['tanggal_selesai'])) continue;
+            $rentangTanggal = (date('Y-m-d', strtotime($p['tanggal_mulai'])) === date('Y-m-d', strtotime($p['tanggal_selesai'])))
+                ? date('Y-m-d', strtotime($p['tanggal_mulai']))
+                : date('Y-m-d', strtotime($p['tanggal_mulai'])) . ' s/d ' . date('Y-m-d', strtotime($p['tanggal_selesai']));
 
-            $tglMulai = new \DateTime($p['tanggal_mulai']);
-            $tglSelesai = new \DateTime($p['tanggal_selesai']);
-
-            if ($tglSelesai->format('Y-m-d H:i:s') >= $now) {
-                $rentangTanggal = ($tglMulai->format('Y-m-d') === $tglSelesai->format('Y-m-d'))
-                    ? $tglMulai->format('Y-m-d')
-                    : $tglMulai->format('Y-m-d') . ' s/d ' . $tglSelesai->format('Y-m-d');
-
-                $gabungan[] = [
-                    'nama_ruang'    => $p['nama_room'] ?? '-',
-                    'nama_kegiatan' => $p['keterangan'] ?? '-',
-                    'peminjam'      => $p['username'] ?? '-',
-                    'tanggal'       => $rentangTanggal,
-                    'jam_mulai'     => date('H:i', strtotime($p['tanggal_mulai'])),
-                    'jam_selesai'   => date('H:i', strtotime($p['tanggal_selesai'])),
-                    'status'        => ucfirst(strtolower($p['status'] ?? 'Booking'))
-                ];
-            }
+            $gabungan[] = [
+                'nama_ruang'    => $p['nama_room'] ?? '-',
+                'nama_kegiatan' => $p['keterangan'] ?? 'Booking Ruangan',
+                'peminjam'      => $p['username'] ?? '-',
+                'tanggal'       => $rentangTanggal,
+                'jam_mulai'     => date('H:i', strtotime($p['tanggal_mulai'])),
+                'jam_selesai'   => date('H:i', strtotime($p['tanggal_selesai'])),
+                'status'        => 'Booking'
+            ];
         }
     }
 
-    // 🔹 jika kosong
+    // 🔹 Jika kosong
     if (empty($gabungan)) {
         $gabungan[] = [
             'nama_ruang'    => '-',
@@ -479,7 +457,7 @@ public function getKalenderData()
         ];
     }
 
-    // 🔹 urutkan benar-benar berdasar tanggal mulai (bukan string strip)
+    // 🔹 Urutkan berdasarkan tanggal & jam mulai
     usort($gabungan, function ($a, $b) {
         $ta = strtotime(explode(' ', $a['tanggal'])[0]);
         $tb = strtotime(explode(' ', $b['tanggal'])[0]);

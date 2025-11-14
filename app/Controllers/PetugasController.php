@@ -65,12 +65,33 @@ class PetugasController extends BaseController
      */
     public function setuju($id)
 {
+    $booking = $this->peminjamanModel->find($id);
+    if (!$booking) {
+        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan');
+    }
+
+    // 🔹 Cek bentrok lagi sebelum approve
+    $start = $booking['tanggal_mulai'];
+    $end   = $booking['tanggal_selesai'];
+    $room  = $booking['id_room'];
+
+    $conflict = $this->jadwalModel
+        ->where('id_room', $room)
+        ->groupStart()
+            ->where("tanggal_mulai < '$end' AND tanggal_selesai > '$start'")
+        ->groupEnd()
+        ->first();
+
+    if ($conflict) {
+        return redirect()->back()->with('error', 'Booking ini masih bentrok dengan jadwal lain. Silakan periksa jadwal yang bentrok sebelum menyetujui.');
+    }
+
     $user = session()->get('user');
     if (!$user) {
         return redirect()->to('/auth/login')->with('error', 'Silakan login terlebih dahulu.');
     }
 
-    // 🔹 Pastikan petugas sudah ada atau buat otomatis
+    // 🔹 Pastikan petugas ada
     $petugas = $this->petugasModel->where('id_user', $user['id_user'])->first();
     if (!$petugas) {
         $this->petugasModel->insert([
@@ -80,46 +101,29 @@ class PetugasController extends BaseController
         $petugas = $this->petugasModel->where('id_user', $user['id_user'])->first();
     }
 
-    // 🔹 Ambil data booking
-    $booking = $this->peminjamanModel->find($id);
-    if (!$booking) {
-        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan');
-    }
-
-    // 🧹 Bersihkan teks bentrok dari keterangan
+    // 🔹 Update status & keterangan
     $newKeterangan = preg_replace('/\|?\s*Bentrok dengan jadwal reguler.*$/i', '', $booking['keterangan']);
     $newKeterangan = trim($newKeterangan, " |");
 
-    // 🔹 Update status & keterangan bersih
     $this->peminjamanModel->update($id, [
         'status'     => 'Diterima',
         'id_petugas' => $petugas['id_petugas'],
         'keterangan' => $newKeterangan ?: 'Peminjaman disetujui'
     ]);
 
-    // 🔹 Tambahkan ke jadwal_reguler jika belum ada
-    $isExist = $this->jadwalModel->where([
+    // 🔹 Tambahkan ke jadwal_reguler
+    $this->jadwalModel->insert([
+        'nama_reguler'    => 'Booking-' . $booking['id_booking'],
         'id_room'         => $booking['id_room'],
+        'id_user'         => $booking['id_user'],
         'tanggal_mulai'   => $booking['tanggal_mulai'],
-        'tanggal_selesai' => $booking['tanggal_selesai']
-    ])->first();
-
-    if (!$isExist) {
-        $this->jadwalModel->insert([
-            'nama_reguler'    => 'Booking-' . $booking['id_booking'],
-            'id_room'         => $booking['id_room'],
-            'id_user'         => $booking['id_user'],
-            'tanggal_mulai'   => $booking['tanggal_mulai'],
-            'tanggal_selesai' => $booking['tanggal_selesai'],
-            'keterangan'      => $newKeterangan ?: 'Peminjaman disetujui'
-        ]);
-    }
+        'tanggal_selesai' => $booking['tanggal_selesai'],
+        'keterangan'      => $newKeterangan ?: 'Peminjaman disetujui'
+    ]);
 
     return redirect()->to('/petugas/peminjaman_daftar')
                      ->with('success', 'Peminjaman berhasil disetujui dan jadwal diperbarui.');
 }
-
-
     /**
      * Menolak peminjaman
      */

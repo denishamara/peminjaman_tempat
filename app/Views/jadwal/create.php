@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <title>Tambah Jadwal Reguler</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <style>
-        body { background-color: #f8f9fa; }
-        .main-content { margin-left: 260px; padding: 30px; }
-        @media (max-width: 991.98px) { .main-content { margin-left: 0; padding: 15px; } }
+        body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+        .main-content { margin-left: 260px; padding: 30px; max-width: 100%; }
+        @media (max-width: 991.98px) { 
+            .main-content { margin-left: 0; padding: 15px; } 
+        }
+        .card { border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .form-check-label { white-space: normal; }
+        @media (max-width: 576px) {
+            .form-control, .form-select { font-size: 14px; padding: 8px; }
+            .input-group-text { font-size: 14px; padding: 8px; }
+            .form-check { margin-bottom: 8px; }
+        }
+        .d-flex { flex-wrap: wrap; gap: 10px; }
     </style>
 </head>
 <body>
@@ -35,10 +46,10 @@
                         <input type="text" name="nama_reguler" class="form-control" required>
                     </div>
 
-                    <!-- Pilih Ruangan (dropdown normal) -->
+                    <!-- Pilih Ruangan -->
                     <div class="mb-3">
                         <label class="form-label">Pilih Ruangan</label>
-                        <select name="id_room" class="form-select" required>
+                        <select id="ruanganSelect" name="id_room" class="form-select" required>
                             <option value="">-- Pilih Ruangan --</option>
                             <?php foreach ($ruangs as $r): ?>
                                 <option value="<?= $r['id_room'] ?>"><?= esc($r['nama_room']) ?></option>
@@ -46,10 +57,10 @@
                         </select>
                     </div>
 
-                    <!-- Pilih Peminjam (dropdown normal) -->
+                    <!-- Pilih Peminjam -->
                     <div class="mb-3">
                         <label class="form-label">Pilih Peminjam</label>
-                        <select name="id_user" class="form-select" required>
+                        <select id="userSelect" name="id_user" class="form-select" required>
                             <option value="">-- Pilih Peminjam --</option>
                             <?php foreach ($users as $u): ?>
                                 <option value="<?= $u['id_user'] ?>"><?= esc($u['username']) ?></option>
@@ -74,18 +85,21 @@
                     ?>
                     <div class="mb-3">
                         <label class="form-label">Pilih Sesi</label>
-                        <?php foreach ($sesi_list as $val => $label): ?>
-                            <div class="form-check">
-                                <input class="form-check-input sesi-check" type="checkbox" name="sesi[]" value="<?= $val ?>" id="sesi<?= $val ?>">
-                                <label class="form-check-label" for="sesi<?= $val ?>"><?= $label ?></label>
-                            </div>
-                        <?php endforeach; ?>
+                        <div class="d-flex flex-wrap">
+                            <?php foreach ($sesi_list as $val => $label): ?>
+                                <div class="form-check me-3">
+                                    <input class="form-check-input sesi-check" type="checkbox" name="sesi[]" value="<?= $val ?>" id="sesi<?= $val ?>">
+                                    <label class="form-check-label" for="sesi<?= $val ?>"><?= $label ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
 
-                    <!-- Hidden untuk tanggal mulai & selesai berdasarkan sesi -->
+                    <!-- Hidden untuk tanggal mulai & selesai -->
                     <input type="hidden" name="tanggal_mulai" id="tanggal_mulai">
                     <input type="hidden" name="tanggal_selesai" id="tanggal_selesai">
 
+                    <!-- Repeat mingguan -->
                     <div class="mb-3">
                         <label class="form-label">Ulangi setiap minggu selama</label>
                         <div class="input-group">
@@ -97,16 +111,22 @@
 
                     <input type="hidden" name="keterangan" value="Reguler">
 
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="<?= base_url('jadwal/index') ?>" class="btn btn-secondary">Batal</a>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="submit" class="btn btn-primary flex-grow-1">Simpan</button>
+                        <a href="<?= base_url('jadwal/index') ?>" class="btn btn-secondary flex-grow-1">Batal</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
+    // Initialize Choices.js untuk dropdown searchable
+    new Choices('#ruanganSelect', { searchEnabled: true, itemSelectText: '' });
+    new Choices('#userSelect', { searchEnabled: true, itemSelectText: '' });
+
+    // Update tanggal_mulai & tanggal_selesai berdasarkan sesi
     const tanggalInput = document.getElementById('tanggal');
     const mulaiInput = document.getElementById('tanggal_mulai');
     const selesaiInput = document.getElementById('tanggal_selesai');

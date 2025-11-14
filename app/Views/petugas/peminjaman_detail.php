@@ -59,6 +59,14 @@
             <h2 class="mb-0">ℹ Detail Peminjaman</h2>
         </div>
 
+        <!-- Notifikasi Flash -->
+        <?php if(session()->getFlashdata('error')): ?>
+            <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+        <?php endif; ?>
+        <?php if(session()->getFlashdata('success')): ?>
+            <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+        <?php endif; ?>
+
         <!-- Detail Table -->
         <div class="card shadow-sm">
             <div class="card-body">

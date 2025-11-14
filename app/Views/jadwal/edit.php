@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Edit Jadwal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
         body { background-color: #f8f9fa; }
         .main-content { margin-left: 260px; padding: 30px; }
@@ -37,119 +39,118 @@
             ?>
 
             <form method="post" action="<?= base_url('jadwal/update/' . $id) ?>">
-                <?= csrf_field() ?>
-                <input type="hidden" name="tipe" value="<?= esc($tipe) ?>">
+    <?= csrf_field() ?>
+    <input type="hidden" name="tipe" value="<?= esc($tipe) ?>">
 
-                <!-- Nama Kegiatan -->
-                <div class="mb-3">
-                    <label class="form-label">Nama Kegiatan</label>
-                    <input type="text" name="nama_kegiatan" class="form-control" value="<?= esc($namaKegiatan) ?>" required>
-                </div>
-
-                <!-- Ruangan -->
-                <div class="mb-3">
-                    <label class="form-label">Pilih Ruangan</label>
-                    <select name="id_room" class="form-select" required>
-                        <option value="">-- Pilih Ruangan --</option>
-                        <?php foreach($ruangs as $r): ?>
-                            <option value="<?= $r['id_room'] ?>" <?= ($jadwal['id_room'] ?? '') == $r['id_room'] ? 'selected' : '' ?>>
-                                <?= esc($r['nama_room']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <!-- Peminjam -->
-                <div class="mb-3">
-                    <label class="form-label">Pilih Peminjam</label>
-                    <select name="id_user" class="form-select" required>
-                        <option value="">-- Pilih User --</option>
-                        <?php foreach($users as $u): ?>
-                            <option value="<?= $u['id_user'] ?>" <?= ($jadwal['id_user'] ?? '') == $u['id_user'] ? 'selected' : '' ?>>
-                                <?= esc($u['username']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <?php if($isReguler): ?>
-                    <!-- Tanggal (sesi akan hitung otomatis) -->
-                    <div class="mb-3">
-                        <label class="form-label">Tanggal</label>
-                        <input type="date" name="tanggal" class="form-control"
-                               value="<?= !empty($jadwal['tanggal_mulai']) ? date('Y-m-d', strtotime($jadwal['tanggal_mulai'])) : '' ?>" required>
-                    </div>
-
-                    <!-- Pilih Sesi -->
-                    <div class="mb-3">
-                        <label class="form-label">Pilih Sesi</label>
-                        <?php
-                            $sesi_list = [
-                                1 => "Sesi 1 (07:15 - 08:00)", 2 => "Sesi 2 (08:05 - 08:50)", 3 => "Sesi 3 (08:55 - 09:40)",
-                                4 => "Sesi 4 (09:45 - 10:30)", 5 => "Sesi 5 (10:35 - 11:20)", 6 => "Sesi 6 (11:25 - 12:10)",
-                                7 => "Sesi 7 (12:15 - 13:00)", 8 => "Sesi 8 (13:05 - 13:50)", 9 => "Sesi 9 (13:55 - 14:40)",
-                                10=> "Sesi 10 (14:45 - 15:30)"
-                            ];
-                            $checkedSesi = [];
-                            $mulaiSesi = date('H:i', strtotime($jadwal['tanggal_mulai'] ?? '07:15'));
-                            $selesaiSesi = date('H:i', strtotime($jadwal['tanggal_selesai'] ?? '08:00'));
-                            foreach($sesi_list as $val => $label){
-                                preg_match("/\((.*?) - (.*?)\)/", $label, $match);
-                                $sStart = $match[1]; $sEnd = $match[2];
-                                if($mulaiSesi <= $sStart && $selesaiSesi >= $sEnd) $checkedSesi[] = $val;
-                            }
-                        ?>
-                        <?php foreach($sesi_list as $val => $label): ?>
-                            <div class="form-check">
-                                <input class="form-check-input sesi-check" type="checkbox" name="sesi[]" value="<?= $val ?>" id="sesi<?= $val ?>" <?= in_array($val, $checkedSesi) ? 'checked' : '' ?>>
-                                <label class="form-check-label" for="sesi<?= $val ?>"><?= $label ?></label>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?= $jadwal['tanggal_mulai'] ?? '' ?>">
-                    <input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?= $jadwal['tanggal_selesai'] ?? '' ?>">
-
-                <?php else: ?>
-                    <!-- BOOKING → pilih tanggal mulai & selesai + jam optional -->
-                    <div class="mb-3 row">
-                        <div class="col">
-                            <label class="form-label">Tanggal Mulai</label>
-                            <input type="date" name="tanggal_mulai_tgl" class="form-control" 
-                                value="<?= !empty($jadwal['tanggal_mulai']) ? date('Y-m-d', strtotime($jadwal['tanggal_mulai'])) : '' ?>" required>
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Tanggal Selesai</label>
-                            <input type="date" name="tanggal_selesai_tgl" class="form-control" 
-                                value="<?= !empty($jadwal['tanggal_selesai']) ? date('Y-m-d', strtotime($jadwal['tanggal_selesai'])) : '' ?>" required>
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <div class="col">
-                            <label class="form-label">Jam Mulai</label>
-                            <input type="time" name="jam_mulai" class="form-control" 
-                                value="<?= !empty($jadwal['tanggal_mulai']) ? date('H:i', strtotime($jadwal['tanggal_mulai'])) : '07:15' ?>">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Jam Selesai</label>
-                            <input type="time" name="jam_selesai" class="form-control" 
-                                value="<?= !empty($jadwal['tanggal_selesai']) ? date('H:i', strtotime($jadwal['tanggal_selesai'])) : '08:00' ?>">
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="<?= base_url('jadwal/index') ?>" class="btn btn-secondary">Batal</a>
-                </div>
-            </form>
-        </div>
+    <!-- Nama Kegiatan -->
+    <div class="mb-3">
+        <label class="form-label">Nama Kegiatan</label>
+        <input type="text" name="nama_kegiatan" class="form-control" value="<?= esc($namaKegiatan) ?>" required>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php if($isReguler): ?>
+    <!-- Ruangan -->
+    <div class="mb-3">
+        <label class="form-label">Pilih Ruangan</label>
+        <select id="ruanganSelect" name="id_room" class="form-select" required>
+            <option value="">-- Pilih Ruangan --</option>
+            <?php foreach($ruangs as $r): ?>
+                <option value="<?= $r['id_room'] ?>" <?= ($jadwal['id_room'] ?? '') == $r['id_room'] ? 'selected' : '' ?>>
+                    <?= esc($r['nama_room']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Peminjam -->
+    <div class="mb-3">
+        <label class="form-label">Pilih Peminjam</label>
+        <select id="userSelect" name="id_user" class="form-select" required>
+            <option value="">-- Pilih User --</option>
+            <?php foreach($users as $u): ?>
+                <option value="<?= $u['id_user'] ?>" <?= ($jadwal['id_user'] ?? '') == $u['id_user'] ? 'selected' : '' ?>>
+                    <?= esc($u['username']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Tanggal & Sesi / Booking -->
+    <?php if($isReguler): ?>
+        <div class="mb-3">
+            <label class="form-label">Tanggal</label>
+            <input type="date" name="tanggal" class="form-control"
+                   value="<?= !empty($jadwal['tanggal_mulai']) ? date('Y-m-d', strtotime($jadwal['tanggal_mulai'])) : '' ?>" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Pilih Sesi</label>
+            <?php
+                $sesi_list = [
+                    1 => "Sesi 1 (07:15 - 08:00)", 2 => "Sesi 2 (08:05 - 08:50)", 3 => "Sesi 3 (08:55 - 09:40)",
+                    4 => "Sesi 4 (09:45 - 10:30)", 5 => "Sesi 5 (10:35 - 11:20)", 6 => "Sesi 6 (11:25 - 12:10)",
+                    7 => "Sesi 7 (12:15 - 13:00)", 8 => "Sesi 8 (13:05 - 13:50)", 9 => "Sesi 9 (13:55 - 14:40)",
+                    10=> "Sesi 10 (14:45 - 15:30)"
+                ];
+                $checkedSesi = [];
+                $mulaiSesi = date('H:i', strtotime($jadwal['tanggal_mulai'] ?? '07:15'));
+                $selesaiSesi = date('H:i', strtotime($jadwal['tanggal_selesai'] ?? '08:00'));
+                foreach($sesi_list as $val => $label){
+                    preg_match("/\((.*?) - (.*?)\)/", $label, $match);
+                    $sStart = $match[1]; $sEnd = $match[2];
+                    if($mulaiSesi <= $sStart && $selesaiSesi >= $sEnd) $checkedSesi[] = $val;
+                }
+            ?>
+            <?php foreach($sesi_list as $val => $label): ?>
+                <div class="form-check">
+                    <input class="form-check-input sesi-check" type="checkbox" name="sesi[]" value="<?= $val ?>" id="sesi<?= $val ?>" <?= in_array($val, $checkedSesi) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="sesi<?= $val ?>"><?= $label ?></label>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?= $jadwal['tanggal_mulai'] ?? '' ?>">
+        <input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?= $jadwal['tanggal_selesai'] ?? '' ?>">
+
+    <?php else: ?>
+        <div class="mb-3 row">
+            <div class="col">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="tanggal_mulai_tgl" class="form-control" 
+                    value="<?= !empty($jadwal['tanggal_mulai']) ? date('Y-m-d', strtotime($jadwal['tanggal_mulai'])) : '' ?>" required>
+            </div>
+            <div class="col">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date" name="tanggal_selesai_tgl" class="form-control" 
+                    value="<?= !empty($jadwal['tanggal_selesai']) ? date('Y-m-d', strtotime($jadwal['tanggal_selesai'])) : '' ?>" required>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col">
+                <label class="form-label">Jam Mulai</label>
+                <input type="time" name="jam_mulai" class="form-control" 
+                    value="<?= !empty($jadwal['tanggal_mulai']) ? date('H:i', strtotime($jadwal['tanggal_mulai'])) : '07:15' ?>">
+            </div>
+            <div class="col">
+                <label class="form-label">Jam Selesai</label>
+                <input type="time" name="jam_selesai" class="form-control" 
+                    value="<?= !empty($jadwal['tanggal_selesai']) ? date('H:i', strtotime($jadwal['tanggal_selesai'])) : '08:00' ?>">
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="<?= base_url('jadwal/index') ?>" class="btn btn-secondary">Batal</a>
+    </div>
+</form>
+
 <script>
+    // Initialize Choices.js
+    new Choices('#ruanganSelect', { searchEnabled: true, itemSelectText: '' });
+    new Choices('#userSelect', { searchEnabled: true, itemSelectText: '' });
+
+    <?php if($isReguler): ?>
+    // Script sesi tetap sama
     const tanggalInput = document.querySelector('input[name="tanggal"]');
     const mulaiInput = document.getElementById('tanggal_mulai');
     const selesaiInput = document.getElementById('tanggal_selesai');
@@ -188,7 +189,7 @@
     sesiCheckboxes.forEach(cb=>cb.addEventListener('change', updateJamDariSesi));
     tanggalInput.addEventListener('change', updateJamDariSesi);
     updateJamDariSesi();
+    <?php endif; ?>
 </script>
-<?php endif; ?>
 </body>
 </html>
