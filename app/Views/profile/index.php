@@ -5,6 +5,29 @@
   <title>Profil Saya</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
+
+  <style>
+    /* Tambahan CSS fix */
+
+    .profile-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* Biar tiap elemen tidak nempel */
+    }
+
+    .profile-body p {
+      margin-bottom: 6px;
+    }
+
+    .btn-edit {
+      margin-top: 15px !important; /* Tambah jarak dari Total Booking */
+      display: inline-block;
+    }
+
+    .profile-card {
+      padding-bottom: 20px; /* Tambahan ruang bawah agar tombol tidak mepet */
+    }
+  </style>
 </head>
 
 <body class="profile-body">
