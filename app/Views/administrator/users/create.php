@@ -88,18 +88,6 @@
             </select>
           </div>
 
-          <div class="mb-3" id="namaPetugasContainer" style="display: none;">
-            <label for="nama_petugas" class="form-label fw-semibold">Nama Petugas</label>
-            <input
-              type="text"
-              id="nama_petugas"
-              name="nama_petugas"
-              class="form-control"
-              value="<?= old('nama_petugas') ?>"
-              placeholder="Masukkan nama petugas"
-            >
-          </div>
-
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">💾 Tambah User</button>
           </div>

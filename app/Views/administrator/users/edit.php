@@ -55,14 +55,6 @@
                         </select>
                     </div>
 
-                    <!-- Nama Petugas (hanya muncul jika role = petugas) -->
-                    <div class="mb-3">
-                        <label class="form-label">Nama Petugas</label>
-                        <input type="text" name="nama_petugas" class="form-control" 
-                               value="<?= esc($nama_petugas ?? '') ?>" 
-                               placeholder="Isi jika role Petugas">
-                    </div>
-
                     <div class="d-flex justify-content-between mt-3">
                         <button type="submit" class="btn btn-primary">Update</button>
                         <a href="<?= base_url('/administrator/users') ?>" class="btn btn-secondary">Batal</a>

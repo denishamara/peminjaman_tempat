@@ -3,17 +3,14 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Models\PetugasModel;
 
 class UserController extends BaseController
 {
     protected $userModel;
-    protected $petugasModel;
 
     public function __construct()
     {
         $this->userModel = new UserModel();
-        $this->petugasModel = new PetugasModel();
     }
 
     // ===============================
@@ -26,7 +23,7 @@ class UserController extends BaseController
 
         return view('administrator/users/index', [
             'users' => $users,
-            'user'  => $currentUser // untuk sidebar
+            'user'  => $currentUser
         ]);
     }
 
@@ -47,8 +44,7 @@ class UserController extends BaseController
         $rules = [
             'username' => 'required|is_unique[user.username]',
             'password' => 'required|min_length[6]',
-            'role'     => 'required|in_list[administrator,petugas,peminjam]',
-            'nama_petugas' => 'permit_empty|string|max_length[100]'
+            'role'     => 'required|in_list[administrator,petugas,peminjam]'
         ];
 
         if (!$this->validate($rules)) {
@@ -62,14 +58,6 @@ class UserController extends BaseController
         ];
 
         $this->userModel->insert($data);
-        $idUser = $this->userModel->getInsertID();
-
-        if ($data['role'] === 'petugas') {
-            $this->petugasModel->insert([
-                'id_user' => $idUser,
-                'nama_petugas' => $this->request->getPost('nama_petugas') ?? $data['username']
-            ]);
-        }
 
         return redirect()->to('/administrator/users')->with('success', 'User berhasil ditambahkan');
     }
@@ -84,18 +72,11 @@ class UserController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('User tidak ditemukan');
         }
 
-        $namaPetugas = null;
-        if ($userToEdit['role'] === 'petugas') {
-            $petugas = $this->petugasModel->where('id_user', $id)->first();
-            $namaPetugas = $petugas['nama_petugas'] ?? null;
-        }
-
-        $currentUser = session()->get('user'); // user login
+        $currentUser = session()->get('user');
 
         return view('administrator/users/edit', [
-            'user' => $currentUser,        // untuk sidebar
-            'userToEdit' => $userToEdit,   // untuk form edit
-            'nama_petugas' => $namaPetugas
+            'user' => $currentUser,
+            'userToEdit' => $userToEdit
         ]);
     }
 
@@ -111,8 +92,7 @@ class UserController extends BaseController
 
         $rules = [
             'username' => "required|is_unique[user.username,id_user,{$id}]",
-            'role'     => 'required|in_list[administrator,petugas,peminjam]',
-            'nama_petugas' => 'permit_empty|string|max_length[100]'
+            'role'     => 'required|in_list[administrator,petugas,peminjam]'
         ];
 
         if ($this->request->getPost('password')) {
@@ -134,24 +114,6 @@ class UserController extends BaseController
 
         $this->userModel->update($id, $data);
 
-        // Update tabel petugas
-        if ($data['role'] === 'petugas') {
-            $existing = $this->petugasModel->where('id_user', $id)->first();
-            if ($existing) {
-                $this->petugasModel->update($existing['id_petugas'], [
-                    'nama_petugas' => $this->request->getPost('nama_petugas') ?? $data['username']
-                ]);
-            } else {
-                $this->petugasModel->insert([
-                    'id_user' => $id,
-                    'nama_petugas' => $this->request->getPost('nama_petugas') ?? $data['username']
-                ]);
-            }
-        } else {
-            // Hapus dari petugas jika bukan role petugas
-            $this->petugasModel->where('id_user', $id)->delete();
-        }
-
         return redirect()->to('/administrator/users')->with('success', 'User berhasil diperbarui');
     }
 
@@ -160,9 +122,7 @@ class UserController extends BaseController
     // ===============================
     public function delete($id)
     {
-        $this->petugasModel->where('id_user', $id)->delete();
         $this->userModel->delete($id);
-
         return redirect()->to('/administrator/users')->with('success', 'User berhasil dihapus');
     }
 }
