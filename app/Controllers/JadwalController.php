@@ -188,7 +188,7 @@ class JadwalController extends BaseController
 
     // 🔁 Update jadwal
     public function update($id)
-{
+    {
     $tipe = $this->request->getPost('tipe');
 
     if ($tipe === 'reguler') {

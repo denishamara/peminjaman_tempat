@@ -18,8 +18,8 @@
         .peminjaman-card button:hover { background-color: #0b5ed7; }
 
         /* responsive */
-        @media (max-width: 991px) { .peminjaman-body.has-sidebar { padding: 120px 20px 20px 20px; } .peminjaman-card { width: 92%; margin-top: 130px; } }
-        @media (max-width: 576px) { .peminjaman-card { padding: 20px; margin-top: 140px; } .peminjaman-card input, .peminjaman-card textarea { font-size: 14px; padding: 10px; } }
+        @media (max-width: 991px) { .peminjaman-body.has-sidebar { padding: 120px 20px 20px 20px; } .peminjaman-card { width: 92%; margin-top: 80px; } }
+        @media (max-width: 576px) { .peminjaman-card { padding: 20px; margin-top: 60px; } .peminjaman-card input, .peminjaman-card textarea { font-size: 14px; padding: 10px; } }
     </style>
 </head>
 <body class="peminjaman-page peminjaman-body has-sidebar">

@@ -59,9 +59,18 @@ class RuangController extends BaseController
 
     // ➕ Tambah ruang
     public function create()
-    {
-        return view('ruang/create');
-    }
+{
+    $ruangModel = new RuangModel();
+    $userModel  = new \App\Models\UserModel(); // pastikan ada model UserModel
+
+    $ruangs = $ruangModel->findAll();
+    $users  = $userModel->findAll();
+
+    return view('ruang/create', [
+        'ruangs' => $ruangs,
+        'users'  => $users
+    ]);
+}
 
     // 💾 Simpan ruang
     public function store()

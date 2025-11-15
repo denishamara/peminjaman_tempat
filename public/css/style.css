@@ -216,15 +216,6 @@ body.register-body .login-link a:hover {
   }
 }
 
-.laporan-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: url('/images/bg.jpeg') no-repeat center center fixed;
-  background-size: cover;
-}
-
 /* ========== Layout dengan Sidebar Umum ========== */
 .has-sidebar {
     display: flex;
@@ -699,10 +690,12 @@ body.kalender-body {
   text-align: center;
 }
 
-/* FullCalendar styling */
+/* ============================================================
+   FULLCALENDAR STYLING
+   ============================================================ */
 #calendar {
   width: 100% !important;
-  min-width: unset !important; /* biar fleksibel */
+  min-width: unset !important;
   overflow-x: auto;
   background: #fff;
   border-radius: 10px !important;
@@ -719,7 +712,6 @@ body.kalender-body {
   color: #0d6efd;
 }
 
-/* Event tetap kebaca */
 .fc .fc-daygrid-event {
   font-size: 0.75rem !important;
   white-space: normal !important;
@@ -727,7 +719,6 @@ body.kalender-body {
   border-radius: 6px !important;
 }
 
-/* Legend */
 .legend {
   display: flex;
   flex-direction: column;
@@ -748,7 +739,6 @@ body.kalender-body {
   display: inline-block;
 }
 
-/* Tombol */
 .fc-button-primary {
   background-color: #2563eb !important;
   border: none !important;
@@ -763,7 +753,6 @@ body.kalender-body {
   background-color: #f1f5f9;
 }
 
-/* Tooltip / pop-up event info */
 .fc-popover {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -794,11 +783,25 @@ body.kalender-body {
   box-sizing: border-box;
 }
 
-/* ========================== */
-/* ====== RESPONSIVE ======== */
-/* ========================== */
+/* ============================================================
+   FIX MODAL TRANSPARAN
+   ============================================================ */
+.modal-content {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  border-radius: 12px !important;
+}
 
-/* Tablet dan bawah */
+.modal-backdrop.show {
+  opacity: 0.55 !important;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 992px) {
   .kalender-container {
     margin-left: 0 !important;
@@ -808,7 +811,6 @@ body.kalender-body {
   }
 }
 
-/* HP (<=576px) */
 @media (max-width: 576px) {
   body.kalender-body {
     flex-direction: column;
@@ -857,6 +859,7 @@ body.kalender-body {
     gap: 0.4rem;
   }
 }
+
 
 /* ===================================================== */
 /* =============== HALAMAN RIWAYAT PEMINJAMAN =========== */

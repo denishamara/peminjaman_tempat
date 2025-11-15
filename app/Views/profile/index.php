@@ -26,6 +26,7 @@
 
         <hr>
         <p><strong>ID:</strong> <?= esc($user['id_user']) ?></p>
+        <p><strong>Total Booking:</strong> <?= esc($totalBooking) ?></p>
 
         <a href="<?= base_url('/profile/edit') ?>" class="btn-edit mt-2">Edit Profil</a>
       </div>

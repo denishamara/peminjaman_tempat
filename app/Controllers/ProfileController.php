@@ -16,12 +16,18 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $user = session()->get('user');
-        if (!$user) {
-            return redirect()->to('/login');
-        }
+    $user = session()->get('user');
+    if (!$user) {
+        return redirect()->to('/login');
+    }
 
-        return view('profile/index', ['user' => $user]);
+    // 🔥 Ambil total booking dari MySQL function
+    $totalBooking = $this->userModel->getTotalBooking($user['id_user']);
+
+    return view('profile/index', [
+        'user' => $user,
+        'totalBooking' => $totalBooking
+    ]);
     }
 
     public function edit()

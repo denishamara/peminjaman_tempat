@@ -7,6 +7,51 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
   <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <style>
+    body { background-color: #f8f9fa; }
+    .main-content { margin-left: 260px; padding: 30px; }
+    @media (max-width: 991.98px) { .main-content { margin-left: 0; padding: 15px; } }
+    .form-check-label { white-space: normal; }
+
+    /* FIX DROPDOWN CHOICES */
+    .choices__list.choices__list--dropdown {
+        z-index: 999999 !important;
+        position: absolute !important;
+        max-height: 250px !important;
+        overflow-y: auto !important; /* scroll utama */
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        width: 100% !important;
+        max-width: 300px !important;
+        left: 0 !important;
+    }
+
+    /* Hilangkan scroll kedua */
+    .choices__list--dropdown .choices__list {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    .choices {
+        max-width: 300px !important;
+        width: 100% !important;
+    }
+
+    @media (max-width: 576px) {
+      .choices,
+      .choices__list--dropdown {
+        max-width: 260px !important;
+      }
+    }
+
+    .choices__inner {
+      padding: 6px 10px !important;
+      min-height: 42px !important;
+      border-radius: 8px !important;
+    }
+</style>
 </head>
 
 <body class="modern-dashboard">
@@ -154,5 +199,15 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    new Choices('#ruangSelect', {
+        searchEnabled: true,
+        itemSelectText: '',
+        removeItemButton: false,
+        shouldSort: false,
+    });
+});
+</script>
 </body>
 </html>

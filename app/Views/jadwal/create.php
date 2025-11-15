@@ -71,7 +71,8 @@
                     <!-- Tanggal -->
                     <div class="mb-3">
                         <label class="form-label">Tanggal</label>
-                        <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+                        <input type="date" name="tanggal" id="tanggal" class="form-control" required
+                            min="<?= date('Y-m-d') ?>"> <!-- batas minimum = hari ini -->
                     </div>
 
                     <!-- Pilih Sesi -->
@@ -132,6 +133,10 @@
     const selesaiInput = document.getElementById('tanggal_selesai');
     const sesiCheckboxes = document.querySelectorAll('.sesi-check');
 
+    // 🔹 Set min date otomatis (agar tidak bisa pilih tanggal lampau)
+    const today = new Date().toISOString().split('T')[0];
+    tanggalInput.setAttribute('min', today);
+
     const sesiWaktu = {
         1: { start: "07:15", end: "08:00" },
         2: { start: "08:05", end: "08:50" },
@@ -147,7 +152,10 @@
 
     function updateDateTime() {
         const tanggal = tanggalInput.value;
-        const selected = Array.from(sesiCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value)).sort((a,b)=>a-b);
+        const selected = Array.from(sesiCheckboxes)
+                              .filter(cb => cb.checked)
+                              .map(cb => parseInt(cb.value))
+                              .sort((a,b)=>a-b);
         if (!tanggal || selected.length === 0) {
             mulaiInput.value = '';
             selesaiInput.value = '';
