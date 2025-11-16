@@ -12,35 +12,29 @@ class UsersSeeder extends Seeder
 
         $data = [
             [
-                'username'   => 'admin',
-                'email'      => 'admin@example.com',
-                'password'   => password_hash('Admin123!', PASSWORD_DEFAULT),
-                'role'       => 'administrator',
-                'foto'       => 'default.jpeg',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'username' => 'admin',
+                'telepon'  => null,
+                'password' => password_hash('Admin123!', PASSWORD_DEFAULT),
+                'role'     => 'administrator',
+                'foto'     => 'default.jpeg',
             ],
             [
-                'username'   => 'petugas1',
-                'email'      => 'petugas1@example.com',
-                'password'   => password_hash('Petugas123!', PASSWORD_DEFAULT),
-                'role'       => 'petugas',
-                'foto'       => 'default.jpeg',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'username' => 'petugas1',
+                'telepon'  => null,
+                'password' => password_hash('Petugas123!', PASSWORD_DEFAULT),
+                'role'     => 'petugas',
+                'foto'     => 'default.jpeg',
             ],
             [
-                'username'   => 'peminjam1',
-                'email'      => 'peminjam1@example.com',
-                'password'   => password_hash('Peminjam123!', PASSWORD_DEFAULT),
-                'role'       => 'peminjam',
-                'foto'       => 'default.jpeg',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'username' => 'peminjam1',
+                'telepon'  => null,
+                'password' => password_hash('Peminjam123!', PASSWORD_DEFAULT),
+                'role'     => 'peminjam',
+                'foto'     => 'default.jpeg',
             ],
         ];
 
-        // Sesuaikan nama tabel jika berbeda
-        $this->db->table('users')->insertBatch($data);
+        // Insert ke tabel `user` sesuai struktur database
+        $this->db->table('user')->insertBatch($data);
     }
 }
