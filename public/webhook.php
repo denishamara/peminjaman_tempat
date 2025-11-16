@@ -20,7 +20,7 @@ define('SECRET_TOKEN', 'your_secret_token_here_ganti_dengan_random_string'); // 
 define('PROJECT_PATH', '/var/www/peminjaman_tempat');
 define('LOG_FILE', PROJECT_PATH . '/writable/logs/webhook.log');
 define('BRANCH', 'main');
-define('PHP_FPM_SERVICE', 'php8.2-fpm'); // Sesuai dengan PHP 8.2
+define('PHP_FPM_SERVICE', 'php8.2-fpm');
 
 // ============ FUNGSI LOG ============
 function logMessage($message) {
@@ -68,6 +68,45 @@ function setupGitSafety() {
     }
 }
 
+// ============ FUNGSI CLEAN GIT WORKING DIRECTORY ============
+function cleanGitWorkingDirectory() {
+    logMessage('Cleaning Git working directory...');
+    
+    $commands = [
+        // Stash any local changes (backup)
+        'git stash push --include-untracked --message "Webhook auto-stash ' . date('Y-m-d H:i:s') . '"',
+        // Reset hard to remote branch
+        'git reset --hard origin/' . BRANCH,
+        // Clean untracked files
+        'git clean -fd',
+        // Pull latest changes
+        'git pull origin ' . BRANCH
+    ];
+    
+    $allOutput = [];
+    $success = true;
+    
+    foreach ($commands as $command) {
+        $output = [];
+        $returnCode = 0;
+        
+        if (!executeCommand($command, $output, $returnCode)) {
+            // Untuk git stash, jika tidak ada changes, akan return error tapi itu normal
+            if (strpos($command, 'git stash') === 0 && $returnCode !== 0) {
+                logMessage('INFO: No local changes to stash');
+                continue;
+            }
+            
+            // Untuk commands lain, log warning tapi continue
+            logMessage('WARNING: Git command failed: ' . $command);
+        }
+        
+        $allOutput = array_merge($allOutput, $output);
+    }
+    
+    return [true, $allOutput];
+}
+
 // ============ FUNGSI DEPLOY ============
 function runDeployment() {
     $allOutput = [];
@@ -77,22 +116,16 @@ function runDeployment() {
     // 1. Setup Git safety first
     setupGitSafety();
     
-    // 2. Reset any local changes dan pull latest changes
-    logMessage('Resetting any local changes and pulling latest changes...');
-    $gitCommands = [
-        'git fetch origin',
-        'git reset --hard origin/' . BRANCH,
-        'git clean -fd'
-    ];
+    // 2. Fetch latest changes dulu
+    logMessage('Fetching latest changes from remote...');
+    executeCommand('git fetch origin');
     
-    foreach ($gitCommands as $gitCommand) {
-        if (!executeCommand($gitCommand, $output, $returnCode)) {
-            logMessage('WARNING: Git command failed: ' . $gitCommand);
-        }
-        $allOutput = array_merge($allOutput, $output);
-    }
+    // 3. Clean working directory dan pull changes
+    logMessage('Cleaning working directory and pulling changes...');
+    list($gitSuccess, $gitOutput) = cleanGitWorkingDirectory();
+    $allOutput = array_merge($allOutput, $gitOutput);
     
-    // 3. Set proper permissions
+    // 4. Set proper permissions
     logMessage('Setting permissions...');
     $permissionCommands = [
         'chmod -R 755 writable/',
@@ -107,7 +140,7 @@ function runDeployment() {
     // Change ownership to www-data
     executeCommand('chown -R www-data:www-data writable/');
     
-    // 4. Clear CodeIgniter cache
+    // 5. Clear CodeIgniter cache
     logMessage('Clearing CodeIgniter cache...');
     $cacheCommands = [
         'rm -rf writable/cache/*',
@@ -119,14 +152,16 @@ function runDeployment() {
         executeCommand($cmd);
     }
     
-    // 5. Run database migrations
+    // 6. Run database migrations
     logMessage('Running database migrations...');
     if (!executeCommand('php spark migrate', $output, $returnCode)) {
         logMessage('WARNING: Database migration might have issues');
+    } else {
+        logMessage('SUCCESS: Database migrations completed');
     }
     $allOutput = array_merge($allOutput, $output);
     
-    // 6. Clear all caches
+    // 7. Clear all caches
     logMessage('Clearing all caches...');
     $sparkCommands = [
         'php spark cache:clear',
@@ -138,37 +173,38 @@ function runDeployment() {
         executeCommand($cmd);
     }
     
-    // 7. Install/update Composer dependencies (jika menggunakan Composer)
+    // 8. Install/update Composer dependencies (jika menggunakan Composer)
     if (file_exists(PROJECT_PATH . '/composer.json')) {
         logMessage('Installing Composer dependencies...');
         if (!executeCommand('composer install --no-dev --optimize-autoloader', $output, $returnCode)) {
             logMessage('WARNING: Composer install failed');
+        } else {
+            logMessage('SUCCESS: Composer dependencies installed');
         }
         $allOutput = array_merge($allOutput, $output);
     }
     
-    // 8. Set final permissions
+    // 9. Set final permissions
     logMessage('Setting final permissions...');
     executeCommand('chmod -R 755 writable/');
     executeCommand('chown -R www-data:www-data writable/');
     
-    // 9. Restart PHP-FPM 8.2 (perlu sudo)
+    // 10. Restart PHP-FPM 8.2 (perlu sudo)
     logMessage('Restarting PHP-FPM 8.2...');
     if (!executeCommand('sudo systemctl restart ' . PHP_FPM_SERVICE, $output, $returnCode)) {
         logMessage('WARNING: Failed to restart PHP-FPM 8.2');
+    } else {
+        logMessage('SUCCESS: PHP-FPM 8.2 restarted');
     }
     $allOutput = array_merge($allOutput, $output);
     
-    // 10. Reload Nginx (perlu sudo)
+    // 11. Reload Nginx (perlu sudo)
     logMessage('Reloading Nginx...');
     if (!executeCommand('sudo systemctl reload nginx', $output, $returnCode)) {
         logMessage('WARNING: Failed to reload Nginx');
+    } else {
+        logMessage('SUCCESS: Nginx reloaded');
     }
-    $allOutput = array_merge($allOutput, $output);
-    
-    // 11. Verify deployment
-    logMessage('Verifying deployment...');
-    executeCommand('php --version', $output);
     $allOutput = array_merge($allOutput, $output);
     
     logMessage('=== DEPLOYMENT COMPLETED SUCCESSFULLY ===');
