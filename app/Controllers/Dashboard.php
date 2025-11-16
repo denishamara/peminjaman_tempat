@@ -53,10 +53,10 @@ class Dashboard extends BaseController
                 $bulanData = [];
                 $jumlahData = [];
                 $result = $this->bookingModel
-                    ->select("DATE_FORMAT(tanggal_mulai, '%b %Y') AS bulan, COUNT(*) AS jumlah")
+                    ->select("DATE_FORMAT(tanggal_mulai, '%b %Y') AS bulan, COUNT(*) AS jumlah, MIN(tanggal_mulai) AS min_tanggal")
                     ->where('tanggal_mulai >=', date('Y-m-01', strtotime('-5 months')))
                     ->groupBy("DATE_FORMAT(tanggal_mulai, '%Y-%m')")
-                    ->orderBy("MIN(tanggal_mulai)", 'ASC')
+                    ->orderBy("min_tanggal", 'ASC')
                     ->findAll();
                 foreach ($result as $r) {
                     $bulanData[] = $r['bulan'];

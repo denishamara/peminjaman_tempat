@@ -13,8 +13,10 @@ class UserModel extends Model
     public function getTotalBooking($id_user)
 {
     $db = \Config\Database::connect();
-    $query = $db->query("SELECT total_booking_user($id_user) AS total");
-    return $query->getRow()->total;
+    // Ganti fungsi yang tidak ada dengan query COUNT langsung
+    $query = $db->query("SELECT COUNT(*) AS total FROM booking WHERE id_user = ?", [$id_user]);
+    $row = $query->getRow();
+    return $row ? $row->total : 0;
 }
 
 }
