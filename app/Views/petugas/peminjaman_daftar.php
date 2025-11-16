@@ -17,7 +17,7 @@
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">📋 Daftar Peminjaman</h2>
+            <h2 class="mb-0 fw-bold" style="font-size: 1.75rem;">📋 Daftar Peminjaman</h2>
         </div>
 
         <!-- Flash Messages -->

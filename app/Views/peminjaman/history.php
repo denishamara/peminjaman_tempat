@@ -12,7 +12,7 @@
 <?= view('layouts/sidebar') ?>
 
 <div class="history-container">
-  <h2>📜 Daftar Peminjaman yang Telah Selesai</h2>
+  <h2 class="fw-bold" style="font-size: 1.75rem;">📜 Daftar Peminjaman yang Telah Selesai</h2>
 
   <?php if (empty($riwayat)) : ?>
     <div class="alert alert-info text-center">Belum ada riwayat peminjaman.</div>

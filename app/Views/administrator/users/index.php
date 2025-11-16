@@ -90,7 +90,7 @@
   <div class="main-content">
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Manajemen User</h2>
+        <h2 class="fw-bold" style="font-size: 1.75rem;">👥 Manajemen User</h2>
         <a href="<?= base_url('administrator/users/create') ?>" class="btn btn-success">+ Tambah User</a>
       </div>
 

@@ -37,7 +37,7 @@
 <main class="main-content">
   <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-bold text-primary">🏫 Daftar Ruang</h3>
+      <h2 class="fw-bold text-primary" style="font-size: 1.75rem;">🏫 Manajemen Ruang</h2>
 
       <?php if (in_array(session()->get('user')['role'] ?? '', ['administrator', 'petugas'])): ?>
         <a href="<?= base_url('/ruang/create') ?>" class="btn btn-primary shadow-sm">+ Tambah Ruang</a>

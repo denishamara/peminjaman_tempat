@@ -6,7 +6,7 @@
 </head>
 <body>
 <div class="container mt-4">
-    <h2>Daftar Peminjaman</h2>
+    <h2 class="fw-bold mb-4" style="font-size: 1.75rem;">📋 Daftar Peminjaman</h2>
     <?php if(session()->getFlashdata('success')): ?>
         <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
     <?php endif; ?>

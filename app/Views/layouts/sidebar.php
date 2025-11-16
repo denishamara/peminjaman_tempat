@@ -215,7 +215,7 @@ $user = isset($user) ? $user : session()->get('user');
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-        <h4 class="fw-bold text-primary mb-0">🏫 Sistem Peminjaman</h4>
+        <h3 class="fw-bold text-primary mb-0" style="font-size: 1.5rem;">🏫 Sistem Peminjaman</h3>
     </div>
 
     <nav class="sidebar-menu mt-4">

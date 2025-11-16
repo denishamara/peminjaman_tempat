@@ -63,14 +63,25 @@
     }
 
     /* ============================================
-       FIX KOLOM TAHUN - LEBIH LEBAR
+       FIX KOLOM FILTER - UKURAN KONSISTEN
        ============================================ */
+    .form-control, .form-select {
+      font-size: 0.875rem; /* Ukuran font lebih kecil */
+      padding: 0.5rem 0.75rem; /* Padding lebih compact */
+    }
+
     .tahun-input {
-      min-width: 120px !important; /* Lebarkan kolom tahun */
+      max-width: 100% !important;
     }
 
     .bulan-select {
-      min-width: 150px !important; /* Lebarkan kolom bulan */
+      max-width: 100% !important;
+    }
+
+    /* Spacing antar kolom filter */
+    .filter-area .row > div {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
     }
 
     * {
@@ -89,13 +100,13 @@
 
       <!-- ================= FILTER CARD ================= -->
       <div class="glass-card mb-4 p-4 filter-area">
-        <h4 class="fw-bold text-primary mb-3">📄 Laporan Peminjaman</h4>
+        <h2 class="fw-bold text-primary mb-3" style="font-size: 1.75rem;">📄 Laporan Peminjaman</h2>
 
         <form method="get" action="<?= base_url('laporan') ?>" class="row g-3 align-items-end">
 
           <!-- Hari -->
-          <div class="col-md-2">
-            <label class="form-label fw-semibold text-secondary">Hari</label>
+          <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label fw-semibold text-secondary small">Hari</label>
             <select name="hari" id="hari" class="form-select">
               <option value="">-- Semua Hari --</option>
               <?php foreach (['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $h): ?>
@@ -107,22 +118,22 @@
           </div>
 
           <!-- Tanggal Mulai -->
-          <div class="col-md-2">
-            <label class="form-label fw-semibold text-secondary">Dari Tanggal</label>
+          <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label fw-semibold text-secondary small">Dari Tanggal</label>
             <input type="date" name="tanggal_mulai" value="<?= esc($tanggalMulai) ?>" class="form-control">
           </div>
 
           <!-- Tanggal Selesai -->
-          <div class="col-md-2">
-            <label class="form-label fw-semibold text-secondary">Sampai Tanggal</label>
+          <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label fw-semibold text-secondary small">Sampai Tanggal</label>
             <input type="date" name="tanggal_selesai" value="<?= esc($tanggalSelesai) ?>" class="form-control">
           </div>
 
           <!-- Bulan -->
-          <div class="col-md-2">
-            <label class="form-label fw-semibold text-secondary">Bulan</label>
+          <div class="col-lg-2 col-md-3 col-6">
+            <label class="form-label fw-semibold text-secondary small">Bulan</label>
             <select name="bulan" id="bulan" class="form-select bulan-select">
-              <option value="">-- Semua Bulan --</option>
+              <option value="">-- Semua --</option>
               <?php 
                 $bulanList = [
                   1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
@@ -138,16 +149,22 @@
           </div>
 
           <!-- Tahun -->
-          <div class="col-md-2">
-            <label class="form-label fw-semibold text-secondary">Tahun</label>
+          <div class="col-lg-1 col-md-2 col-6">
+            <label class="form-label fw-semibold text-secondary small">Tahun</label>
             <input type="number" name="tahun" min="2020" max="<?= date('Y') + 1 ?>" 
-                   value="<?= esc($tahun ?? date('Y')) ?>" class="form-control tahun-input">
+                   value="<?= esc($tahun ?? date('Y')) ?>" class="form-control tahun-input" placeholder="<?= date('Y') ?>">
           </div>
 
           <!-- Buttons -->
-          <div class="col-md-2 d-flex flex-column gap-2">
-            <button type="submit" class="btn btn-primary fw-semibold shadow-sm">🔍 Tampilkan</button>
-            <a href="<?= base_url('laporan') ?>" class="btn btn-outline-secondary fw-semibold shadow-sm">🔄 Reset</a>
+          <div class="col-lg-3 col-md-6 col-12">
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary fw-semibold shadow-sm flex-fill">
+                <i class="fas fa-search"></i> Tampilkan
+              </button>
+              <a href="<?= base_url('laporan') ?>" class="btn btn-outline-secondary fw-semibold shadow-sm flex-fill">
+                <i class="fas fa-redo"></i> Reset
+              </a>
+            </div>
           </div>
 
         </form>
