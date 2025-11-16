@@ -4,48 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - SmartRoom</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
-<body class="auth-body">
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
 
     <!-- NAVBAR -->
-    <nav class="auth-navbar">
-        <div class="container">
-            <a href="<?= base_url('/') ?>" class="brand">
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="<?= base_url('/') ?>" class="flex items-center gap-2 text-primary-600 font-bold text-xl">
                 <i class="fas fa-building"></i>
-                SmartRoom
+                <span>SmartRoom</span>
             </a>
-            <a href="<?= base_url('/') ?>" class="btn-back">
+            <a href="<?= base_url('/') ?>" class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-primary-600 transition">
                 <i class="fas fa-arrow-left"></i>
-                Kembali
+                <span>Kembali</span>
             </a>
         </div>
     </nav>
 
     <!-- REGISTER SECTION -->
-    <div class="auth-container">
-        <div class="auth-card">
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8">
             <!-- Icon Header -->
-            <div class="auth-icon">
-                <i class="fas fa-user-plus"></i>
+            <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-user-plus text-3xl text-white"></i>
             </div>
 
             <!-- Title -->
-            <h2 class="auth-title">Buat Akun Baru</h2>
-            <p class="auth-subtitle">Daftar untuk mulai memesan ruangan</p>
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Buat Akun Baru</h2>
+            <p class="text-center text-gray-600 mb-8">Daftar untuk mulai memesan ruangan</p>
 
             <!-- Alert Messages -->
             <?php if (session()->getFlashdata('errors')): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <ul class="mb-0">
-                        <?php foreach (session()->getFlashdata('errors') as $error): ?>
-                            <li><?= esc($error) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-3"></i>
+                        <ul class="text-sm text-red-700 list-disc list-inside">
+                            <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                                <li><?= esc($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
                 </div>
             <?php endif; ?>
 
