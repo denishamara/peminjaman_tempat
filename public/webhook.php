@@ -1,22 +1,10 @@
 <?php
 /**
- * GitHub Webhook Auto Deploy
- * 
- * Script ini akan otomatis:
- * 1. Pull perubahan dari GitHub
- * 2. Clear cache CodeIgniter
- * 3. Run database migrations
- * 4. Restart PHP-FPM 8.2 dan Nginx
- * 
- * Setup:
- * 1. Upload file ini ke public/webhook.php di VPS
- * 2. Tambahkan webhook di GitHub repo settings
- * 3. Webhook URL: https://denishaamara.my.id/webhook.php
- * 4. Secret: ganti SECRET_TOKEN di bawah dengan token rahasia kamu
+ * GitHub Webhook Auto Deploy - FIXED VERSION
  */
 
 // ============ KONFIGURASI ============
-define('SECRET_TOKEN', 'your_secret_token_here_ganti_dengan_random_string'); // GANTI INI!
+define('SECRET_TOKEN', 'your_secret_token_here_ganti_dengan_random_string');
 define('PROJECT_PATH', '/var/www/peminjaman_tempat');
 define('LOG_FILE', PROJECT_PATH . '/writable/logs/webhook.log');
 define('BRANCH', 'main');
@@ -27,6 +15,7 @@ function logMessage($message) {
     $timestamp = date('Y-m-d H:i:s');
     $logEntry = "[{$timestamp}] {$message}\n";
     file_put_contents(LOG_FILE, $logEntry, FILE_APPEND | LOCK_EX);
+    error_log($message); // Juga log ke system log
 }
 
 // ============ VERIFIKASI SIGNATURE ============
@@ -40,8 +29,11 @@ function verifySignature($payload, $signature) {
 }
 
 // ============ FUNGSI EXECUTE COMMAND ============
-function executeCommand($command, &$output = null, &$returnCode = null) {
+function executeCommand($command) {
     $fullCommand = 'cd ' . PROJECT_PATH . ' && ' . $command . ' 2>&1';
+    $output = [];
+    $returnCode = 0;
+    
     exec($fullCommand, $output, $returnCode);
     
     // Log output
@@ -49,227 +41,253 @@ function executeCommand($command, &$output = null, &$returnCode = null) {
         logMessage('CMD: ' . $line);
     }
     
-    return $returnCode === 0;
+    return [
+        'success' => $returnCode === 0,
+        'output' => $output,
+        'return_code' => $returnCode
+    ];
 }
 
-// ============ FUNGSI SETUP GIT SAFETY ============
-function setupGitSafety() {
-    logMessage('Setting up Git safety...');
+// ============ FUNGSI SETUP GIT ============
+function setupGit() {
+    logMessage('Setting up Git...');
     
-    // Set safe directory untuk Git
     $commands = [
         'git config --global --add safe.directory ' . PROJECT_PATH,
         'git config --global user.name "Webhook Deploy"',
         'git config --global user.email "webhook@denishaamara.my.id"'
     ];
     
+    $allOutput = [];
+    
     foreach ($commands as $command) {
-        executeCommand($command);
+        $result = executeCommand($command);
+        $allOutput = array_merge($allOutput, $result['output']);
     }
+    
+    return $allOutput;
 }
 
-// ============ FUNGSI CLEAN GIT WORKING DIRECTORY ============
-function cleanGitWorkingDirectory() {
-    logMessage('Cleaning Git working directory...');
+// ============ FUNGSI GIT FORCE SYNC ============
+function gitForceSync() {
+    logMessage('Force syncing Git repository...');
     
     $commands = [
-        // Stash any local changes (backup)
-        'git stash push --include-untracked --message "Webhook auto-stash ' . date('Y-m-d H:i:s') . '"',
-        // Reset hard to remote branch
+        'git fetch --all',
         'git reset --hard origin/' . BRANCH,
-        // Clean untracked files
-        'git clean -fd',
-        // Pull latest changes
-        'git pull origin ' . BRANCH
+        'git clean -fd -x', // -x untuk hapus file ignored juga
+        'git pull origin ' . BRANCH . ' --force'
     ];
     
     $allOutput = [];
     $success = true;
     
     foreach ($commands as $command) {
-        $output = [];
-        $returnCode = 0;
+        $result = executeCommand($command);
+        $allOutput = array_merge($allOutput, $result['output']);
         
-        if (!executeCommand($command, $output, $returnCode)) {
-            // Untuk git stash, jika tidak ada changes, akan return error tapi itu normal
-            if (strpos($command, 'git stash') === 0 && $returnCode !== 0) {
-                logMessage('INFO: No local changes to stash');
-                continue;
-            }
-            
-            // Untuk commands lain, log warning tapi continue
-            logMessage('WARNING: Git command failed: ' . $command);
+        if (!$result['success'] && strpos($command, 'git pull') !== false) {
+            $success = false;
         }
-        
-        $allOutput = array_merge($allOutput, $output);
     }
     
-    return [true, $allOutput];
+    return [
+        'success' => $success,
+        'output' => $allOutput
+    ];
+}
+
+// ============ FUNGSI SET PERMISSIONS ============
+function setPermissions() {
+    logMessage('Setting permissions...');
+    
+    $commands = [
+        'chmod -R 755 writable/',
+        'chmod 755 app/',
+        'chmod 755 public/',
+        'chown -R www-data:www-data writable/',
+        'chmod -R 775 writable/cache/',
+        'chmod -R 775 writable/logs/',
+        'chmod -R 775 writable/uploads/'
+    ];
+    
+    $allOutput = [];
+    
+    foreach ($commands as $command) {
+        $result = executeCommand($command);
+        $allOutput = array_merge($allOutput, $result['output']);
+    }
+    
+    return $allOutput;
+}
+
+// ============ FUNGSI CLEAR CACHE ============
+function clearCache() {
+    logMessage('Clearing cache...');
+    
+    $commands = [
+        'rm -rf writable/cache/*',
+        'rm -rf writable/logs/*.log',
+        'php spark cache:clear',
+        'php spark config:clear',
+        'php spark route:clear'
+    ];
+    
+    $allOutput = [];
+    
+    foreach ($commands as $command) {
+        $result = executeCommand($command);
+        $allOutput = array_merge($allOutput, $result['output']);
+    }
+    
+    return $allOutput;
+}
+
+// ============ FUNGSI RUN MIGRATIONS ============
+function runMigrations() {
+    logMessage('Running database migrations...');
+    
+    $result = executeCommand('php spark migrate');
+    
+    if ($result['success']) {
+        logMessage('SUCCESS: Database migrations completed');
+    } else {
+        logMessage('WARNING: Database migrations may have issues');
+    }
+    
+    return $result;
+}
+
+// ============ FUNGSI RESTART SERVICES ============
+function restartServices() {
+    logMessage('Restarting services...');
+    
+    $commands = [
+        'sudo systemctl restart ' . PHP_FPM_SERVICE,
+        'sudo systemctl reload nginx'
+    ];
+    
+    $allOutput = [];
+    $success = true;
+    
+    foreach ($commands as $command) {
+        $result = executeCommand($command);
+        $allOutput = array_merge($allOutput, $result['output']);
+        
+        if (!$result['success']) {
+            $success = false;
+            logMessage('WARNING: Failed to execute: ' . $command);
+        }
+    }
+    
+    return [
+        'success' => $success,
+        'output' => $allOutput
+    ];
 }
 
 // ============ FUNGSI DEPLOY ============
 function runDeployment() {
     $allOutput = [];
+    $allOutput[] = '=== DEPLOYMENT STARTED ===';
     
-    logMessage('=== STARTING DEPLOYMENT ===');
-    
-    // 1. Setup Git safety first
-    setupGitSafety();
-    
-    // 2. Fetch latest changes dulu
-    logMessage('Fetching latest changes from remote...');
-    executeCommand('git fetch origin');
-    
-    // 3. Clean working directory dan pull changes
-    logMessage('Cleaning working directory and pulling changes...');
-    list($gitSuccess, $gitOutput) = cleanGitWorkingDirectory();
-    $allOutput = array_merge($allOutput, $gitOutput);
-    
-    // 4. Set proper permissions
-    logMessage('Setting permissions...');
-    $permissionCommands = [
-        'chmod -R 755 writable/',
-        'chmod 755 app/',
-        'chmod 755 public/'
-    ];
-    
-    foreach ($permissionCommands as $cmd) {
-        executeCommand($cmd);
-    }
-    
-    // Change ownership to www-data
-    executeCommand('chown -R www-data:www-data writable/');
-    
-    // 5. Clear CodeIgniter cache
-    logMessage('Clearing CodeIgniter cache...');
-    $cacheCommands = [
-        'rm -rf writable/cache/*',
-        'rm -rf writable/logs/*.log',
-        'rm -rf writable/session/*'
-    ];
-    
-    foreach ($cacheCommands as $cmd) {
-        executeCommand($cmd);
-    }
-    
-    // 6. Run database migrations
-    logMessage('Running database migrations...');
-    if (!executeCommand('php spark migrate', $output, $returnCode)) {
-        logMessage('WARNING: Database migration might have issues');
-    } else {
-        logMessage('SUCCESS: Database migrations completed');
-    }
-    $allOutput = array_merge($allOutput, $output);
-    
-    // 7. Clear all caches
-    logMessage('Clearing all caches...');
-    $sparkCommands = [
-        'php spark cache:clear',
-        'php spark config:clear', 
-        'php spark route:clear'
-    ];
-    
-    foreach ($sparkCommands as $cmd) {
-        executeCommand($cmd);
-    }
-    
-    // 8. Install/update Composer dependencies (jika menggunakan Composer)
-    if (file_exists(PROJECT_PATH . '/composer.json')) {
-        logMessage('Installing Composer dependencies...');
-        if (!executeCommand('composer install --no-dev --optimize-autoloader', $output, $returnCode)) {
-            logMessage('WARNING: Composer install failed');
-        } else {
-            logMessage('SUCCESS: Composer dependencies installed');
+    try {
+        // 1. Setup Git
+        $allOutput = array_merge($allOutput, setupGit());
+        
+        // 2. Force Git Sync
+        $gitResult = gitForceSync();
+        $allOutput = array_merge($allOutput, $gitResult['output']);
+        
+        if (!$gitResult['success']) {
+            throw new Exception('Git sync failed');
         }
-        $allOutput = array_merge($allOutput, $output);
+        
+        // 3. Set Permissions
+        $allOutput = array_merge($allOutput, setPermissions());
+        
+        // 4. Clear Cache
+        $allOutput = array_merge($allOutput, clearCache());
+        
+        // 5. Run Migrations
+        $migrationResult = runMigrations();
+        $allOutput = array_merge($allOutput, $migrationResult['output']);
+        
+        // 6. Restart Services
+        $serviceResult = restartServices();
+        $allOutput = array_merge($allOutput, $serviceResult['output']);
+        
+        $allOutput[] = '=== DEPLOYMENT COMPLETED SUCCESSFULLY ===';
+        return [true, $allOutput];
+        
+    } catch (Exception $e) {
+        logMessage('ERROR: ' . $e->getMessage());
+        $allOutput[] = 'ERROR: ' . $e->getMessage();
+        $allOutput[] = '=== DEPLOYMENT FAILED ===';
+        return [false, $allOutput];
     }
-    
-    // 9. Set final permissions
-    logMessage('Setting final permissions...');
-    executeCommand('chmod -R 755 writable/');
-    executeCommand('chown -R www-data:www-data writable/');
-    
-    // 10. Restart PHP-FPM 8.2 (perlu sudo)
-    logMessage('Restarting PHP-FPM 8.2...');
-    if (!executeCommand('sudo systemctl restart ' . PHP_FPM_SERVICE, $output, $returnCode)) {
-        logMessage('WARNING: Failed to restart PHP-FPM 8.2');
-    } else {
-        logMessage('SUCCESS: PHP-FPM 8.2 restarted');
-    }
-    $allOutput = array_merge($allOutput, $output);
-    
-    // 11. Reload Nginx (perlu sudo)
-    logMessage('Reloading Nginx...');
-    if (!executeCommand('sudo systemctl reload nginx', $output, $returnCode)) {
-        logMessage('WARNING: Failed to reload Nginx');
-    } else {
-        logMessage('SUCCESS: Nginx reloaded');
-    }
-    $allOutput = array_merge($allOutput, $output);
-    
-    logMessage('=== DEPLOYMENT COMPLETED SUCCESSFULLY ===');
-    
-    return [true, $allOutput];
 }
 
 // ============ MAIN LOGIC ============
-// Set header
 header('Content-Type: application/json');
 
-// Log request
-logMessage('Webhook triggered from IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+// Enable error logging
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', PROJECT_PATH . '/writable/logs/webhook_errors.log');
 
-// Ambil payload
-$payload = file_get_contents('php://input');
-$signature = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
-
-// Verifikasi signature
-if (!verifySignature($payload, $signature)) {
-    logMessage('ERROR: Invalid signature');
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid signature']);
-    exit;
-}
-
-// Parse payload
-$data = json_decode($payload, true);
-
-// Cek apakah ini push event ke branch main
-if (!isset($data['ref']) || $data['ref'] !== 'refs/heads/main') {
-    logMessage('INFO: Not a push to main branch, skipping deployment');
-    echo json_encode(['status' => 'skipped', 'message' => 'Not a push to main branch']);
-    exit;
-}
-
-// Log info commit
-$commitId = $data['head_commit']['id'] ?? 'unknown';
-$commitMessage = $data['head_commit']['message'] ?? 'No message';
-$committer = $data['head_commit']['committer']['name'] ?? 'unknown';
-logMessage("INFO: Processing push to main - Commit: {$commitId} - By: {$committer} - Message: {$commitMessage}");
-
-// Jalankan deployment
-list($success, $output) = runDeployment();
-
-if ($success) {
-    logMessage('SUCCESS: Deployment completed successfully');
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Deployment completed',
-        'commit' => $commitId,
-        'committer' => $committer,
-        'commit_message' => $commitMessage,
-        'output' => $output
-    ]);
-} else {
-    logMessage('ERROR: Deployment failed');
+try {
+    // Log request
+    logMessage('Webhook triggered from IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    
+    // Ambil payload
+    $payload = file_get_contents('php://input');
+    $signature = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
+    
+    // Verifikasi signature
+    if (!verifySignature($payload, $signature)) {
+        throw new Exception('Invalid signature');
+    }
+    
+    // Parse payload
+    $data = json_decode($payload, true);
+    
+    // Cek apakah ini push event ke branch main
+    if (!isset($data['ref']) || $data['ref'] !== 'refs/heads/main') {
+        echo json_encode(['status' => 'skipped', 'message' => 'Not a push to main branch']);
+        exit;
+    }
+    
+    // Log info commit
+    $commitId = $data['head_commit']['id'] ?? 'unknown';
+    $commitMessage = $data['head_commit']['message'] ?? 'No message';
+    $committer = $data['head_commit']['committer']['name'] ?? 'unknown';
+    
+    logMessage("Processing push to main - Commit: {$commitId} - By: {$committer} - Message: {$commitMessage}");
+    
+    // Jalankan deployment
+    list($success, $output) = runDeployment();
+    
+    if ($success) {
+        logMessage('SUCCESS: Deployment completed');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Deployment completed',
+            'commit' => $commitId,
+            'committer' => $committer,
+            'commit_message' => $commitMessage,
+            'output' => $output
+        ]);
+    } else {
+        throw new Exception('Deployment process failed');
+    }
+    
+} catch (Exception $e) {
+    logMessage('ERROR: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Deployment failed',
-        'commit' => $commitId,
-        'committer' => $committer,
-        'commit_message' => $commitMessage,
-        'output' => $output
+        'message' => $e->getMessage()
     ]);
 }
 ?>
