@@ -187,14 +187,17 @@
 
     .table-responsive {
       border-radius: 0;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: visible;
       box-shadow: none;
       background: transparent;
       padding: 0;
+      -webkit-overflow-scrolling: touch;
     }
 
     .table {
       margin-bottom: 0;
+      min-width: 900px;
     }
 
     .table thead {
@@ -354,6 +357,7 @@
 
       .table {
         font-size: 0.85rem;
+        min-width: 700px;
       }
 
       .table thead th,
@@ -378,6 +382,12 @@
 
       .table {
         font-size: 0.8rem;
+        min-width: 650px;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.65rem 0.4rem;
       }
 
       .badge {
