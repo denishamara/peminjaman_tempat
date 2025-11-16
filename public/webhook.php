@@ -4,7 +4,8 @@
  */
 
 // ============ KONFIGURASI ============
-define('SECRET_TOKEN', 'your_secret_token_here_ganti_dengan_random_string');
+// GANTI DENGAN TOKEN RANDOM YANG SAMA DENGAN DI GITHUB WEBHOOK
+define('SECRET_TOKEN', 'sku-suka-rama-rudi');
 define('PROJECT_PATH', '/var/www/peminjaman_tempat');
 define('LOG_FILE', PROJECT_PATH . '/writable/logs/webhook.log');
 define('BRANCH', 'main');
@@ -15,17 +16,25 @@ function logMessage($message) {
     $timestamp = date('Y-m-d H:i:s');
     $logEntry = "[{$timestamp}] {$message}\n";
     file_put_contents(LOG_FILE, $logEntry, FILE_APPEND | LOCK_EX);
-    error_log($message); // Juga log ke system log
 }
 
 // ============ VERIFIKASI SIGNATURE ============
 function verifySignature($payload, $signature) {
     if (empty($signature)) {
+        logMessage('ERROR: No signature provided');
         return false;
     }
     
     $hash = 'sha256=' . hash_hmac('sha256', $payload, SECRET_TOKEN);
-    return hash_equals($hash, $signature);
+    $isValid = hash_equals($hash, $signature);
+    
+    if (!$isValid) {
+        logMessage('ERROR: Invalid signature. Expected: ' . $hash . ' Received: ' . $signature);
+    } else {
+        logMessage('SUCCESS: Signature verified');
+    }
+    
+    return $isValid;
 }
 
 // ============ FUNGSI EXECUTE COMMAND ============
@@ -53,9 +62,10 @@ function setupGit() {
     logMessage('Setting up Git...');
     
     $commands = [
-        'git config --global --add safe.directory ' . PROJECT_PATH,
-        'git config --global user.name "Webhook Deploy"',
-        'git config --global user.email "webhook@denishaamara.my.id"'
+        // Use system git config to avoid permission issues
+        'git config --system --add safe.directory ' . PROJECT_PATH,
+        'git config user.name "Webhook Deploy"',
+        'git config user.email "webhook@denishaamara.my.id"'
     ];
     
     $allOutput = [];
@@ -75,7 +85,7 @@ function gitForceSync() {
     $commands = [
         'git fetch --all',
         'git reset --hard origin/' . BRANCH,
-        'git clean -fd -x', // -x untuk hapus file ignored juga
+        'git clean -fd',
         'git pull origin ' . BRANCH . ' --force'
     ];
     
@@ -103,8 +113,6 @@ function setPermissions() {
     
     $commands = [
         'chmod -R 755 writable/',
-        'chmod 755 app/',
-        'chmod 755 public/',
         'chown -R www-data:www-data writable/',
         'chmod -R 775 writable/cache/',
         'chmod -R 775 writable/logs/',
@@ -168,22 +176,17 @@ function restartServices() {
     ];
     
     $allOutput = [];
-    $success = true;
     
     foreach ($commands as $command) {
         $result = executeCommand($command);
         $allOutput = array_merge($allOutput, $result['output']);
         
         if (!$result['success']) {
-            $success = false;
             logMessage('WARNING: Failed to execute: ' . $command);
         }
     }
     
-    return [
-        'success' => $success,
-        'output' => $allOutput
-    ];
+    return $allOutput;
 }
 
 // ============ FUNGSI DEPLOY ============
@@ -214,8 +217,8 @@ function runDeployment() {
         $allOutput = array_merge($allOutput, $migrationResult['output']);
         
         // 6. Restart Services
-        $serviceResult = restartServices();
-        $allOutput = array_merge($allOutput, $serviceResult['output']);
+        $serviceOutput = restartServices();
+        $allOutput = array_merge($allOutput, $serviceOutput);
         
         $allOutput[] = '=== DEPLOYMENT COMPLETED SUCCESSFULLY ===';
         return [true, $allOutput];
@@ -238,22 +241,32 @@ ini_set('error_log', PROJECT_PATH . '/writable/logs/webhook_errors.log');
 
 try {
     // Log request
-    logMessage('Webhook triggered from IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    $clientIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+    logMessage("Webhook request from IP: {$clientIP}, User-Agent: {$userAgent}");
     
     // Ambil payload
     $payload = file_get_contents('php://input');
     $signature = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
     
+    logMessage("Payload length: " . strlen($payload) . " bytes");
+    logMessage("Signature: " . $signature);
+    
     // Verifikasi signature
     if (!verifySignature($payload, $signature)) {
-        throw new Exception('Invalid signature');
+        throw new Exception('Invalid signature - check SECRET_TOKEN configuration');
     }
     
     // Parse payload
     $data = json_decode($payload, true);
     
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Invalid JSON payload: ' . json_last_error_msg());
+    }
+    
     // Cek apakah ini push event ke branch main
     if (!isset($data['ref']) || $data['ref'] !== 'refs/heads/main') {
+        logMessage('INFO: Not a push to main branch, skipping');
         echo json_encode(['status' => 'skipped', 'message' => 'Not a push to main branch']);
         exit;
     }
