@@ -1,0 +1,16 @@
+{
+  "name": "peminjaman-tempat",
+  "version": "1.0.0",
+  "description": "Room Booking System with Tailwind CSS",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "build": "npx tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify"
+  },
+  "keywords": ["tailwind", "codeigniter", "booking"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}
