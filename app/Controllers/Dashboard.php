@@ -49,7 +49,7 @@ class Dashboard extends BaseController
                     ->orderBy('booking.tanggal_mulai', 'DESC')
                     ->findAll(5);
 
-                // 📊 Statistik per bulan (6 bulan terakhir)
+                // 📊 Statistik per bulan (6 bulan terakhir) - Fixed GROUP BY compatibility
                 $bulanData = [];
                 $jumlahData = [];
                 $result = $this->bookingModel
