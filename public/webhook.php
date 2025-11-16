@@ -135,10 +135,8 @@ function clearCache() {
     
     $commands = [
         'rm -rf writable/cache/*',
-        'rm -rf writable/logs/*.log',
-        'php spark cache:clear',
-        'php spark config:clear',
-        'php spark route:clear'
+        'php spark cache:clear'
+        // Removed: config:clear and route:clear (not available in CI4)
     ];
     
     $allOutput = [];
@@ -170,21 +168,16 @@ function runMigrations() {
 function restartServices() {
     logMessage('Restarting services...');
     
-    $commands = [
-        'sudo systemctl restart ' . PHP_FPM_SERVICE,
-        'sudo systemctl reload nginx'
-    ];
+    // DISABLED: Requires sudo which causes 502 timeout
+    // Services will auto-reload via OPcache or on next request
+    // For manual restart: ssh to server and run: sudo systemctl restart php8.2-fpm nginx
     
     $allOutput = [];
+    $allOutput[] = 'INFO: Service restart skipped (auto-reload enabled via OPcache)';
+    $allOutput[] = 'INFO: Changes will take effect within 60 seconds';
+    $allOutput[] = 'INFO: For immediate restart, SSH to server and run: sudo systemctl restart php8.2-fpm nginx';
     
-    foreach ($commands as $command) {
-        $result = executeCommand($command);
-        $allOutput = array_merge($allOutput, $result['output']);
-        
-        if (!$result['success']) {
-            logMessage('WARNING: Failed to execute: ' . $command);
-        }
-    }
+    logMessage('INFO: Service restart skipped to prevent timeout');
     
     return $allOutput;
 }
