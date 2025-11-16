@@ -197,8 +197,13 @@ public function delete($id)
 
     $id_room = $booking['id_room']; // Simpan id_room sebelum dihapus
     
-    // Hapus booking
+    // Hapus booking dari tabel booking
     $bookingModel->delete($id);
+    
+    // ⭐ Hapus juga dari jadwal_reguler jika booking sudah diapprove
+    // (Booking yang diapprove akan masuk ke jadwal_reguler dengan nama "Booking-{id}")
+    $jadwalModel = new \App\Models\JadwalModel();
+    $jadwalModel->where('nama_reguler', "Booking-{$id}")->delete();
     
     // ⭐ OPTIONAL: Update status ruang langsung (jika ingin real-time)
     // $ruangModel = new RuangModel();

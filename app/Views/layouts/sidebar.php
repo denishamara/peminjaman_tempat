@@ -42,6 +42,7 @@ $user = isset($user) ? $user : session()->get('user');
     scrollbar-color: rgba(0,0,0,0.2) transparent;
     transition: left 0.3s ease;
     z-index: 1000;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling di iOS */
   }
 
   /* Scrollbar (Chrome, Edge, Safari) */
@@ -149,6 +150,9 @@ $user = isset($user) ? $user : session()->get('user');
       position: fixed;
       top: 56px; /* biar gak ketimpa navbar kecil */
       height: calc(100vh - 56px);
+      overflow-y: auto !important; /* Pastikan bisa scroll */
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
     }
     .sidebar.show { left: 0; }
     .main-content {
@@ -162,6 +166,8 @@ $user = isset($user) ? $user : session()->get('user');
   @media (max-width: 576px) {
     .sidebar {
       width: 220px;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
     }
     .sidebar-link {
       font-size: 0.9rem;
