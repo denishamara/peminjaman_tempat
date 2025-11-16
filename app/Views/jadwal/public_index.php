@@ -17,8 +17,8 @@
     }
 
     :root {
-      --primary: #0d6efd;
-      --secondary: #0a58ca;
+      --primary: #667eea;
+      --secondary: #764ba2;
       --dark: #0f172a;
       --light: #f8fafc;
     }
@@ -53,7 +53,7 @@
     }
 
     .navbar-brand i {
-      color: var(--primary);
+      color: #667eea;
     }
 
     .nav-link {
@@ -72,7 +72,7 @@
       transform: translateX(-50%);
       width: 0;
       height: 2px;
-      background: var(--primary);
+      background: #667eea;
       transition: width 0.3s ease;
     }
 
@@ -83,7 +83,7 @@
 
     .nav-link:hover,
     .nav-link.active {
-      color: var(--primary) !important;
+      color: #667eea !important;
     }
 
     /* Main Content */
@@ -98,11 +98,11 @@
 
     /* Page Header */
     .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 20px;
       padding: 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 10px 40px rgba(13, 110, 253, 0.2);
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25);
       color: #fff;
     }
 
@@ -139,8 +139,8 @@
     }
 
     .filter-btn {
-      border: 2px solid var(--primary);
-      color: var(--primary);
+      border: 2px solid #667eea;
+      color: #667eea;
       background: transparent;
       padding: 0.6rem 1.5rem;
       border-radius: 50px;
@@ -151,16 +151,16 @@
     }
 
     .filter-btn:hover {
-      background: var(--primary);
+      background: #667eea;
       color: #fff;
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
     }
 
     .filter-btn.active {
-      background: var(--primary) !important;
+      background: #667eea !important;
       color: #fff !important;
-      box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
     .btn-calendar {
@@ -200,7 +200,7 @@
     }
 
     .table thead {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
     }
 
@@ -224,12 +224,12 @@
     }
 
     .table tbody tr:hover {
-      background-color: rgba(13, 110, 253, 0.05);
+      background-color: rgba(102, 126, 234, 0.05);
       transform: scale(1.01);
     }
 
     .table-primary {
-      background-color: rgba(13, 110, 253, 0.1) !important;
+      background-color: rgba(102, 126, 234, 0.1) !important;
     }
 
     .table-warning {
@@ -244,7 +244,7 @@
     }
 
     .badge-reguler {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
     }
 
@@ -263,7 +263,7 @@
     }
 
     footer i {
-      color: var(--primary);
+      color: #a78bfa;
     }
 
     /* Responsive */

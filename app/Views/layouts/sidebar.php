@@ -103,17 +103,32 @@ function isActive($path, $segment1, $segment2 = '') {
      🌐 DASHBOARD STYLE (Sidebar + Layout + Responsif)
      ======================================================= */
   body {
-    background-color: #f5f7fb;
-    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
+    min-height: 100vh;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   /* ====== SIDEBAR ====== */
   .sidebar {
     width: 250px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    border-right: 1px solid rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
     padding: 1.8rem 1.2rem;
     display: flex;
     flex-direction: column;
@@ -121,61 +136,96 @@ function isActive($path, $segment1, $segment2 = '') {
     height: 100vh;
     left: 0;
     top: 0;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+    box-shadow: 
+      4px 0 20px rgba(0, 0, 0, 0.08),
+      inset -1px 0 0 rgba(255, 255, 255, 0.5);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.2) transparent;
+    scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
     transition: left 0.3s ease;
     z-index: 1000;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling di iOS */
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Scrollbar (Chrome, Edge, Safari) */
   .sidebar::-webkit-scrollbar { width: 6px; }
   .sidebar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 10px;
   }
   .sidebar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(180deg, #764ba2, #667eea);
   }
 
   /* ====== SIDEBAR ISI ====== */
-  .sidebar-header h4 {
-    font-weight: 700;
-    color: #0d6efd;
-    margin-bottom: 1.2rem;
+  .sidebar-header h3 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    margin-bottom: 0;
     text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
   }
 
   .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .sidebar-link {
-    color: #334155;
-    padding: 0.7rem 1rem;
-    border-radius: 8px;
+    color: #475569;
+    padding: 0.85rem 1.1rem;
+    border-radius: 12px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sidebar-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
   }
 
   .sidebar-link:hover,
   .sidebar-link.active {
-    background: rgba(13,110,253,0.12);
-    color: #0d6efd;
-    transform: translateX(6px);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    color: #667eea;
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  .sidebar-link.active::before {
+    transform: scaleY(1);
+  }
+
+  .sidebar-link i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
   }
 
   /* ====== SIDEBAR FOOTER ====== */
   .sidebar-footer {
     margin-top: auto;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(0,0,0,0.08);
+    padding-top: 1.5rem;
+    border-top: 2px solid rgba(102, 126, 234, 0.1);
     text-align: center;
   }
 
@@ -184,49 +234,100 @@ function isActive($path, $segment1, $segment2 = '') {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
   .sidebar-profile-img {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
-    border: 2px solid #0d6efd;
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #667eea, #764ba2) border-box;
     object-fit: cover;
-    background-color: #f8f9fa;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
   }
 
   .sidebar-profile-img:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
   }
 
-  /* ====== MAIN CONTENT (opsional untuk halaman utama) ====== */
+  .sidebar-footer .fw-semibold {
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 600;
+  }
+
+  .sidebar-footer .text-muted {
+    font-size: 0.85rem;
+    text-transform: capitalize;
+    color: #64748b;
+  }
+
+  .sidebar-footer .btn-outline-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.65rem 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .sidebar-footer .btn-outline-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+
+  /* ====== MAIN CONTENT ====== */
   .main-content {
     margin-left: 260px;
     padding: 2rem;
     width: calc(100% - 260px);
     transition: all 0.3s ease;
+    min-height: 100vh;
   }
 
   /* ====== NAVBAR KECIL (untuk layar kecil) ====== */
   .navbar {
-    height: 56px;
-    z-index: 1100;
+    height: 60px;
+    z-index: 999999;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
 
   .menu-toggle {
-    background: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     border: none;
-    font-size: 1.8rem;
-    color: #0d6efd;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    color: white;
     cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
   .menu-toggle:hover {
-    color: #0b5ed7;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+
+  .navbar .text-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
   }
 
   /* ====== RESPONSIVE ====== */
@@ -234,45 +335,138 @@ function isActive($path, $segment1, $segment2 = '') {
     .sidebar {
       left: -260px;
       position: fixed;
-      top: 56px; /* biar gak ketimpa navbar kecil */
-      height: calc(100vh - 56px);
-      overflow-y: auto !important; /* Pastikan bisa scroll */
+      top: 60px;
+      height: calc(100vh - 60px);
+      overflow-y: auto !important;
       overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+      -webkit-overflow-scrolling: touch;
+      z-index: 1000000 !important;
     }
-    .sidebar.show { left: 0; }
+    .sidebar.show { 
+      left: 0;
+      box-shadow: 8px 0 40px rgba(0, 0, 0, 0.2);
+    }
     .main-content {
       margin-left: 0;
       width: 100%;
       padding: 1.5rem;
-      margin-top: 60px; /* beri jarak dari navbar */
+      margin-top: 65px;
     }
   }
 
   @media (max-width: 576px) {
     .sidebar {
-      width: 220px;
+      width: 240px;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
+      padding: 1.5rem 1rem;
     }
     .sidebar-link {
       font-size: 0.9rem;
-      padding: 0.6rem 0.8rem;
+      padding: 0.75rem 0.9rem;
+      gap: 0.6rem;
+    }
+    .sidebar-link i {
+      font-size: 1rem;
     }
     .sidebar-profile-img {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
+    }
+    .navbar {
+      height: 56px;
+    }
+    .menu-toggle {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+  }
+
+  /* Animated Floating Orbs */
+  .floating-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: float 20s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.6), transparent);
+    top: -10%;
+    left: -10%;
+    animation-delay: 0s;
+    animation-duration: 25s;
+  }
+
+  .orb-2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(240, 147, 251, 0.5), transparent);
+    top: 60%;
+    right: -10%;
+    animation-delay: 5s;
+    animation-duration: 20s;
+  }
+
+  .orb-3 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(79, 172, 254, 0.5), transparent);
+    bottom: -10%;
+    left: 40%;
+    animation-delay: 10s;
+    animation-duration: 30s;
+  }
+
+  .orb-4 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(118, 75, 162, 0.6), transparent);
+    top: 30%;
+    right: 30%;
+    animation-delay: 15s;
+    animation-duration: 22s;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    25% {
+      transform: translate(50px, -50px) scale(1.1) rotate(90deg);
+    }
+    50% {
+      transform: translate(-30px, 30px) scale(0.9) rotate(180deg);
+    }
+    75% {
+      transform: translate(30px, 50px) scale(1.05) rotate(270deg);
     }
   }
   </style>
 </head>
 
 <body>
+  <!-- Animated Floating Orbs Background -->
+  <div class="floating-orb orb-1"></div>
+  <div class="floating-orb orb-2"></div>
+  <div class="floating-orb orb-3"></div>
+  <div class="floating-orb orb-4"></div>
+
   <!-- Navbar kecil (hanya muncul di layar kecil) -->
-  <nav class="navbar bg-white shadow-sm px-3 d-lg-none d-flex align-items-center fixed-top">
-    <div class="d-flex align-items-center">
-      <button class="menu-toggle me-2" onclick="toggleSidebar()">☰</button>
-      <span class="fw-bold text-primary fs-5">Menu</span>
+  <nav class="navbar bg-white shadow-sm px-3 d-lg-none d-flex align-items-center fixed-top justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="text-primary fs-5">
+        <i class="fas fa-building me-1"></i>Menu
+      </span>
     </div>
   </nav>
 

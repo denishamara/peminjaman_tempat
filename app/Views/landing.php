@@ -20,11 +20,11 @@
     }
 
     :root {
-      --primary: #0d6efd;
-      --secondary: #0a58ca;
-      --accent: #3b82f6;
-      --light-blue: #60a5fa;
-      --dark-blue: #1e3a8a;
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --accent: #8b5cf6;
+      --light-purple: #a78bfa;
+      --dark-purple: #5b21b6;
       --dark: #0f172a;
       --light: #f8fafc;
     }
@@ -100,7 +100,7 @@
     /* ===== HERO SECTION ===== */
     .hero {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 50%, #1e3a8a 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b21b6 100%);
       position: relative;
       display: flex;
       align-items: center;
@@ -153,7 +153,7 @@
     }
 
     .hero-content .gradient-text {
-      background: linear-gradient(90deg, #60a5fa, #93c5fd, #dbeafe);
+      background: linear-gradient(90deg, #a78bfa, #c4b5fd, #e9d5ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -249,14 +249,14 @@
 
     .feature-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
       border-color: var(--primary);
     }
 
     .feature-icon {
       width: 70px;
       height: 70px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: linear-gradient(135deg, #667eea, #764ba2);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -264,7 +264,7 @@
       margin-bottom: 1.5rem;
       font-size: 2rem;
       color: #fff;
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
     }
 
     .feature-card h5 {
@@ -295,7 +295,7 @@
     .step-number {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: linear-gradient(135deg, #667eea, #764ba2);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -303,7 +303,7 @@
       font-size: 2rem;
       font-weight: 800;
       margin: 0 auto 1.5rem;
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
     }
 
     .step-item h5 {
@@ -321,7 +321,7 @@
     /* ===== CTA SECTION ===== */
     .cta {
       padding: 6rem 0;
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 50%, #1e3a8a 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b21b6 100%);
       color: #fff;
       text-align: center;
     }
@@ -404,7 +404,7 @@
     }
 
     .social-links a:hover {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: linear-gradient(135deg, #667eea, #764ba2);
       transform: translateY(-3px);
     }
 
@@ -828,7 +828,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p>© <?= date('Y') ?> SmartRoom. All Rights Reserved. Made with <i class="bi bi-heart-fill" style="color: #60a5fa;"></i></p>
+        <p>© <?= date('Y') ?> SmartRoom. All Rights Reserved. Made with <i class="bi bi-heart-fill" style="color: #a78bfa;"></i></p>
       </div>
     </div>
   </footer>

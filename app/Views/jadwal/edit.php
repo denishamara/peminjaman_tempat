@@ -8,42 +8,220 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
     <style>
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        /* Utility class */
+        @media (min-width: 768px) {
+            .w-md-auto {
+                width: auto !important;
+            }
+        }
+
         .sesi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
         }
+        
         .sesi-checkbox {
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             padding: 0.75rem;
             transition: all 0.3s ease;
             cursor: pointer;
+            display: flex;
+            align-items: flex-start;
         }
+        
+        .sesi-checkbox input {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        .sesi-checkbox label {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+        
         .sesi-checkbox:hover {
             border-color: #3b82f6;
             background-color: #f0f7ff;
         }
+        
         .sesi-checkbox input:checked ~ label {
             color: #3b82f6;
             font-weight: 600;
         }
+        
         .sesi-checkbox input:checked {
             background-color: #3b82f6;
             border-color: #3b82f6;
         }
+
+        /* Responsive Styles */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px 10px;
+            }
+
+            .glass-card {
+                border-radius: 12px !important;
+            }
+
+            .glass-card.p-4 {
+                padding: 1.5rem !important;
+            }
+
+            h2 {
+                font-size: 1.4rem !important;
+            }
+
+            p.text-muted {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .form-label {
+                font-size: 0.95rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.95rem;
+            }
+
+            small.text-muted {
+                font-size: 0.85rem;
+            }
+
+            .input-group-text {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+
         @media (max-width: 576px) {
-            .sesi-grid { grid-template-columns: 1fr; }
+            .main-content {
+                padding: 10px 8px;
+            }
+
+            .glass-card.p-4 {
+                padding: 1rem !important;
+            }
+
+            h2 {
+                font-size: 1.15rem !important;
+            }
+
+            p.text-muted {
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                width: 100%;
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .btn i {
+                font-size: 0.85rem;
+            }
+
+            .form-label {
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-label i {
+                font-size: 0.85rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .sesi-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .sesi-checkbox {
+                padding: 0.6rem 0.75rem;
+            }
+
+            .sesi-checkbox label {
+                font-size: 0.875rem;
+                line-height: 1.3;
+            }
+
+            small.text-muted {
+                font-size: 0.8rem;
+            }
+
+            .input-group-text {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.7rem;
+            }
+
+            .row > .col-md-6 {
+                margin-bottom: 0.75rem;
+            }
+
+            .d-flex.gap-3 {
+                gap: 0.75rem !important;
+            }
+
+            .alert {
+                font-size: 0.875rem;
+                padding: 0.75rem;
+            }
+
+            .alert i {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .main-content {
+                padding: 8px 6px;
+            }
+
+            .glass-card.p-4 {
+                padding: 0.75rem !important;
+            }
+
+            h2 {
+                font-size: 1.05rem !important;
+            }
+
+            .sesi-checkbox label {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 <body class="modern-dashboard">
 <?= view('layouts/sidebar') ?>
 
-<div class="main-content" style="margin-left: 260px; padding: 30px;">
+<div class="main-content">
     <!-- Page Header -->
     <div class="glass-card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
             <div>
                 <h2 class="fw-bold mb-2" style="font-size: 1.75rem;">
                     <i class="fas fa-edit text-warning me-2"></i>Edit Jadwal
@@ -52,7 +230,7 @@
                     <i class="fas fa-info-circle me-1"></i>Perbarui informasi jadwal peminjaman ruangan
                 </p>
             </div>
-            <a href="<?= base_url('jadwal/index') ?>" class="btn btn-outline-secondary">
+            <a href="<?= base_url('jadwal/index') ?>" class="btn btn-outline-secondary w-100 w-md-auto">
                 <i class="fas fa-arrow-left me-2"></i>Kembali
             </a>
         </div>

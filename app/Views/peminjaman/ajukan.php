@@ -36,7 +36,7 @@
 
         /* Card Header */
         .page-header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 20px 20px 0 0;
             padding: 2rem;
             color: #fff;
@@ -107,7 +107,7 @@
         }
 
         .form-label i {
-            color: #0d6efd;
+            color: #667eea;
             font-size: 1.1rem;
         }
 
@@ -125,8 +125,8 @@
         .form-control:focus,
         .form-select:focus,
         textarea:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
             background: #fff;
             outline: none;
         }
@@ -147,8 +147,8 @@
 
         .choices__inner:focus,
         .choices.is-focused .choices__inner {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
             background: #fff;
         }
 
@@ -163,14 +163,14 @@
         }
 
         .choices__item--selectable.is-highlighted {
-            background-color: #0d6efd;
+            background-color: #667eea;
         }
 
         /* Submit Button */
         .btn-submit {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             border: none;
             border-radius: 12px;
@@ -178,7 +178,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -188,7 +188,7 @@
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(13, 110, 253, 0.4);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
         }
 
         .btn-submit:active {
@@ -197,8 +197,8 @@
 
         /* Info Box */
         .info-box {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #0d6efd;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e9d5ff 100%);
+            border-left: 4px solid #667eea;
             border-radius: 12px;
             padding: 1rem 1.25rem;
             margin-bottom: 1.5rem;
@@ -206,7 +206,7 @@
 
         .info-box p {
             margin: 0;
-            color: #1e40af;
+            color: #5b21b6;
             font-size: 0.9rem;
             display: flex;
             align-items: center;

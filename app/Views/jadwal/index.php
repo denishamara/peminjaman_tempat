@@ -9,9 +9,24 @@
   <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
   
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --dark: #0f172a;
+      --light: #f8fafc;
+    }
+
     body {
       background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
       font-family: 'Poppins', sans-serif;
+      color: #1e293b;
+      min-height: 100vh;
     }
 
     .main-content {
@@ -23,9 +38,79 @@
     @media (max-width: 991.98px) {
       .main-content {
         margin-left: 0;
-        padding: 20px 15px;
-        margin-top: 60px;
+        padding: 80px 15px 40px 15px;
+        margin-top: 0;
       }
+    }
+
+    /* Page Header */
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25);
+      color: #fff;
+    }
+
+    .page-header h3 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .page-header p {
+      margin-bottom: 0;
+      opacity: 0.95;
+      font-size: 1rem;
+    }
+
+    /* Filter Section */
+    .filter-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      border: 2px solid #667eea;
+      color: #667eea;
+      background: transparent;
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .filter-btn:hover {
+      background: #667eea;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-btn.active {
+      background: #667eea !important;
+      color: #fff !important;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
     /* Card Modern */
@@ -33,46 +118,11 @@
       border: none;
       border-radius: 20px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-      border: none;
-      padding: 1.5rem;
-    }
-
-    .card-header h4 {
-      font-weight: 700;
-      font-size: 1.5rem;
-      margin: 0;
+      overflow: visible;
     }
 
     .card-body {
-      padding: 2rem;
-    }
-
-    /* Page Title */
-    .page-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .page-title h5 {
-      font-weight: 700;
-      font-size: 1.3rem;
-      margin: 0;
-      color: #1e293b;
-    }
-
-    .page-title .action-buttons {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
+      padding: 0;
     }
 
     /* Buttons */
@@ -82,6 +132,10 @@
       font-weight: 600;
       transition: all 0.3s ease;
       border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .btn:hover {
@@ -90,40 +144,30 @@
     }
 
     .btn-outline-primary {
-      border: 2px solid #0d6efd;
-      color: #0d6efd;
+      border: 2px solid #667eea;
+      color: #667eea;
       background: transparent;
     }
 
     .btn-outline-primary:hover {
-      background: #0d6efd;
+      background: #667eea;
       color: #fff;
     }
 
     .btn-success {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
     }
 
     .btn-success:hover {
       box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
-    }
-
-    .btn-outline-light {
-      border: 2px solid rgba(255, 255, 255, 0.3);
       color: #fff;
-      background: transparent;
     }
 
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .filter-btn.active {
-      background: rgba(255, 255, 255, 1) !important;
-      color: #0d6efd !important;
-      border-color: rgba(255, 255, 255, 1) !important;
-      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+    .action-buttons-top {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     /* Alerts */
@@ -134,11 +178,19 @@
     }
 
     /* Table Container */
-    .table-responsive {
+    .table-container {
+      background: #fff;
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      background: #fff;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .table-responsive {
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: none;
+      background: transparent;
+      padding: 0;
     }
 
     .table {
@@ -146,7 +198,7 @@
     }
 
     .table thead {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
     }
 
@@ -170,12 +222,12 @@
     }
 
     .table tbody tr:hover {
-      background-color: rgba(13, 110, 253, 0.05);
-      transform: scale(1.005);
+      background-color: rgba(102, 126, 234, 0.05);
+      transform: scale(1.01);
     }
 
     .table-primary {
-      background-color: rgba(13, 110, 253, 0.1) !important;
+      background-color: rgba(102, 126, 234, 0.1) !important;
     }
 
     .table-warning {
@@ -236,6 +288,16 @@
       font-size: 0.85rem;
     }
 
+    .badge-reguler {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+
+    .badge-booking {
+      background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+      color: #fff;
+    }
+
     /* Filter Header Responsive */
     .card-header.flex-header {
       display: flex;
@@ -252,40 +314,51 @@
     }
 
     @media (max-width: 768px) {
-      .card-header.flex-header {
+      .main-content {
+        padding: 80px 1rem 40px;
+      }
+
+      .page-header {
+        padding: 1.5rem;
+      }
+
+      .page-header h3 {
+        font-size: 1.5rem;
+      }
+
+      .page-header p {
+        font-size: 0.95rem;
+      }
+
+      .filter-section {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
 
-      .card-header h4 {
-        font-size: 1.2rem;
-      }
-
-      .card-header .btn-group {
+      .btn-group {
         width: 100%;
       }
 
-      .card-header .btn-group .btn {
+      .filter-btn {
         flex: 1;
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
+        text-align: center;
       }
 
-      .page-title {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .page-title .action-buttons {
+      .action-buttons-top {
         width: 100%;
       }
 
-      .page-title .action-buttons .btn {
+      .action-buttons-top .btn {
         flex: 1;
       }
 
       .table {
         font-size: 0.85rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.75rem 0.5rem;
       }
 
       .action-buttons {
@@ -299,21 +372,17 @@
     }
 
     @media (max-width: 576px) {
-      .card-body {
-        padding: 1.5rem 1rem;
-      }
-
-      .page-title h5 {
-        font-size: 1.1rem;
+      .page-header h3 {
+        font-size: 1.3rem;
       }
 
       .table {
         font-size: 0.8rem;
       }
 
-      .table thead th,
-      .table tbody td {
-        padding: 0.75rem 0.5rem;
+      .badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
       }
     }
   </style>
@@ -323,59 +392,58 @@
   <?= view('layouts/sidebar') ?>
 
   <div class="main-content">
-    <div class="card">
-      <!-- Header -->
-      <div class="card-header flex-header">
-        <h4><i class="fas fa-calendar-alt me-2"></i>Jadwal Ruangan</h4>
-        <div class="btn-group">
-          <a href="?filter=all" class="btn btn-outline-light filter-btn <?= ($filter ?? 'all') == 'all' ? 'active' : '' ?>">
-            <i class="fas fa-list me-1"></i>Semua
-          </a>
-          <a href="?filter=reguler" class="btn btn-outline-light filter-btn <?= ($filter ?? '') == 'reguler' ? 'active' : '' ?>">
-            <i class="fas fa-calendar-check me-1"></i>Reguler
-          </a>
-          <a href="?filter=booking" class="btn btn-outline-light filter-btn <?= ($filter ?? '') == 'booking' ? 'active' : '' ?>">
-            <i class="fas fa-bookmark me-1"></i>Booking
-          </a>
-        </div>
+    <!-- Page Header -->
+    <div class="page-header">
+      <h3><i class="fas fa-calendar-alt"></i>Jadwal Ruangan</h3>
+      <p>Lihat dan kelola semua jadwal reguler & booking ruangan</p>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="btn-group">
+        <a href="?filter=all" class="filter-btn <?= ($filter ?? 'all') == 'all' ? 'active' : '' ?>">
+          <i class="fas fa-list me-1"></i>Semua Jadwal
+        </a>
+        <a href="?filter=reguler" class="filter-btn <?= ($filter ?? '') == 'reguler' ? 'active' : '' ?>">
+          <i class="fas fa-calendar-check me-1"></i>Reguler
+        </a>
+        <a href="?filter=booking" class="filter-btn <?= ($filter ?? '') == 'booking' ? 'active' : '' ?>">
+          <i class="fas fa-bookmark me-1"></i>Booking
+        </a>
       </div>
-
-      <div class="card-body">
-        <!-- Page Title & Actions -->
-        <div class="page-title">
-          <h5><i class="fas fa-table me-2"></i>Daftar Jadwal Reguler & Booking</h5>
-          <div class="action-buttons">
-            <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-outline-primary">
-              <i class="fas fa-calendar me-1"></i>Lihat Kalender
-            </a>
-            <?php 
-              $user = session()->get('user');
-              if (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])): ?>
-              <a href="<?= base_url('jadwal/create') ?>" class="btn btn-success">
-                <i class="fas fa-plus-circle me-1"></i>Tambah Jadwal
-              </a>
-            <?php endif; ?>
-          </div>
-        </div>
-
-        <!-- Alerts -->
-        <?php if (session()->getFlashdata('success')): ?>
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            <?= session()->getFlashdata('success') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        <?php elseif (session()->getFlashdata('error')): ?>
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <?= session()->getFlashdata('error') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
+      <div class="action-buttons-top">
+        <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-outline-primary">
+          <i class="fas fa-calendar"></i>Lihat Kalender
+        </a>
+        <?php 
+          $user = session()->get('user');
+          if (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])): ?>
+          <a href="<?= base_url('jadwal/create') ?>" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i>Tambah Jadwal
+          </a>
         <?php endif; ?>
+      </div>
+    </div>
 
-        <!-- Table -->
-        <div class="table-responsive">
-          <table class="table table-hover align-middle">
+    <!-- Alerts -->
+    <?php if (session()->getFlashdata('success')): ?>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <?= session()->getFlashdata('success') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <?php elseif (session()->getFlashdata('error')): ?>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <?= session()->getFlashdata('error') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <?php endif; ?>
+
+    <!-- Table -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
             <thead class="text-center">
               <tr>
                 <th><i class="fas fa-door-open me-1"></i>Ruangan</th>
@@ -397,6 +465,7 @@
                   <?php
                     $status = strtolower($j['status'] ?? 'reguler');
                     $rowClass = $status === 'reguler' ? 'table-primary' : 'table-warning';
+                    $badgeClass = $status === 'reguler' ? 'badge-reguler' : 'badge-booking';
                     $id = $j['id'] ?? $j['id_reguler'] ?? $j['id_booking'] ?? null;
 
                     $tglMulai   = $j['tanggal_mulai'] ?? $j['tgl_pinjam'] ?? $j['tgl_booking'] ?? null;
@@ -424,7 +493,7 @@
                     <td class="text-center"><strong><?= esc($jamMulai) ?></strong></td>
                     <td class="text-center"><strong><?= esc($jamSelesai) ?></strong></td>
                     <td class="text-center">
-                      <span class="badge <?= $status === 'reguler' ? 'bg-primary' : 'bg-warning text-dark' ?> text-capitalize">
+                      <span class="badge <?= esc($badgeClass) ?> text-capitalize">
                         <?= esc($j['status'] ?? '-') ?>
                       </span>
                     </td>
