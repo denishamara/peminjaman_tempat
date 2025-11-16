@@ -6,7 +6,7 @@
  * 1. Pull perubahan dari GitHub
  * 2. Clear cache CodeIgniter
  * 3. Run database migrations
- * 4. Restart PHP-FPM dan Nginx
+ * 4. Restart PHP-FPM 8.2 dan Nginx
  * 
  * Setup:
  * 1. Upload file ini ke public/webhook.php di VPS
@@ -16,10 +16,11 @@
  */
 
 // ============ KONFIGURASI ============
-define('SECRET_TOKEN', 'aku-suka-rama-rudi'); // GANTI INI!
+define('SECRET_TOKEN', 'your_secret_token_here_ganti_dengan_random_string'); // GANTI INI!
 define('PROJECT_PATH', '/var/www/peminjaman_tempat');
 define('LOG_FILE', PROJECT_PATH . '/writable/logs/webhook.log');
 define('BRANCH', 'main');
+define('PHP_FPM_SERVICE', 'php8.2-fpm'); // Sesuai dengan PHP 8.2
 
 // ============ FUNGSI LOG ============
 function logMessage($message) {
@@ -51,74 +52,124 @@ function executeCommand($command, &$output = null, &$returnCode = null) {
     return $returnCode === 0;
 }
 
+// ============ FUNGSI SETUP GIT SAFETY ============
+function setupGitSafety() {
+    logMessage('Setting up Git safety...');
+    
+    // Set safe directory untuk Git
+    $commands = [
+        'git config --global --add safe.directory ' . PROJECT_PATH,
+        'git config --global user.name "Webhook Deploy"',
+        'git config --global user.email "webhook@denishaamara.my.id"'
+    ];
+    
+    foreach ($commands as $command) {
+        executeCommand($command);
+    }
+}
+
 // ============ FUNGSI DEPLOY ============
 function runDeployment() {
     $allOutput = [];
-    $success = true;
     
     logMessage('=== STARTING DEPLOYMENT ===');
     
-    // 1. Git pull latest changes
-    logMessage('Pulling latest changes from ' . BRANCH . ' branch...');
-    if (!executeCommand('git pull origin ' . BRANCH, $output, $returnCode)) {
-        $success = false;
-        logMessage('ERROR: Git pull failed');
-    }
-    $allOutput = array_merge($allOutput, $output);
+    // 1. Setup Git safety first
+    setupGitSafety();
     
-    if (!$success) return [false, $allOutput];
+    // 2. Reset any local changes dan pull latest changes
+    logMessage('Resetting any local changes and pulling latest changes...');
+    $gitCommands = [
+        'git fetch origin',
+        'git reset --hard origin/' . BRANCH,
+        'git clean -fd'
+    ];
     
-    // 2. Set proper permissions
-    logMessage('Setting permissions...');
-    executeCommand('chmod -R 755 writable/');
-    executeCommand('chown -R www-data:www-data writable/');
-    
-    // 3. Clear CodeIgniter cache
-    logMessage('Clearing CodeIgniter cache...');
-    executeCommand('rm -rf writable/cache/*');
-    
-    // 4. Run database migrations
-    logMessage('Running database migrations...');
-    if (!executeCommand('php spark migrate', $output, $returnCode)) {
-        $success = false;
-        logMessage('ERROR: Database migration failed');
-    }
-    $allOutput = array_merge($allOutput, $output);
-    
-    if (!$success) return [false, $allOutput];
-    
-    // 5. Clear all caches
-    logMessage('Clearing all caches...');
-    executeCommand('php spark cache:clear');
-    executeCommand('php spark config:clear');
-    executeCommand('php spark route:clear');
-    
-    // 6. Install/update Composer dependencies (jika menggunakan Composer)
-    if (file_exists(PROJECT_PATH . '/composer.json')) {
-        logMessage('Installing Composer dependencies...');
-        if (!executeCommand('composer install --no-dev --optimize-autoloader', $output, $returnCode)) {
-            logMessage('WARNING: Composer install failed, but continuing...');
+    foreach ($gitCommands as $gitCommand) {
+        if (!executeCommand($gitCommand, $output, $returnCode)) {
+            logMessage('WARNING: Git command failed: ' . $gitCommand);
         }
         $allOutput = array_merge($allOutput, $output);
     }
     
-    // 7. Restart PHP-FPM (perlu sudo)
-    logMessage('Restarting PHP-FPM...');
-    if (!executeCommand('sudo systemctl restart php8.1-fpm', $output, $returnCode)) {
-        logMessage('WARNING: Failed to restart PHP-FPM, but continuing...');
+    // 3. Set proper permissions
+    logMessage('Setting permissions...');
+    $permissionCommands = [
+        'chmod -R 755 writable/',
+        'chmod 755 app/',
+        'chmod 755 public/'
+    ];
+    
+    foreach ($permissionCommands as $cmd) {
+        executeCommand($cmd);
+    }
+    
+    // Change ownership to www-data
+    executeCommand('chown -R www-data:www-data writable/');
+    
+    // 4. Clear CodeIgniter cache
+    logMessage('Clearing CodeIgniter cache...');
+    $cacheCommands = [
+        'rm -rf writable/cache/*',
+        'rm -rf writable/logs/*.log',
+        'rm -rf writable/session/*'
+    ];
+    
+    foreach ($cacheCommands as $cmd) {
+        executeCommand($cmd);
+    }
+    
+    // 5. Run database migrations
+    logMessage('Running database migrations...');
+    if (!executeCommand('php spark migrate', $output, $returnCode)) {
+        logMessage('WARNING: Database migration might have issues');
     }
     $allOutput = array_merge($allOutput, $output);
     
-    // 8. Reload Nginx (perlu sudo)
-    logMessage('Reloading Nginx...');
-    if (!executeCommand('sudo systemctl reload nginx', $output, $returnCode)) {
-        logMessage('WARNING: Failed to reload Nginx, but continuing...');
-    }
-    $allOutput = array_merge($allOutput, $output);
+    // 6. Clear all caches
+    logMessage('Clearing all caches...');
+    $sparkCommands = [
+        'php spark cache:clear',
+        'php spark config:clear', 
+        'php spark route:clear'
+    ];
     
-    // 9. Update permissions again to ensure everything is correct
+    foreach ($sparkCommands as $cmd) {
+        executeCommand($cmd);
+    }
+    
+    // 7. Install/update Composer dependencies (jika menggunakan Composer)
+    if (file_exists(PROJECT_PATH . '/composer.json')) {
+        logMessage('Installing Composer dependencies...');
+        if (!executeCommand('composer install --no-dev --optimize-autoloader', $output, $returnCode)) {
+            logMessage('WARNING: Composer install failed');
+        }
+        $allOutput = array_merge($allOutput, $output);
+    }
+    
+    // 8. Set final permissions
+    logMessage('Setting final permissions...');
     executeCommand('chmod -R 755 writable/');
     executeCommand('chown -R www-data:www-data writable/');
+    
+    // 9. Restart PHP-FPM 8.2 (perlu sudo)
+    logMessage('Restarting PHP-FPM 8.2...');
+    if (!executeCommand('sudo systemctl restart ' . PHP_FPM_SERVICE, $output, $returnCode)) {
+        logMessage('WARNING: Failed to restart PHP-FPM 8.2');
+    }
+    $allOutput = array_merge($allOutput, $output);
+    
+    // 10. Reload Nginx (perlu sudo)
+    logMessage('Reloading Nginx...');
+    if (!executeCommand('sudo systemctl reload nginx', $output, $returnCode)) {
+        logMessage('WARNING: Failed to reload Nginx');
+    }
+    $allOutput = array_merge($allOutput, $output);
+    
+    // 11. Verify deployment
+    logMessage('Verifying deployment...');
+    executeCommand('php --version', $output);
+    $allOutput = array_merge($allOutput, $output);
     
     logMessage('=== DEPLOYMENT COMPLETED SUCCESSFULLY ===');
     
