@@ -5,7 +5,7 @@
 
 // ============ KONFIGURASI ============
 // GANTI DENGAN TOKEN RANDOM YANG SAMA DENGAN DI GITHUB WEBHOOK
-define('SECRET_TOKEN', 'sku-suka-rama-rudi');
+define('SECRET_TOKEN', 'aku-suka-rama-rudi');
 define('PROJECT_PATH', '/var/www/peminjaman_tempat');
 define('LOG_FILE', PROJECT_PATH . '/writable/logs/webhook.log');
 define('BRANCH', 'main');
