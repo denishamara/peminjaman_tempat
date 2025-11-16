@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <title><?= esc($title ?? 'Jadwal Ruangan') ?></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
   
   <style>
     body {
@@ -186,7 +187,7 @@
       text-align: center;
       vertical-align: middle !important;
       white-space: nowrap;
-      width: 180px;
+      min-width: 160px;
     }
 
     .action-buttons {
@@ -194,14 +195,20 @@
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
-      flex-wrap: wrap;
     }
 
     .action-buttons .btn {
-      min-width: 70px;
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+    }
+
+    .action-buttons .btn i {
       font-size: 0.85rem;
-      border-radius: 8px;
     }
 
     .btn-warning {
@@ -319,16 +326,16 @@
     <div class="card">
       <!-- Header -->
       <div class="card-header flex-header">
-        <h4><i class="bi bi-calendar-event me-2"></i>Jadwal Ruangan</h4>
+        <h4><i class="fas fa-calendar-alt me-2"></i>Jadwal Ruangan</h4>
         <div class="btn-group">
           <a href="?filter=all" class="btn btn-outline-light filter-btn <?= ($filter ?? 'all') == 'all' ? 'active' : '' ?>">
-            <i class="bi bi-list-ul me-1"></i>Semua
+            <i class="fas fa-list me-1"></i>Semua
           </a>
           <a href="?filter=reguler" class="btn btn-outline-light filter-btn <?= ($filter ?? '') == 'reguler' ? 'active' : '' ?>">
-            <i class="bi bi-calendar3 me-1"></i>Reguler
+            <i class="fas fa-calendar-check me-1"></i>Reguler
           </a>
           <a href="?filter=booking" class="btn btn-outline-light filter-btn <?= ($filter ?? '') == 'booking' ? 'active' : '' ?>">
-            <i class="bi bi-bookmark-check me-1"></i>Booking
+            <i class="fas fa-bookmark me-1"></i>Booking
           </a>
         </div>
       </div>
@@ -336,16 +343,16 @@
       <div class="card-body">
         <!-- Page Title & Actions -->
         <div class="page-title">
-          <h5><i class="bi bi-table me-2"></i>Daftar Jadwal Reguler & Booking</h5>
+          <h5><i class="fas fa-table me-2"></i>Daftar Jadwal Reguler & Booking</h5>
           <div class="action-buttons">
             <a href="<?= base_url('jadwal/kalender') ?>" class="btn btn-outline-primary">
-              <i class="bi bi-calendar3 me-1"></i>Lihat Kalender
+              <i class="fas fa-calendar me-1"></i>Lihat Kalender
             </a>
             <?php 
               $user = session()->get('user');
               if (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])): ?>
               <a href="<?= base_url('jadwal/create') ?>" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i>Tambah Jadwal
+                <i class="fas fa-plus-circle me-1"></i>Tambah Jadwal
               </a>
             <?php endif; ?>
           </div>
@@ -354,13 +361,13 @@
         <!-- Alerts -->
         <?php if (session()->getFlashdata('success')): ?>
           <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>
+            <i class="fas fa-check-circle me-2"></i>
             <?= session()->getFlashdata('success') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
         <?php elseif (session()->getFlashdata('error')): ?>
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>
+            <i class="fas fa-exclamation-triangle me-2"></i>
             <?= session()->getFlashdata('error') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
@@ -371,15 +378,15 @@
           <table class="table table-hover align-middle">
             <thead class="text-center">
               <tr>
-                <th><i class="bi bi-door-open me-1"></i>Ruangan</th>
-                <th><i class="bi bi-info-circle me-1"></i>Kegiatan</th>
-                <th><i class="bi bi-person me-1"></i>Peminjam</th>
-                <th><i class="bi bi-calendar-date me-1"></i>Tanggal</th>
-                <th><i class="bi bi-clock me-1"></i>Jam Mulai</th>
-                <th><i class="bi bi-clock-fill me-1"></i>Jam Selesai</th>
-                <th><i class="bi bi-tag me-1"></i>Status</th>
+                <th><i class="fas fa-door-open me-1"></i>Ruangan</th>
+                <th><i class="fas fa-info-circle me-1"></i>Kegiatan</th>
+                <th><i class="fas fa-user me-1"></i>Peminjam</th>
+                <th><i class="fas fa-calendar-day me-1"></i>Tanggal</th>
+                <th><i class="fas fa-clock me-1"></i>Jam Mulai</th>
+                <th><i class="fas fa-clock me-1"></i>Jam Selesai</th>
+                <th><i class="fas fa-tag me-1"></i>Status</th>
                 <?php if (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])): ?>
-                  <th><i class="bi bi-gear me-1"></i>Aksi</th>
+                  <th><i class="fas fa-cog me-1"></i>Aksi</th>
                 <?php endif; ?>
               </tr>
             </thead>
@@ -427,16 +434,16 @@
                         <?php if (!empty($id)): ?>
                           <div class="action-buttons">
                             <a href="<?= base_url('jadwal/edit/' . $id . '?tipe=' . strtolower($j['status'])) ?>" 
-                               class="btn btn-warning btn-sm">
-                              <i class="bi bi-pencil"></i> Edit
+                               class="btn btn-warning btn-sm" title="Edit Jadwal">
+                              <i class="fas fa-edit"></i> Edit
                             </a>
                             <form action="<?= base_url('jadwal/delete/' . $id) ?>" method="post" style="display:inline;">
                               <?= csrf_field() ?>
                               <input type="hidden" name="_method" value="DELETE">
                               <input type="hidden" name="tipe" value="<?= strtolower($j['status'] ?? 'reguler') ?>">
-                              <button type="submit" class="btn btn-danger btn-sm"
-                                      onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                <i class="bi bi-trash"></i> Hapus
+                              <button type="submit" class="btn btn-danger btn-sm" title="Hapus Jadwal"
+                                      onclick="return confirm('⚠️ Yakin ingin menghapus jadwal ini?\n\nData yang dihapus tidak dapat dikembalikan.')">
+                                <i class="fas fa-trash-alt"></i> Hapus
                               </button>
                             </form>
                           </div>
@@ -450,7 +457,7 @@
               <?php else: ?>
                 <tr>
                   <td colspan="<?= (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])) ? '8' : '7' ?>" class="text-center text-muted py-4">
-                    <i class="bi bi-inbox fs-1 d-block mb-2" style="opacity: 0.3;"></i>
+                    <i class="fas fa-inbox fs-1 d-block mb-2" style="opacity: 0.3;"></i>
                     <p class="mb-0">Tidak ada jadwal ditemukan.</p>
                   </td>
                 </tr>

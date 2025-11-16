@@ -109,59 +109,263 @@ $user = session()->get('user');
         </div>
 
       <?php elseif ($user['role'] === 'petugas'): ?>
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-clock text-warning" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-warning mb-1"><?= esc($totalPeminjamanPending) ?></h3>
+              <p class="text-muted mb-0 small">Peminjaman Pending</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-calendar-check text-success" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-success mb-1"><?= count($jadwalRuang) ?></h3>
+              <p class="text-muted mb-0 small">Total Jadwal</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-clipboard-list text-primary" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-primary mb-1">
+                <?= count(array_filter($jadwalRuang, fn($j) => strtolower($j['status']) === 'diterima')) ?>
+              </h3>
+              <p class="text-muted mb-0 small">Disetujui</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-ban text-danger" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-danger mb-1">
+                <?= count(array_filter($jadwalRuang, fn($j) => strtolower($j['status']) === 'ditolak')) ?>
+              </h3>
+              <p class="text-muted mb-0 small">Ditolak</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                  <i class="fas fa-tasks text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-0">Kelola Peminjaman</h5>
+                  <p class="text-muted small mb-0">Review dan approve peminjaman</p>
+                </div>
+              </div>
+              <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="btn btn-primary w-100">
+                <i class="fas fa-arrow-right me-2"></i>Lihat Daftar Peminjaman
+              </a>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                  <i class="fas fa-history text-success" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-0">Riwayat Peminjaman</h5>
+                  <p class="text-muted small mb-0">Lihat history peminjaman selesai</p>
+                </div>
+              </div>
+              <a href="<?= base_url('peminjaman/history') ?>" class="btn btn-success w-100">
+                <i class="fas fa-arrow-right me-2"></i>Lihat Riwayat
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jadwal Ruangan Table -->
         <div class="glass-card p-4">
-          <p><strong>Total Peminjaman Pending:</strong> <?= esc($totalPeminjamanPending) ?></p>
-          <h5 class="fw-bold mb-3 text-primary">📋 Jadwal Ruangan</h5>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold mb-0 text-primary">
+              <i class="fas fa-calendar-alt me-2"></i>Jadwal Ruangan Hari Ini
+            </h5>
+            <span class="badge bg-primary"><?= count($jadwalRuang) ?> Jadwal</span>
+          </div>
           <div class="table-responsive">
             <table class="modern-table table-hover">
               <thead>
                 <tr>
-                  <th>Ruangan</th>
-                  <th>Tanggal Mulai</th>
-                  <th>Tanggal Selesai</th>
-                  <th>Status</th>
-                  <th>Keterangan</th>
+                  <th><i class="fas fa-door-open me-2"></i>Ruangan</th>
+                  <th><i class="fas fa-calendar me-2"></i>Tanggal Mulai</th>
+                  <th><i class="fas fa-calendar-check me-2"></i>Tanggal Selesai</th>
+                  <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                  <th><i class="fas fa-comment me-2"></i>Keterangan</th>
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($jadwalRuang as $j): ?>
+                <?php if (empty($jadwalRuang)): ?>
                   <tr>
-                    <td><?= esc($j['nama_room'] ?? '-') ?></td>
-                    <td><?= esc(date('d-m-Y H:i', strtotime($j['tanggal_mulai']))) ?></td>
-                    <td><?= esc(date('d-m-Y H:i', strtotime($j['tanggal_selesai']))) ?></td>
-                    <td><span class="status-badge <?= esc($j['status']) ?>"><?= esc(ucfirst($j['status'] ?? '-')) ?></span></td>
-                    <td><?= esc($j['keterangan']) ?></td>
+                    <td colspan="5" class="text-center py-4">
+                      <i class="fas fa-inbox text-muted mb-2" style="font-size: 3rem;"></i>
+                      <p class="text-muted mb-0">Belum ada jadwal untuk hari ini</p>
+                    </td>
                   </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                  <?php foreach ($jadwalRuang as $j): ?>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-door-open text-primary me-2"></i>
+                          <strong><?= esc($j['nama_room'] ?? '-') ?></strong>
+                        </div>
+                      </td>
+                      <td><?= esc(date('d M Y, H:i', strtotime($j['tanggal_mulai']))) ?></td>
+                      <td><?= esc(date('d M Y, H:i', strtotime($j['tanggal_selesai']))) ?></td>
+                      <td><span class="status-badge <?= esc($j['status']) ?>"><?= esc(ucfirst($j['status'] ?? '-')) ?></span></td>
+                      <td><?= esc($j['keterangan']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
         </div>
 
       <?php elseif ($user['role'] === 'peminjam'): ?>
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-clipboard-list text-primary" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-primary mb-1"><?= count($myPeminjaman) ?></h3>
+              <p class="text-muted mb-0 small">Total Pengajuan</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-clock text-warning" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-warning mb-1">
+                <?= count(array_filter($myPeminjaman, fn($p) => strtolower($p['status']) === 'proses')) ?>
+              </h3>
+              <p class="text-muted mb-0 small">Menunggu Approval</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-check-circle text-success" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-success mb-1">
+                <?= count(array_filter($myPeminjaman, fn($p) => strtolower($p['status']) === 'diterima')) ?>
+              </h3>
+              <p class="text-muted mb-0 small">Disetujui</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="glass-card p-4 text-center">
+              <div class="mb-3">
+                <i class="fas fa-times-circle text-danger" style="font-size: 2.5rem;"></i>
+              </div>
+              <h3 class="fw-bold text-danger mb-1">
+                <?= count(array_filter($myPeminjaman, fn($p) => strtolower($p['status']) === 'ditolak')) ?>
+              </h3>
+              <p class="text-muted mb-0 small">Ditolak</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                  <i class="fas fa-plus-circle text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-0">Ajukan Peminjaman Baru</h5>
+                  <p class="text-muted small mb-0">Buat pengajuan peminjaman ruangan</p>
+                </div>
+              </div>
+              <a href="<?= base_url('peminjaman/ajukan') ?>" class="btn btn-primary w-100">
+                <i class="fas fa-arrow-right me-2"></i>Ajukan Sekarang
+              </a>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="glass-card p-4 h-100">
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3">
+                  <i class="fas fa-calendar-alt text-info" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-0">Lihat Jadwal Ruangan</h5>
+                  <p class="text-muted small mb-0">Cek ketersediaan ruangan</p>
+                </div>
+              </div>
+              <a href="<?= base_url('jadwal/index') ?>" class="btn btn-info w-100">
+                <i class="fas fa-arrow-right me-2"></i>Lihat Jadwal
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pengajuan Peminjaman Table -->
         <div class="glass-card p-4">
-          <h5 class="fw-bold mb-3 text-primary">📑 Pengajuan Peminjaman Saya</h5>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold mb-0 text-primary">
+              <i class="fas fa-list-alt me-2"></i>Pengajuan Peminjaman Saya
+            </h5>
+            <span class="badge bg-primary"><?= count($myPeminjaman) ?> Pengajuan</span>
+          </div>
           <div class="table-responsive">
             <table class="modern-table table-hover">
               <thead>
                 <tr>
-                  <th>Ruang</th>
-                  <th>Tanggal Mulai</th>
-                  <th>Tanggal Selesai</th>
-                  <th>Status</th>
-                  <th>Keterangan</th>
+                  <th><i class="fas fa-door-open me-2"></i>Ruang</th>
+                  <th><i class="fas fa-calendar me-2"></i>Tanggal Mulai</th>
+                  <th><i class="fas fa-calendar-check me-2"></i>Tanggal Selesai</th>
+                  <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                  <th><i class="fas fa-comment me-2"></i>Keterangan</th>
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($myPeminjaman as $p): ?>
+                <?php if (empty($myPeminjaman)): ?>
                   <tr>
-                    <td><?= esc($p['nama_room']) ?></td>
-                    <td><?= esc(date('d-m-Y H:i', strtotime($p['tanggal_mulai']))) ?></td>
-                    <td><?= esc(date('d-m-Y H:i', strtotime($p['tanggal_selesai']))) ?></td>
-                    <td><span class="status-badge <?= esc($p['status']) ?>"><?= esc(ucfirst($p['status'])) ?></span></td>
-                    <td><?= esc($p['keterangan']) ?></td>
+                    <td colspan="5" class="text-center py-4">
+                      <i class="fas fa-inbox text-muted mb-2" style="font-size: 3rem;"></i>
+                      <p class="text-muted mb-3">Belum ada pengajuan peminjaman</p>
+                      <a href="<?= base_url('peminjaman/ajukan') ?>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus-circle me-2"></i>Ajukan Peminjaman
+                      </a>
+                    </td>
                   </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                  <?php foreach ($myPeminjaman as $p): ?>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-door-open text-primary me-2"></i>
+                          <strong><?= esc($p['nama_room']) ?></strong>
+                        </div>
+                      </td>
+                      <td><?= esc(date('d M Y, H:i', strtotime($p['tanggal_mulai']))) ?></td>
+                      <td><?= esc(date('d M Y, H:i', strtotime($p['tanggal_selesai']))) ?></td>
+                      <td><span class="status-badge <?= esc($p['status']) ?>"><?= esc(ucfirst($p['status'])) ?></span></td>
+                      <td><?= esc($p['keterangan']) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>

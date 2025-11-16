@@ -1,6 +1,67 @@
 <?php
 // Pastikan user dari session terbaca
 $user = isset($user) ? $user : session()->get('user');
+
+// Helper function untuk check active menu
+$uri = service('uri');
+$segment1 = $uri->getSegment(1) ?? '';
+$segment2 = $uri->getSegment(2) ?? '';
+
+function isActive($path, $segment1, $segment2 = '') {
+    // Exact match untuk dashboard
+    if ($path === 'dashboard' && $segment1 === 'dashboard') {
+        return 'active';
+    }
+    
+    // Check administrator routes
+    if (strpos($path, 'administrator') !== false) {
+        if ($segment1 === 'administrator' && $segment2 === 'users') {
+            return 'active';
+        }
+    }
+    
+    // Check ruang
+    if (($path === 'ruang/index' || $path === 'ruang') && $segment1 === 'ruang') {
+        return 'active';
+    }
+    
+    // Check laporan
+    if ($path === 'laporan' && $segment1 === 'laporan') {
+        return 'active';
+    }
+    
+    // Check peminjaman history
+    if ($path === 'peminjaman/history' && $segment1 === 'peminjaman' && $segment2 === 'history') {
+        return 'active';
+    }
+    
+    // Check peminjaman ajukan
+    if ($path === 'peminjaman/ajukan' && $segment1 === 'peminjaman' && $segment2 === 'ajukan') {
+        return 'active';
+    }
+    
+    // Check petugas peminjaman daftar
+    if ($path === 'petugas/peminjaman_daftar' && $segment1 === 'petugas' && $segment2 === 'peminjaman_daftar') {
+        return 'active';
+    }
+    
+    // Check jadwal
+    if (($path === 'jadwal/index' || $path === 'jadwal') && $segment1 === 'jadwal') {
+        return 'active';
+    }
+    
+    // Check profile
+    if ($path === 'profile' && $segment1 === 'profile') {
+        return 'active';
+    }
+    
+    // Check kontak
+    if ($path === 'kontak' && $segment1 === 'kontak') {
+        return 'active';
+    }
+    
+    return '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -33,6 +94,9 @@ $user = isset($user) ? $user : session()->get('user');
       }
     }
   </script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
   /* =======================================================
@@ -215,37 +279,67 @@ $user = isset($user) ? $user : session()->get('user');
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-        <h3 class="fw-bold text-primary mb-0" style="font-size: 1.5rem;">🏫 Sistem Peminjaman</h3>
+        <h3 class="fw-bold text-primary mb-0" style="font-size: 1.5rem;">
+            <i class="fas fa-building"></i> Sistem Peminjaman
+        </h3>
     </div>
 
     <nav class="sidebar-menu mt-4">
-        <a href="<?= base_url('dashboard') ?>" class="sidebar-link">🏠 Home</a>
+        <a href="<?= base_url('dashboard') ?>" class="sidebar-link <?= isActive('dashboard', $segment1) ?>">
+            <i class="fas fa-home"></i> Home
+        </a>
 
         <?php if (isset($user) && $user['role'] === 'administrator'): ?>
-            <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link">👥 Manajemen User</a>
-            <a href="<?= base_url('ruang/index') ?>" class="sidebar-link">🏫 Manajemen Ruang</a>
-            <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
-            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
+            <a href="<?= base_url('administrator/users/index') ?>" class="sidebar-link <?= isActive('administrator/users/index', $segment1, $segment2) ?>">
+                <i class="fas fa-users"></i> Manajemen User
+            </a>
+            <a href="<?= base_url('ruang/index') ?>" class="sidebar-link <?= isActive('ruang/index', $segment1) ?>">
+                <i class="fas fa-door-open"></i> Manajemen Ruang
+            </a>
+            <a href="<?= base_url('laporan') ?>" class="sidebar-link <?= isActive('laporan', $segment1) ?>">
+                <i class="fas fa-file-alt"></i> Generate Laporan
+            </a>
+            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link <?= isActive('peminjaman/history', $segment1, $segment2) ?>">
+                <i class="fas fa-history"></i> Riwayat Peminjaman
+            </a>
+            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link <?= isActive('petugas/peminjaman_daftar', $segment1, $segment2) ?>">
+                <i class="fas fa-clipboard-list"></i> Daftar Peminjaman
+            </a>
 
         <?php elseif (isset($user) && $user['role'] === 'petugas'): ?>
-            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link">📋 Daftar Peminjaman</a>
-            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link">🕓 Riwayat Peminjaman</a>
-            <a href="<?= base_url('laporan') ?>" class="sidebar-link">📄 Generate Laporan</a>
+            <a href="<?= base_url('petugas/peminjaman_daftar') ?>" class="sidebar-link <?= isActive('petugas/peminjaman_daftar', $segment1, $segment2) ?>">
+                <i class="fas fa-clipboard-list"></i> Daftar Peminjaman
+            </a>
+            <a href="<?= base_url('peminjaman/history') ?>" class="sidebar-link <?= isActive('peminjaman/history', $segment1, $segment2) ?>">
+                <i class="fas fa-history"></i> Riwayat Peminjaman
+            </a>
+            <a href="<?= base_url('laporan') ?>" class="sidebar-link <?= isActive('laporan', $segment1) ?>">
+                <i class="fas fa-file-alt"></i> Generate Laporan
+            </a>
 
         <?php elseif (isset($user) && $user['role'] === 'peminjam'): ?>
-            <a href="<?= base_url('ruang') ?>" class="sidebar-link">🏫 Daftar Ruang</a>
-            <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link">📝 Pengajuan Peminjaman</a>
+            <a href="<?= base_url('ruang') ?>" class="sidebar-link <?= isActive('ruang', $segment1) ?>">
+                <i class="fas fa-door-open"></i> Daftar Ruang
+            </a>
+            <a href="<?= base_url('peminjaman/ajukan') ?>" class="sidebar-link <?= isActive('peminjaman/ajukan', $segment1, $segment2) ?>">
+                <i class="fas fa-edit"></i> Pengajuan Peminjaman
+            </a>
         <?php endif; ?>
 
-        <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link">📅 Jadwal Ruang</a>
+        <a href="<?= base_url('jadwal/index') ?>" class="sidebar-link <?= isActive('jadwal', $segment1) ?>">
+            <i class="fas fa-calendar-alt"></i> Jadwal Ruang
+        </a>
 
         <?php if ($user): ?>
             <a href="<?= base_url('profile') ?>" 
-               class="sidebar-link <?= service('uri')->getSegment(1) === 'profile' ? 'active' : '' ?>">👤 Profile</a>
+               class="sidebar-link <?= isActive('profile', $segment1) ?>">
+                <i class="fas fa-user-circle"></i> Profile
+            </a>
         <?php endif; ?>
 
-        <a href="<?= base_url('kontak') ?>" class="sidebar-link text-danger fw-semibold">📞 Kontak Petugas</a>
+        <a href="<?= base_url('kontak') ?>" class="sidebar-link <?= isActive('kontak', $segment1) ?>">
+            <i class="fas fa-phone-alt"></i> Kontak Petugas
+        </a>
     </nav>
 
     <?php if ($user): ?>
@@ -256,9 +350,15 @@ $user = isset($user) ? $user : session()->get('user');
                class="sidebar-profile-img"
                onerror="this.src='<?= base_url('images/profile/default.jpeg') ?>'">
         </div>
-        <div class="fw-semibold text-dark small mb-1"><?= esc($user['username']) ?></div>
-        <div class="text-muted small mb-2">(<?= esc($user['role']) ?>)</div>
-        <a href="<?= base_url('auth/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">Logout</a>
+        <div class="fw-semibold text-dark small mb-1">
+            <i class="fas fa-user"></i> <?= esc($user['username']) ?>
+        </div>
+        <div class="text-muted small mb-2">
+            <i class="fas fa-id-badge"></i> <?= esc($user['role']) ?>
+        </div>
+        <a href="<?= base_url('auth/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
       </div>
     <?php endif; ?>
   </aside>
