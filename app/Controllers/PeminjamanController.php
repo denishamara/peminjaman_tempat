@@ -186,22 +186,25 @@ public function daftar()
 }
 
 // 🗑️ Hapus riwayat peminjaman
-public function delete($id_booking)
+public function delete($id)
 {
-    $peminjamanModel = new \App\Models\PeminjamanModel();
-
-    $peminjaman = $peminjamanModel->find($id_booking);
-
-    if (!$peminjaman) {
-        return redirect()->back()->with('error', 'Data peminjaman tidak ditemukan.');
+    $bookingModel = new BookingModel();
+    $booking = $bookingModel->find($id);
+    
+    if (!$booking) {
+        return redirect()->to('/booking')->with('error', 'Data booking tidak ditemukan');
     }
 
-    try {
-        $peminjamanModel->delete($id_booking);
-        return redirect()->to('/peminjaman/history')->with('success', 'Riwayat peminjaman berhasil dihapus.');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Gagal menghapus riwayat: ' . $e->getMessage());
-    }
+    $id_room = $booking['id_room']; // Simpan id_room sebelum dihapus
+    
+    // Hapus booking
+    $bookingModel->delete($id);
+    
+    // ⭐ OPTIONAL: Update status ruang langsung (jika ingin real-time)
+    // $ruangModel = new RuangModel();
+    // $ruangModel->update($id_room, ['status' => 'Tersedia']);
+    
+    return redirect()->to('/booking')->with('success', 'Booking berhasil dihapus');
 }
 
 }

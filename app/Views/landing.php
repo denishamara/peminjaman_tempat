@@ -74,21 +74,48 @@
       color: #cbd5e1;
     }
 
-    /* Button styles */
+    /* Button styles - DIKECILKAN */
     .btn-glow {
       background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
       border: none;
       color: #fff;
-      padding: 0.75rem 2rem;
+      padding: 0.6rem 1.5rem; /* DIKECILKAN dari 0.75rem 2rem */
       border-radius: 50px;
-      font-size: 1.1rem;
+      font-size: 1rem; /* DIKECILKAN dari 1.1rem */
       transition: all 0.3s ease;
       box-shadow: 0 0 10px rgba(102, 16, 242, 0.4);
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      font-weight: 500;
     }
 
     .btn-glow:hover {
       transform: scale(1.05);
       box-shadow: 0 0 20px rgba(102, 16, 242, 0.8);
+      color: #fff;
+    }
+
+    /* Tombol sekunder yang konsisten - DIKECILKAN */
+    .btn-outline-glow {
+      border: 2px solid var(--primary-color);
+      color: var(--text-light);
+      padding: 0.6rem 1.5rem; /* DIKECILKAN dari 0.75rem 2rem */
+      border-radius: 50px;
+      font-size: 1rem; /* DIKECILKAN dari 1.1rem */
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      font-weight: 500;
+      background: transparent;
+    }
+
+    .btn-outline-glow:hover {
+      background: var(--primary-color);
+      color: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
     }
 
     section {
@@ -134,10 +161,10 @@
     <h1>Selamat Datang di <span class="text-primary">SmartRoom</span></h1>
     <p>Kelola peminjaman ruang dengan mudah, cepat, dan efisien — kapan saja dan di mana saja.</p>
     <div class="mt-4">
-      <a href="<?= base_url('jadwal/public') ?>" class="btn btn-glow me-3">
+      <a href="<?= base_url('jadwal/public') ?>" class="btn-glow me-3">
         <i class="bi bi-calendar-event"></i> Lihat Jadwal
       </a>
-      <a href="<?= base_url('auth/login') ?>" class="btn btn-outline-light rounded-pill px-4">
+      <a href="<?= base_url('auth/login') ?>" class="btn-outline-glow">
         <i class="bi bi-box-arrow-in-right"></i> Masuk
       </a>
     </div>

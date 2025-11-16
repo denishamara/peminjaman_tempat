@@ -15,9 +15,11 @@ class CreateLogBookingTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
+            // gunakan TIMESTAMP dengan DEFAULT CURRENT_TIMESTAMP agar kompatibel
             'waktu_log' => [
-                'type' => 'DATETIME',
-                'null' => false,
+                'type'    => 'TIMESTAMP',
+                'null'    => false,
+                'default' => 'CURRENT_TIMESTAMP',
             ],
             'aksi' => [
                 'type'       => 'VARCHAR',
@@ -59,8 +61,8 @@ class CreateLogBookingTable extends Migration
         $this->forge->addPrimaryKey('id_log');
         $this->forge->createTable('log_booking');
 
-        // Set default value menggunakan query manual
-        $this->db->query("ALTER TABLE log_booking MODIFY waktu_log DATETIME DEFAULT CURRENT_TIMESTAMP");
+        // Catatan: jika server MySQL/MariaDB lama yang tidak menerima default pada DATETIME,
+        // penggunaan TIMESTAMP di atas biasanya kompatibel.
     }
 
     public function down()

@@ -14,36 +14,30 @@ class RuangModel extends Model
      * Ambil daftar ruang beserta status (booking / reguler / tersedia)
      */
     public function getRuangWithStatus()
-    {
-        $today = date('Y-m-d H:i:s');
+{
+    $today = date('Y-m-d H:i:s');
 
-        $builder = $this->db->table('room r');
+    $builder = $this->db->table('room r');
 
-        $builder->select("
-            r.*,
-            CASE
-                WHEN b.id_booking IS NOT NULL THEN 'Tidak Tersedia'
-                WHEN j.id_reguler IS NOT NULL THEN 'Terpakai (Reguler)'
-                ELSE 'Tersedia'
-            END AS status
-        ");
+    $builder->select("
+        r.*,
+        CASE
+            WHEN EXISTS (
+                SELECT 1 FROM booking b 
+                WHERE b.id_room = r.id_room 
+                AND b.status != 'Selesai' 
+                AND b.status != 'Dibatalkan'
+                AND b.tanggal_selesai >= '$today'
+            ) THEN 'Tidak Tersedia'
+            WHEN EXISTS (
+                SELECT 1 FROM jadwal_reguler j 
+                WHERE j.id_room = r.id_room 
+                AND j.tanggal_selesai >= '$today'
+            ) THEN 'Terpakai (Reguler)'
+            ELSE 'Tersedia'
+        END AS status
+    ");
 
-        // Join booking aktif
-        $builder->join(
-            'booking b', 
-            "b.id_room = r.id_room AND b.status != 'Selesai' AND b.tanggal_selesai >= '$today'", 
-            'left'
-        );
-
-        // Join jadwal reguler aktif
-        $builder->join(
-            'jadwal_reguler j', 
-            "j.id_room = r.id_room AND j.tanggal_selesai >= '$today'", 
-            'left'
-        );
-
-        $builder->groupBy('r.id_room');
-
-        return $builder->get()->getResultArray();
-    }
+    return $builder->get()->getResultArray();
+}
 }

@@ -24,196 +24,278 @@ body { font-family: "Poppins", sans-serif; color: #1e293b; min-height: 100vh; ba
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* ===== RESET & BASE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* ===== BODY LOGIN & REGISTER ===== */
+/* ===== BODY BACKGROUND ===== */
 body.login-body,
 body.register-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, #0a58ca, #0f172a);
-  font-family: "Poppins", sans-serif;
-  overflow-x: hidden;
+    min-height: 100vh;
+    background: radial-gradient(circle at top left, #0a58ca, #0f172a) !important;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px; /* TAMBAHKAN INI untuk desktop */
 }
 
 /* ===== NAVBAR ===== */
 .login-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 2rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+    height: 70px; /* TAMBAHKAN tinggi navbar */
 }
 
 .login-navbar .brand {
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.2rem;
-  text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-decoration: none;
 }
 
 .login-navbar .btn-landing {
-  background: #2563eb;
-  color: #fff;
-  padding: 0.45rem 1rem;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: 0.3s;
+    background: #2563eb;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+    font-size: 0.9rem;
 }
 .login-navbar .btn-landing:hover {
-  background: #1d4ed8;
+    background: #1d4ed8;
+    transform: translateY(-2px);
 }
 
-/* ===== CARD LOGIN ===== */
-body.login-body .container {
-  margin-top: 6rem;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
-}
-
-/* ===== CARD REGISTER ===== */
-body.register-body .register-container {
-  margin-top: 7rem;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
+/* ===== MAIN CONTAINER ===== */
+.login-container,
+.register-container {
+    width: 100%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    padding: 2.5rem;
+    margin-top: 2rem; /* DIKURANGI dari 6rem */
+    text-align: center;
 }
 
 /* ===== TITLE ===== */
-body.login-body h2,
-body.register-body h2 {
-  color: #0066ff;
-  font-weight: 700;
-  margin-bottom: 1.8rem;
+.login-container h2,
+.register-container h2 {
+    color: #0066ff;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
 }
 
 /* ===== FORM ===== */
-body.login-body form,
-body.register-body form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+.login-container form,
+.register-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-/* Pastikan label di atas input */
-body.login-body label,
-body.register-body label {
-  display: block;
-  text-align: left;
-  font-weight: 600;
-  color: #334155;
-  font-size: 0.9rem;
-  margin-bottom: 0.4rem; /* jarak label ke input */
+/* ===== FORM GROUP ===== */
+.form-group {
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
 }
 
 /* ===== INPUT ===== */
-body.login-body input,
-body.register-body input {
-  padding: 0.8rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 1rem;
-  outline: none;
-  width: 100%;
-  transition: border 0.3s ease;
+.login-container input,
+.register-container input {
+    padding: 0.9rem 1.2rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    width: 100%;
+    transition: all 0.3s ease;
+    background: #fff;
 }
-body.login-body input:focus,
-body.register-body input:focus {
-  border-color: #2563eb;
+
+.login-container input:focus,
+.register-container input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* ===== BUTTON ===== */
-body.login-body button,
-body.register-body button {
-  background: linear-gradient(90deg, #0066ff, #6610f2);
-  border: none;
-  border-radius: 10px;
-  color: white;
-  padding: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-body.login-body button:hover,
-body.register-body button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 15px rgba(102,16,242,0.5);
-}
-
-/* ===== LINK LOGIN / REGISTER ===== */
-body.login-body .login-link,
-body.register-body .login-link {
-  text-align: center;
-  margin-top: 1.2rem;
-}
-body.login-body .login-link a,
-body.register-body .login-link a {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-body.login-body .login-link a:hover,
-body.register-body .login-link a:hover {
-  text-decoration: underline;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
-  body.login-body .container,
-  body.register-body .register-container {
-    padding: 1.8rem;
-    margin-top: 1.5rem;
-    max-width: 90%;
-  }
-
-  .login-navbar {
-    padding: 0.6rem 1rem;
-  }
-
-  .login-navbar .brand {
+.login-container button,
+.register-container button {
+    background: linear-gradient(135deg, #0066ff, #6610f2);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
     font-size: 1rem;
-  }
-
-  .login-navbar .btn-landing {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-  }
-
-  /* Biar teks tetap tengah di HP */
-  body.login-body .login-link,
-  body.register-body .login-link {
-    text-align: center;
-    margin-top: 1rem;
-  }
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 15px rgba(102, 16, 242, 0.3);
 }
 
-/* ===== VERTICAL ALIGN UNTUK LAYAR TINGGI ===== */
+.login-container button:hover,
+.register-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 16, 242, 0.4);
+}
+
+/* ===== LINK ===== */
+.login-link {
+    text-align: center;
+    margin-top: 2rem;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.login-link a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+/* ===== ALERT STYLES ===== */
+.alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease-in-out;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.alert-success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #16a34a;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== DESKTOP SPECIFIC ===== */
+@media (min-width: 769px) {
+    body.login-body,
+    body.register-body {
+        padding-top: 100px; /* LEBIH TINGGI untuk desktop */
+        justify-content: flex-start; /* Mulai dari atas */
+    }
+    
+    .login-container,
+    .register-container {
+        margin-top: 3rem; /* Tambah jarak di desktop */
+    }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    body.login-body,
+    body.register-body {
+        padding-top: 70px; /* Sesuaikan dengan tinggi navbar mobile */
+    }
+    
+    .login-container,
+    .register-container {
+        margin-top: 1.5rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        padding: 2rem 1.5rem;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    body.login-body,
+    body.register-body {
+        padding-top: 65px;
+    }
+    
+    .login-navbar {
+        padding: 0.7rem 1rem;
+        height: 65px;
+    }
+    
+    .login-navbar .brand {
+        font-size: 1.1rem;
+    }
+    
+    .login-navbar .btn-landing {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .login-container,
+    .register-container {
+        margin-top: 1rem;
+        padding: 1.8rem 1.2rem;
+        max-width: 95%;
+    }
+    
+    .login-container h2,
+    .register-container h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .login-container input,
+    .register-container input {
+        padding: 0.8rem 1rem;
+    }
+}
+
+/* Untuk layar tinggi */
 @media (min-height: 900px) {
-  body.register-body {
-    justify-content: center;
-  }
-  body.register-body .register-container {
-    margin-top: 3rem;
-  }
+    body.login-body,
+    body.register-body {
+        justify-content: center;
+        padding-top: 0;
+    }
+    
+    .login-container,
+    .register-container {
+        margin-top: 0;
+    }
 }
 
 /* ========== Layout dengan Sidebar Umum ========== */
@@ -512,25 +594,36 @@ body.edit-jadwal-body {
 /* ===================================================== */
 
 
-body.profile-body {
+/* Reset dan base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
   min-height: 100vh;
   background: url('/images/bg.jpeg') no-repeat center center fixed;
   background-size: cover;
-  font-family: "Poppins", sans-serif;
-  margin: 0;
-  display: flex;
 }
 
-/* Container utama profil */
+/* Layout utama */
+.main-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Container profil */
 .profile-container {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* bukan center lagi */
+  align-items: center;
   margin-left: 250px;
-  height: 100vh;
+  padding: 1rem;
   background: transparent;
-  padding-top: 3rem; /* naikkan sedikit */
 }
 
 /* Kartu profil */
@@ -566,37 +659,39 @@ body.profile-body {
   background-color: #f8f9fa;
 }
 
-/* Isi profil */
-.profile-body {
+/* Konten profil */
+.profile-content {
   padding: 80px 20px 30px;
 }
 
-.profile-body h4 {
+.profile-content h4 {
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 0.3rem;
 }
 
-.profile-body p {
+.profile-content p {
   color: #64748b;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.5rem;
 }
 
-.profile-body .badge {
+.profile-content .badge {
   background-color: #2563eb;
+  color: white;
   font-size: 0.85rem;
   border-radius: 6px;
   padding: 0.45rem 0.7rem;
   margin-top: 0.5rem;
+  display: inline-block;
 }
 
-.profile-body hr {
+.profile-content hr {
   margin: 1.2rem 0;
   border-color: #e2e8f0;
 }
 
 /* Tombol Edit */
-.profile-body .btn-edit {
+.profile-content .btn-edit {
   background: #2563eb;
   color: white;
   border: none;
@@ -605,29 +700,51 @@ body.profile-body {
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease-in-out;
+  display: inline-block;
+  margin-top: 1rem;
 }
 
-.profile-body .btn-edit:hover {
+.profile-content .btn-edit:hover {
   background: #1d4ed8;
   transform: translateY(-2px);
+  color: white;
 }
 
-/* Efek animasi */
+/* Animasi */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 /* Responsif */
 @media (max-width: 992px) {
   .profile-container {
     margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .profile-card {
     width: 100%;
-    border-radius: 0;
-    padding: 2rem 1rem;
+    max-width: 400px;
   }
 }
 
+@media (max-width: 576px) {
+  .profile-card {
+    width: 100%;
+    margin: 0 1rem;
+  }
+  
+  .profile-content {
+    padding: 80px 15px 25px;
+  }
+}
 
 /* === Dashboard Stat Boxes === */
 .stat-box {
