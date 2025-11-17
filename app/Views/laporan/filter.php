@@ -162,6 +162,27 @@
       color: white;
     }
 
+    /* PDF Mobile Button */
+    .btn-generate-pdf-mobile {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-generate-pdf-mobile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6);
+      color: white;
+    }
+
     /* Table Card */
     .table-card-modern {
       background: rgba(255, 255, 255, 0.95);
@@ -377,6 +398,14 @@
       margin-bottom: 1.5rem;
     }
 
+    /* Button Group */
+    .button-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
     /* Responsive */
     @media (max-width: 992px) {
       .page-header-card {
@@ -397,7 +426,13 @@
         align-items: flex-start;
       }
 
-      .btn-generate-pdf {
+      .button-group {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .btn-generate-pdf,
+      .btn-generate-pdf-mobile {
         width: 100%;
         justify-content: center;
       }
@@ -468,6 +503,16 @@
       .modern-laporan-table th:nth-child(7),
       .modern-laporan-table td:nth-child(7) {
         display: none;
+      }
+
+      .button-group {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-generate-pdf,
+      .btn-generate-pdf-mobile {
+        width: 100%;
       }
     }
 
@@ -549,8 +594,6 @@
       }
     }
   </style>
-
-
 </head>
 
 <body class="modern-dashboard">
@@ -673,12 +716,13 @@
           <i class="fas fa-table"></i>
           Data Peminjaman
         </h3>
-        <div class="d-flex align-items-center gap-3">
+        <div class="button-group">
           <span class="record-count-badge">
             <i class="fas fa-database me-1"></i>
-            <span id="recordCount">0</span> Records
+            <span id="recordCount"><?= count($bookings) ?></span> Records
           </span>
           
+          <!-- Original PDF -->
           <form method="post" action="<?= base_url('laporan/generate') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="tanggal_mulai" value="<?= esc($tanggalMulai) ?>">
@@ -686,10 +730,23 @@
             <input type="hidden" name="status" value="<?= esc($status) ?>">
             <input type="hidden" name="bulan" value="<?= esc($bulan) ?>">
             <input type="hidden" name="tahun" value="<?= esc($tahun) ?>">
-
             <button type="submit" class="btn-generate-pdf">
               <i class="fas fa-file-pdf"></i>
               Generate PDF
+            </button>
+          </form>
+
+          <!-- Mobile PDF -->
+          <form method="post" action="<?= base_url('laporan/generateMobile') ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="tanggal_mulai" value="<?= esc($tanggalMulai) ?>">
+            <input type="hidden" name="tanggal_selesai" value="<?= esc($tanggalSelesai) ?>">
+            <input type="hidden" name="status" value="<?= esc($status) ?>">
+            <input type="hidden" name="bulan" value="<?= esc($bulan) ?>">
+            <input type="hidden" name="tahun" value="<?= esc($tahun) ?>">
+            <button type="submit" class="btn-generate-pdf-mobile">
+              <i class="fas fa-mobile-alt"></i>
+              PDF Mobile
             </button>
           </form>
         </div>

@@ -77,11 +77,12 @@ $routes->group('petugas', function($routes) {
 
 // Laporan routes (filter & generate PDF)
 $routes->group('laporan', ['filter' => 'auth'], function($routes) {
-    // Halaman filter laporan
+    // Halaman utama laporan
     $routes->get('/', 'LaporanController::index');
     
-    // Generate laporan PDF
-    $routes->post('generate', 'LaporanController::generate');
+    // Generate PDF routes
+    $routes->post('generate', 'LaporanController::generate');          // POST: /laporan/generate
+    $routes->post('generateMobile', 'LaporanController::generateMobile'); // POST: /laporan/generateMobile
 });
 // 📞 Halaman kontak untuk semua user
 $routes->get('kontak', 'KontakController::index');
