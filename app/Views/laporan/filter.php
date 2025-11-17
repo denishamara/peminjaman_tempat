@@ -580,17 +580,17 @@
 
       <form method="get" action="<?= base_url('laporan') ?>">
         <div class="row g-3">
-          <!-- Hari -->
+          <!-- Status -->
           <div class="col-lg-2 col-md-3 col-6">
             <label class="form-label-modern">
-              <i class="fas fa-calendar-day"></i>
-              Hari
+              <i class="fas fa-flag"></i>
+              Status
             </label>
-            <select name="hari" id="hari" class="form-select form-select-modern">
-              <option value="">Semua Hari</option>
-              <?php foreach (['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $h): ?>
-                <option value="<?= $h ?>" <?= ($hari ?? '') === $h ? 'selected' : '' ?>>
-                  <?= $h ?>
+            <select name="status" id="status" class="form-select form-select-modern">
+              <option value="">Semua Status</option>
+              <?php foreach (['proses', 'diterima', 'ditolak', 'selesai'] as $s): ?>
+                <option value="<?= $s ?>" <?= ($status ?? '') === $s ? 'selected' : '' ?>>
+                  <?= ucfirst($s) ?>
                 </option>
               <?php endforeach; ?>
             </select>
@@ -683,7 +683,7 @@
             <?= csrf_field() ?>
             <input type="hidden" name="tanggal_mulai" value="<?= esc($tanggalMulai) ?>">
             <input type="hidden" name="tanggal_selesai" value="<?= esc($tanggalSelesai) ?>">
-            <input type="hidden" name="hari" value="<?= esc($hari) ?>">
+            <input type="hidden" name="status" value="<?= esc($status) ?>">
             <input type="hidden" name="bulan" value="<?= esc($bulan) ?>">
             <input type="hidden" name="tahun" value="<?= esc($tahun) ?>">
 

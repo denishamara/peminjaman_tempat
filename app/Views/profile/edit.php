@@ -21,202 +21,333 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
     .sidebar {
         width: 250px;
         background: #fff;
-        border-right: 1px solid #ddd;
+        border-right: 1px solid #e2e8f0;
         height: 100vh;
         position: fixed;
         padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
     }
     
     .main-content {
-        margin-left: 270px;
+        margin-left: 250px;
         padding: 40px;
-        width: calc(100% - 270px);
+        width: calc(100% - 250px);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .content-wrapper {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        justify-content: center;
     }
     
     .card-modern {
-        max-width: 650px;
-        background: rgba(255, 255, 255, 0.95);
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(20px);
         border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+        overflow: hidden;
     }
     
     .card-header-purple {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 20px 20px 0 0;
-      border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 0;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header-purple::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: cover;
     }
     
     .card-header-purple h4 {
-      margin: 0;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+        margin: 0;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 1;
     }
     
+    .card-body {
+        padding: 2.5rem;
+    }
+
     .profile-preview {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 4px solid #667eea;
-      object-fit: cover;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 5px solid #667eea;
+        object-fit: cover;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .profile-preview:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
     }
     
     .btn-delete-photo {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      border: none;
-      color: white;
-      padding: 0.6rem 1.25rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.875rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
     }
     
     .btn-delete-photo:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-      color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+        color: white;
     }
     
     .btn-save-purple {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border: none;
-      color: white;
-      padding: 0.75rem 2rem;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        padding: 0.85rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
     .btn-save-purple:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
-      color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+        color: white;
     }
     
     .btn-cancel {
-      background: #e2e8f0;
-      border: none;
-      color: #475569;
-      padding: 0.75rem 2rem;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        color: #475569;
+        padding: 0.85rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
     }
     
     .btn-cancel:hover {
-      background: #cbd5e1;
-      color: #334155;
-      transform: translateY(-2px);
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #334155;
+        transform: translateY(-2px);
+        text-decoration: none;
     }
     
     .form-label {
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
     }
     
     .form-control {
-      border-radius: 10px;
-      border: 2px solid #e2e8f0;
-      padding: 0.75rem 1rem;
-      transition: all 0.3s ease;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        padding: 0.85rem 1.25rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        background: #f8fafc;
     }
     
     .form-control:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.3rem rgba(102, 126, 234, 0.15);
+        background: white;
     }
-    
-    /* Responsive */
+
+    .file-input-info {
+        background: #f8fafc;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 2rem;
+        border-top: 2px solid #f1f5f9;
+        margin-top: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1199px) {
+        .main-content {
+            padding: 30px;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+    }
+
     @media (max-width: 991px) {
-      .main-content {
-        margin-left: 0;
-        width: 100%;
-        padding: 2rem 1rem;
-      }
-      
-      .card-modern {
-        max-width: 100%;
-      }
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .content-wrapper {
+            max-width: 100%;
+        }
     }
     
     @media (max-width: 767px) {
-      .main-content {
-        padding: 1.5rem 0.75rem;
-      }
-      
-      .card-header-purple {
-        padding: 1.25rem;
-      }
-      
-      .card-header-purple h4 {
-        font-size: 1.25rem;
-      }
-      
-      .profile-preview {
-        width: 100px;
-        height: 100px;
-      }
-      
-      .btn-delete-photo {
-        width: 100%;
-        justify-content: center;
-        margin-top: 0.75rem;
-      }
-      
-      .btn-save-purple,
-      .btn-cancel {
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 0.5rem;
-      }
+        .main-content {
+            padding: 15px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-header-purple {
+            padding: 1.5rem;
+        }
+        
+        .card-header-purple h4 {
+            font-size: 1.3rem;
+        }
+        
+        .profile-preview {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .btn-delete-photo {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn-save-purple,
+        .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
     }
     
     @media (max-width: 575px) {
-      .card-header-purple h4 {
-        font-size: 1.1rem;
-      }
-      
-      .btn-save-purple,
-      .btn-cancel {
-        padding: 0.65rem 1.5rem;
-        font-size: 0.875rem;
-      }
-      
-      .btn-delete-photo {
-        padding: 0.55rem 1.1rem;
-        font-size: 0.8rem;
-      }
+        .main-content {
+            padding: 10px;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .card-header-purple {
+            padding: 1.25rem;
+        }
+        
+        .card-header-purple h4 {
+            font-size: 1.1rem;
+        }
+        
+        .profile-preview {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .btn-save-purple,
+        .btn-cancel {
+            padding: 0.75rem 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-delete-photo {
+            padding: 0.65rem 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+        }
     }
-  </style>
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card-modern {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
 </head>
 
 <body>

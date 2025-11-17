@@ -429,170 +429,205 @@
       }
     }
 
-    @media (max-width: 768px) {
-      .page-header-card {
-        padding: 1.25rem;
-      }
+    /* GANTI bagian media query yang ada dengan ini: */
 
-      .page-title {
-        font-size: 1.5rem;
-      }
+@media (max-width: 992px) {
+  .page-header-card {
+    padding: 1.5rem;
+  }
 
-      .stats-summary {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
+  .page-title {
+    font-size: 1.75rem;
+  }
 
-      .stat-summary-card {
-        padding: 1.25rem;
-      }
+  .stats-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-      .stat-summary-number {
-        font-size: 1.75rem;
-      }
+  .table-card-modern {
+    padding: 1.5rem;
+  }
 
-      .table-card-modern {
-        padding: 1.25rem;
-      }
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
 
-      .table-title-icon {
-        font-size: 1.25rem;
-      }
+  /* Sembunyikan deskripsi di tablet */
+  .modern-rooms-table th:nth-child(3),
+  .modern-rooms-table td:nth-child(3) {
+    display: none;
+  }
+}
 
-      .btn-add-modern {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        width: 100%;
-        gap: 0.4rem;
-      }
-
-      .btn-action {
-        width: 100%;
-        justify-content: center;
-        padding: 0.6rem 1rem;
-        white-space: normal;
-        text-align: center;
-      }
-
-      .room-info {
-        flex-direction: row;
-        align-items: center;
-      }
-
-      /* Adjust table for mobile */
-      .modern-rooms-table {
-        font-size: 0.875rem;
-      }
-
-      .modern-rooms-table thead th,
-      .modern-rooms-table tbody td {
-        padding: 0.875rem 0.5rem;
-      }
-
-      /* Hide description column on tablet */
-      .modern-rooms-table th:nth-child(3),
-      .modern-rooms-table td:nth-child(3) {
-        display: none;
-      }
+  @media (max-width: 768px) {
+    .page-header-card {
+      padding: 1.25rem;
     }
 
-    @media (max-width: 576px) {
-      .page-title {
-        font-size: 1.25rem;
-      }
+    .page-title {
+      font-size: 1.5rem;
+    }
 
-      .page-header-card,
-      .filter-card-modern,
-      .table-card-modern {
-        padding: 1rem;
-        border-radius: 15px;
-      }
+    .stats-summary {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
 
-      .stat-summary-card {
-        padding: 1rem;
-      }
+    .stat-summary-card {
+      padding: 1.25rem;
+    }
 
-      .stat-summary-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-      }
+    .stat-summary-number {
+      font-size: 1.75rem;
+    }
 
-      .stat-summary-number {
-        font-size: 1.5rem;
-      }
+    .table-card-modern {
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
 
-      .stat-summary-label {
-        font-size: 0.75rem;
-      }
+    .table-title-icon {
+      font-size: 1.25rem;
+    }
 
-      .table-title-icon {
-        font-size: 1rem;
-      }
+    .btn-add-modern {
+      width: 100%;
+      justify-content: center;
+    }
 
-      .room-count-badge {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.75rem;
-      }
+    /* Tampilkan semua kolom tapi dengan layout compact */
+    .modern-rooms-table {
+      min-width: 700px; /* Force horizontal scroll */
+      font-size: 0.875rem;
+    }
 
-      /* Very compact table */
-      .modern-rooms-table {
-        font-size: 0.75rem;
-      }
+    .modern-rooms-table thead th,
+    .modern-rooms-table tbody td {
+      padding: 0.875rem 0.5rem;
+    }
 
-      .modern-rooms-table thead th,
-      .modern-rooms-table tbody td {
-        padding: 0.625rem 0.35rem;
-      }
+    .room-info {
+      flex-direction: row;
+      align-items: center;
+    }
 
-      .room-icon {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-        margin-right: 0.5rem;
-      }
+    .action-buttons {
+      flex-direction: column;
+      width: 100%;
+      gap: 0.4rem;
+    }
 
-      .room-name {
-        font-size: 0.875rem;
-      }
+    .btn-action {
+      width: 100%;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+      white-space: normal;
+      text-align: center;
+    }
+  }
 
-      .room-location {
-        font-size: 0.75rem;
-      }
+  @media (max-width: 576px) {
+    .page-title {
+      font-size: 1.25rem;
+    }
 
-      .capacity-badge {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.75rem;
-      }
+    .page-header-card,
+    .table-card-modern {
+      padding: 1rem;
+      border-radius: 15px;
+    }
 
-      .status-badge-modern {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.75rem;
-      .btn-action {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
-        white-space: normal;
-        text-align: center;
-        line-height: 1.2;
-      }
+    .stat-summary-card {
+      padding: 1rem;
+    }
 
-      /* Adjust button text for small screens */
-      .btn-action i {
-        margin-right: 0.25rem;
-        flex-shrink: 0;
-      } padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
-      }
+    .stat-summary-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+    }
 
-      /* Hide capacity column on very small screens */
-      .modern-rooms-table th:nth-child(4),
-      .modern-rooms-table td:nth-child(4) {
-        display: none;
-      }
+    .stat-summary-number {
+      font-size: 1.5rem;
+    }
+
+    .stat-summary-label {
+      font-size: 0.75rem;
+    }
+
+    .table-title-icon {
+      font-size: 1rem;
+    }
+
+    .room-count-badge {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+    }
+
+    /* Very compact table dengan horizontal scroll */
+    .modern-rooms-table {
+      min-width: 600px;
+      font-size: 0.75rem;
+    }
+
+    .modern-rooms-table thead th,
+    .modern-rooms-table tbody td {
+      padding: 0.625rem 0.35rem;
+    }
+
+    .room-icon {
+      width: 35px;
+      height: 35px;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+
+    .room-name {
+      font-size: 0.875rem;
+    }
+
+    .room-location {
+      font-size: 0.75rem;
+    }
+
+    .capacity-badge {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+    }
+
+    .status-badge-modern {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+    }
+
+    .btn-action {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .btn-action i {
+      margin-right: 0.25rem;
+      flex-shrink: 0;
+    }
+  }
+
+  /* EXTRA: Untuk layar sangat kecil (mobile portrait) */
+  @media (max-width: 400px) {
+    .modern-rooms-table {
+      min-width: 550px; /* Lebih sempit tapi tetap ada semua kolom */
+    }
+    
+    /* Sembunyikan nomor urut untuk hemat space */
+    .modern-rooms-table th:first-child,
+    .modern-rooms-table td:first-child {
+      display: none;
+    }
+  }
 
       .empty-state {
         padding: 2rem 1rem;
@@ -602,6 +637,88 @@
         font-size: 3rem;
       }
     }
+    /* ================================================ */
+/* FIX: Tombol Edit & Hapus Sama Besar di Mobile */
+/* ================================================ */
+
+/* Action Buttons - FIX untuk mobile */
+/* Action Buttons - Desktop (tetap seperti semula) */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn-action {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* FIX HANYA UNTUK MOBILE */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .action-buttons a,
+  .action-buttons form {
+    width: 100%;
+    display: flex;
+    margin: 0;
+  }
+
+  .action-buttons .btn-action {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin: 0;
+    min-height: 44px;
+  }
+
+  /* Pastikan button dalam form sama persis dengan link */
+  .action-buttons form button.btn-action {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .action-buttons {
+    gap: 0.4rem;
+  }
+
+  .action-buttons .btn-action {
+    padding: 0.7rem 0.9rem;
+    font-size: 0.8rem;
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 400px) {
+  .action-buttons .btn-action {
+    padding: 0.65rem 0.8rem;
+    font-size: 0.75rem;
+    min-height: 40px;
+  }
+}
   </style>
 </head>
 

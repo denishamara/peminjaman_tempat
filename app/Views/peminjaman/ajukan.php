@@ -343,7 +343,11 @@
             <form action="<?= base_url('peminjaman/submit') ?>" method="post">
                 <?= csrf_field() ?>
 
-                <?php $now = date('Y-m-d\TH:i'); ?>
+                <?php 
+                $now = date('Y-m-d\TH:i');
+                // Ambil ruang_id dari URL parameter
+                $ruangIdFromUrl = $_GET['ruang_id'] ?? '';
+                ?>
 
                 <!-- Dropdown Ruang -->
                 <div class="form-group">
@@ -354,8 +358,9 @@
                     <select id="ruangSelect" name="id_room" class="form-select" required>
                         <option value="">-- Pilih Ruang --</option>
                         <?php foreach($rooms as $room): ?>
-                            <option value="<?= esc($room['id_room']) ?>" <?= old('id_room') == $room['id_room'] ? 'selected' : '' ?>>
-                                <?= esc($room['nama_room']) ?>
+                            <option value="<?= esc($room['id_room']) ?>" 
+                                <?= (old('id_room') == $room['id_room'] || $ruangIdFromUrl == $room['id_room']) ? 'selected' : '' ?>>
+                                <?= esc($room['nama_room']) ?> - <?= esc($room['lokasi']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -421,24 +426,58 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // tanggal dinamis
-    const mulaiInput = document.getElementById('tanggal_mulai');
-    const selesaiInput = document.getElementById('tanggal_selesai');
-    mulaiInput.addEventListener('change', () => {
-        selesaiInput.min = mulaiInput.value;
-        if (selesaiInput.value && selesaiInput.value < mulaiInput.value) selesaiInput.value = '';
-    });
+    // Fungsi untuk mendapatkan parameter dari URL
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        const results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
 
-    // Choices.js untuk dropdown
-    const ruangChoices = new Choices('#ruangSelect', {
-        searchEnabled: true,
-        itemSelectText: '',
-        shouldSort: false
-    });
+    // Ambil ruang_id dari URL
+    const ruangIdFromUrl = getUrlParameter('ruang_id');
+    
+    // Jika ada ruang_id di URL, set dropdown secara otomatis
+    document.addEventListener('DOMContentLoaded', function() {
+        if (ruangIdFromUrl) {
+            const ruangSelect = document.getElementById('ruangSelect');
+            ruangSelect.value = ruangIdFromUrl;
+            
+            // Jika menggunakan Choices.js, update juga
+            if (typeof ruangChoices !== 'undefined') {
+                ruangChoices.setChoiceByValue(ruangIdFromUrl);
+            }
+            
+            // Tampilkan pesan bahwa ruangan sudah dipilih
+            console.log('Ruangan dengan ID', ruangIdFromUrl, 'telah dipilih secara otomatis');
+        }
 
-    // set pilihan lama (old value)
-    const oldValue = '<?= old('id_room') ?>';
-    if(oldValue) ruangChoices.setChoiceByValue(oldValue);
+        // Validasi tanggal dinamis
+        const mulaiInput = document.getElementById('tanggal_mulai');
+        const selesaiInput = document.getElementById('tanggal_selesai');
+        
+        mulaiInput.addEventListener('change', () => {
+            selesaiInput.min = mulaiInput.value;
+            if (selesaiInput.value && selesaiInput.value < mulaiInput.value) {
+                selesaiInput.value = '';
+            }
+        });
+
+        // Inisialisasi Choices.js untuk dropdown (jika digunakan)
+        if (typeof Choices !== 'undefined') {
+            const ruangChoices = new Choices('#ruangSelect', {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false
+            });
+
+            // Set pilihan lama (old value) atau dari URL
+            const oldValue = '<?= old('id_room') ?>' || ruangIdFromUrl;
+            if(oldValue) {
+                ruangChoices.setChoiceByValue(oldValue);
+            }
+        }
+    });
 </script>
 
 </body>
