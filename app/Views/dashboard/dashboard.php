@@ -699,7 +699,7 @@ $user = session()->get('user');
           <div class="table-header-modern">
             <h5 class="table-title">
               <i class="fas fa-calendar-alt"></i>
-              Jadwal Ruangan Hari Ini
+              Peminjaman Pending
             </h5>
             <span class="count-badge">
               <i class="fas fa-list-ul me-1"></i>
