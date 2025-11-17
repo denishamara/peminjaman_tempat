@@ -130,68 +130,83 @@ class JadwalController extends BaseController
 
     // 💾 Simpan jadwal baru (dengan repeat)
     public function store()
-    {
-        if ($res = $this->onlyNonPeminjam()) return $res;
+{
+    if ($res = $this->onlyNonPeminjam()) return $res;
 
-        $data = [
-            'nama_reguler'    => $this->request->getPost('nama_reguler'),
-            'id_room'         => $this->request->getPost('id_room'),
-            'id_user'         => $this->request->getPost('id_user'),
-            'tanggal_mulai'   => $this->request->getPost('tanggal_mulai'),
-            'tanggal_selesai' => $this->request->getPost('tanggal_selesai'),
-            'keterangan'      => $this->request->getPost('keterangan'),
-        ];
+    $data = [
+        'nama_reguler'    => $this->request->getPost('nama_reguler'),
+        'id_room'         => $this->request->getPost('id_room'),
+        'id_user'         => $this->request->getPost('id_user'),
+        'tanggal_mulai'   => $this->request->getPost('tanggal_mulai'),
+        'tanggal_selesai' => $this->request->getPost('tanggal_selesai'),
+        'keterangan'      => $this->request->getPost('keterangan'),
+    ];
 
-        $repeat = (int) $this->request->getPost('repeat_minggu');
-        if ($repeat > 52) $repeat = 52; // maksimal 1 tahun
+    $repeat = (int) $this->request->getPost('repeat_minggu');
+    if ($repeat > 52) $repeat = 52; // maksimal 1 tahun
 
-        // Validasi wajib isi
-        if (empty($data['id_room']) || empty($data['id_user']) || empty($data['tanggal_mulai']) || empty($data['tanggal_selesai'])) {
-            return redirect()->back()->withInput()->with('error', 'Semua field wajib diisi.');
-        }
+    // Validasi wajib isi
+    if (empty($data['id_room']) || empty($data['id_user']) || empty($data['tanggal_mulai']) || empty($data['tanggal_selesai'])) {
+        return redirect()->back()->withInput()->with('error', 'Semua field wajib diisi.');
+    }
 
-        // Cek bentrok dengan jadwal lain
-        if ($this->jadwalModel->isTimeConflict($data)) {
-            return redirect()->back()->withInput()->with('error', 'Jadwal bentrok dengan jadwal lain.');
-        }
+    // ⛔ VALIDASI BARU: Cegah membuat jadwal di waktu yang sudah lewat
+    $now = time();
+    $mulai = strtotime($data['tanggal_mulai']);
+    $selesai = strtotime($data['tanggal_selesai']);
 
-        // Buat group_id unik agar jadwal berulang bisa dikaitkan
-        $groupId = uniqid('reg_');
-        $data['group_id'] = $groupId;
+    if ($mulai < $now || $selesai < $now) {
+        return redirect()->back()->withInput()->with('error', 'Tidak dapat membuat jadwal pada waktu yang sudah lewat.');
+    }
 
-        // Simpan jadwal utama
-        $this->jadwalModel->insert($data);
+    // Cek bentrok dengan jadwal lain
+    if ($this->jadwalModel->isTimeConflict($data)) {
+        return redirect()->back()->withInput()->with('error', 'Jadwal bentrok dengan jadwal lain.');
+    }
 
-        // Buat jadwal otomatis mingguan
-        if ($repeat > 0) {
-            $mulai = strtotime($data['tanggal_mulai']);
-            $selesai = strtotime($data['tanggal_selesai']);
+    // Buat group_id unik agar jadwal berulang bisa dikaitkan
+    $groupId = uniqid('reg_');
+    $data['group_id'] = $groupId;
 
-            for ($i = 1; $i <= $repeat; $i++) {
-                $nextMulai = strtotime("+{$i} week", $mulai);
-                $nextSelesai = strtotime("+{$i} week", $selesai);
+    // Simpan jadwal utama
+    $this->jadwalModel->insert($data);
 
-                if ($nextMulai < time()) continue; // skip jika jadwal sudah lewat
+    // Buat jadwal otomatis mingguan
+    if ($repeat > 0) {
+        $mulai = strtotime($data['tanggal_mulai']);
+        $selesai = strtotime($data['tanggal_selesai']);
 
-                $newData = $data;
-                $newData['tanggal_mulai'] = date('Y-m-d H:i:s', $nextMulai);
-                $newData['tanggal_selesai'] = date('Y-m-d H:i:s', $nextSelesai);
+        for ($i = 1; $i <= $repeat; $i++) {
+            $nextMulai = strtotime("+{$i} week", $mulai);
+            $nextSelesai = strtotime("+{$i} week", $selesai);
 
-                if (!$this->jadwalModel->isTimeConflict($newData)) {
-                    $this->jadwalModel->insert($newData);
-                }
+            // tetap benar → skip jadwal yang sudah lewat
+            if ($nextMulai < time()) continue;
+
+            $newData = $data;
+            $newData['tanggal_mulai'] = date('Y-m-d H:i:s', $nextMulai);
+            $newData['tanggal_selesai'] = date('Y-m-d H:i:s', $nextSelesai);
+
+            // tetap benar → cek bentrok untuk jadwal repeat
+            if (!$this->jadwalModel->isTimeConflict($newData)) {
+                $this->jadwalModel->insert($newData);
             }
         }
-
-        return redirect()->to('/jadwal/index')->with('success', 'Jadwal berhasil ditambahkan' . ($repeat > 0 ? " dan diulang $repeat minggu ke depan." : '.'));
     }
+
+    return redirect()->to('/jadwal')->with('success', 'Jadwal berhasil dibuat.');
+}
 
     // 🔁 Update jadwal
     public function update($id)
-    {
+{
     $tipe = $this->request->getPost('tipe');
 
+    /* ======================================================
+       ==============  UPDATE JADWAL REGULER  ===============
+       ====================================================== */
     if ($tipe === 'reguler') {
+
         $data = [
             'id_room' => $this->request->getPost('id_room'),
             'id_user' => $this->request->getPost('id_user'),
@@ -199,8 +214,8 @@ class JadwalController extends BaseController
             'status' => $this->request->getPost('status') ?? 'Aktif',
         ];
 
-        // Ambil sesi yang dicentang
-        $sesi = $this->request->getPost('sesi'); // array sesi[]
+        // Ambil sesi (jika ada)
+        $sesi = $this->request->getPost('sesi');
         if (!empty($sesi)) {
             sort($sesi);
             $sesiWaktu = [
@@ -209,38 +224,74 @@ class JadwalController extends BaseController
                 7 => ['12:15','13:00'], 8 => ['13:05','13:50'], 9 => ['13:55','14:40'],
                 10=> ['14:45','15:30']
             ];
+
             $tanggal = $this->request->getPost('tanggal');
             $first = $sesiWaktu[$sesi[0]];
             $last  = $sesiWaktu[end($sesi)];
+
             $data['tanggal_mulai'] = $tanggal . ' ' . $first[0];
             $data['tanggal_selesai'] = $tanggal . ' ' . $last[1];
         }
 
+        /* === VALIDASI WAKTU LEWAT — hanya jika sesi diubah === */
+        if (!empty($sesi)) {
+            $now = time();
+            $mulai  = strtotime($data['tanggal_mulai']);
+            $selesai = strtotime($data['tanggal_selesai']);
+
+            if ($mulai < $now || $selesai < $now) {
+                return redirect()->back()->withInput()->with('error', 'Tidak dapat memindahkan jadwal ke waktu yang sudah lewat.');
+            }
+
+            // Cek bentrok jadwal lain (kecuali dirinya sendiri)
+            if ($this->jadwalModel->isTimeConflict($data, $id)) {
+                return redirect()->back()->withInput()->with('error', 'Jadwal bentrok dengan jadwal lain.');
+            }
+        }
+
+        // Update jadwal reguler
         $this->jadwalModel->update($id, $data);
+    }
 
-    } else {
-        if($tipe === 'booking'){
-    $mulaiTgl = $this->request->getPost('tanggal_mulai_tgl');
-    $selesaiTgl = $this->request->getPost('tanggal_selesai_tgl');
-    $mulaiJam = $this->request->getPost('jam_mulai') ?? '00:00';
-    $selesaiJam = $this->request->getPost('jam_selesai') ?? '23:59';
+    /* ======================================================
+       ==================  UPDATE BOOKING  ==================
+       ====================================================== */
+    else if ($tipe === 'booking') {
 
-    $data = [
-        'id_room' => $this->request->getPost('id_room'),
-        'id_user' => $this->request->getPost('id_user'),
-        'tanggal_mulai' => date('Y-m-d H:i:s', strtotime("$mulaiTgl $mulaiJam")),
-        'tanggal_selesai' => date('Y-m-d H:i:s', strtotime("$selesaiTgl $selesaiJam")),
-        'keterangan' => $this->request->getPost('nama_kegiatan') ?? '',
-        'status' => 'Diterima',
-    ];
+        $mulaiTgl = $this->request->getPost('tanggal_mulai_tgl');
+        $selesaiTgl = $this->request->getPost('tanggal_selesai_tgl');
+        $mulaiJam = $this->request->getPost('jam_mulai') ?? '00:00';
+        $selesaiJam = $this->request->getPost('jam_selesai') ?? '23:59';
 
-    $this->bookingModel->update($id, $data);
-}
+        $data = [
+            'id_room' => $this->request->getPost('id_room'),
+            'id_user' => $this->request->getPost('id_user'),
+            'tanggal_mulai' => date('Y-m-d H:i:s', strtotime("$mulaiTgl $mulaiJam")),
+            'tanggal_selesai' => date('Y-m-d H:i:s', strtotime("$selesaiTgl $selesaiJam")),
+            'keterangan' => $this->request->getPost('nama_kegiatan') ?? '',
+            'status' => 'Diterima',
+        ];
+
+        /* === VALIDASI WAKTU LEWAT === */
+        $now = time();
+        $mulai  = strtotime($data['tanggal_mulai']);
+        $selesai = strtotime($data['tanggal_selesai']);
+
+        if ($mulai < $now || $selesai < $now) {
+            return redirect()->back()->withInput()->with('error', 'Tidak dapat memindahkan booking ke waktu yang sudah lewat.');
+        }
+
+        // Cek bentrok booking lain (kecuali dirinya sendiri)
+        if ($this->bookingModel->isTimeConflict($data, $id)) {
+            return redirect()->back()->withInput()->with('error', 'Waktu booking bentrok dengan jadwal lain.');
+        }
+
+        // Update booking
+        $this->bookingModel->update($id, $data);
     }
 
     return redirect()->to('/jadwal/index')->with('success', 'Jadwal berhasil diperbarui.');
 }
-
 
     public function edit($id)
 {

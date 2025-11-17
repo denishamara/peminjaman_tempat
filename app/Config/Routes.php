@@ -35,9 +35,10 @@ $routes->get('ruang/create', 'RuangController::create', ['filter' => 'auth:admin
 $routes->post('ruang/store', 'RuangController::store', ['filter' => 'auth:administrator,petugas']);
 $routes->get('ruang/edit/(:num)', 'RuangController::edit/$1', ['filter' => 'auth:administrator,petugas']);
 $routes->post('ruang/update/(:num)', 'RuangController::update/$1', ['filter' => 'auth:administrator,petugas']);
-$routes->delete('ruang/delete/(:num)', 'RuangController::delete/$1', ['filter' => 'auth:administrator,petugas']);
+$routes->post('ruang/delete/(:num)', 'RuangController::delete/$1');
 
 // Jadwal routes
+$routes->get('jadwal', 'JadwalController::index');
 $routes->get('jadwal/index', 'JadwalController::index');
 $routes->get('jadwal/create', 'JadwalController::create');
 $routes->post('jadwal/store', 'JadwalController::store');

@@ -114,8 +114,12 @@ class RuangController extends BaseController
     // 🗑️ Hapus ruang
     public function delete($id)
     {
+    if ($this->ruangModel->find($id)) {
         $this->ruangModel->delete($id);
-        return redirect()->to('/ruang/index')->with('success', 'Data ruang berhasil dihapus');
+        return redirect()->back()->with('success', 'Ruangan berhasil dihapus.');
+    }
+
+    return redirect()->back()->with('error', 'Ruangan tidak ditemukan.');
     }
 
 }

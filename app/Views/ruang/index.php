@@ -768,11 +768,15 @@
                           <i class="fas fa-edit"></i>
                           Edit
                         </a>
-                        <button type="button" class="btn-action btn-delete" 
-                                onclick="confirmDelete('<?= ($r['id_room'] ?? $r['id'] ?? '') ?>', '<?= esc($r['nama_room'] ?? $r['nama_ruang'] ?? '') ?>')">
-                          <i class="fas fa-trash-alt"></i>
-                          Hapus
+                        <form action="<?= base_url('ruang/delete/' . ($r['id_room'] ?? $r['id'] ?? '')) ?>" 
+                          method="POST" 
+                          style="display: inline;" 
+                          onsubmit="return confirm('⚠️ Yakin ingin menghapus ruangan: <?= esc($r['nama_room']) ?>?\n\nData yang terhapus tidak dapat dikembalikan!');">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn-action btn-delete">
+                            <i class="fas fa-trash-alt"></i> Hapus
                         </button>
+                    </form>
                       <?php else: ?>
                         <?php if (strtolower($r['status']) === 'tersedia'): ?>
                           <a href="<?= base_url('/peminjaman/ajukan?ruang_id=' . ($r['id_room'] ?? $r['id'] ?? '')) ?>" class="btn-action btn-submit">
