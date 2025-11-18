@@ -18,8 +18,6 @@ class RuangController extends BaseController
     // 📋 Daftar ruang + status & keterangan
     public function index()
     {
-        $ruangs = $this->ruangModel->getRuangWithStatus();
-        
         $ruangModel   = new RuangModel();
         $jadwalModel  = new JadwalModel(); // jadwal reguler
         $bookingModel = new BookingModel(); // peminjaman / booking
@@ -30,10 +28,11 @@ class RuangController extends BaseController
         foreach ($ruangs as &$r) {
             $id_room = $r['id_room'];
 
-            // 🔹 Cek apakah ruangan ini sedang dibooking
+            // 🔹 Cek apakah ruangan ini sedang dibooking (hanya yang statusnya 'Diterima' atau 'Berlangsung')
             $bookingAktif = $bookingModel
                 ->where('id_room', $id_room)
-                ->where('status !=', 'Selesai')
+                ->where('status', 'Diterima') // Hanya booking yang sudah diterima
+                ->orWhere('status', 'Berlangsung') // Atau yang sedang berlangsung
                 ->where('tanggal_selesai >=', $today)
                 ->first();
 
@@ -59,18 +58,18 @@ class RuangController extends BaseController
 
     // ➕ Tambah ruang
     public function create()
-{
-    $ruangModel = new RuangModel();
-    $userModel  = new \App\Models\UserModel(); // pastikan ada model UserModel
+    {
+        $ruangModel = new RuangModel();
+        $userModel  = new \App\Models\UserModel();
 
-    $ruangs = $ruangModel->findAll();
-    $users  = $userModel->findAll();
+        $ruangs = $ruangModel->findAll();
+        $users  = $userModel->findAll();
 
-    return view('ruang/create', [
-        'ruangs' => $ruangs,
-        'users'  => $users
-    ]);
-}
+        return view('ruang/create', [
+            'ruangs' => $ruangs,
+            'users'  => $users
+        ]);
+    }
 
     // 💾 Simpan ruang
     public function store()
@@ -114,12 +113,11 @@ class RuangController extends BaseController
     // 🗑️ Hapus ruang
     public function delete($id)
     {
-    if ($this->ruangModel->find($id)) {
-        $this->ruangModel->delete($id);
-        return redirect()->back()->with('success', 'Ruangan berhasil dihapus.');
-    }
+        if ($this->ruangModel->find($id)) {
+            $this->ruangModel->delete($id);
+            return redirect()->back()->with('success', 'Ruangan berhasil dihapus.');
+        }
 
-    return redirect()->back()->with('error', 'Ruangan tidak ditemukan.');
+        return redirect()->back()->with('error', 'Ruangan tidak ditemukan.');
     }
-
 }
