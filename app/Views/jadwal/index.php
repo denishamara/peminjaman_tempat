@@ -319,7 +319,11 @@
       background-color: rgba(255, 193, 7, 0.15) !important;
     }
 
-    /* Action Buttons in Table */
+    /* ================================================ */
+    /* PERBAIKAN: Action Buttons Responsif */
+    /* ================================================ */
+
+    /* Action Buttons in Table - Desktop */
     td.aksi-col {
       text-align: center;
       vertical-align: middle !important;
@@ -342,6 +346,7 @@
       align-items: center;
       gap: 0.4rem;
       font-weight: 500;
+      min-height: 36px;
     }
 
     .action-buttons .btn i {
@@ -365,6 +370,65 @@
       box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
     }
 
+    /* ================================================ */
+    /* FIX: Tombol Edit & Hapus Sama Besar di Mobile */
+    /* ================================================ */
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+      }
+
+      .action-buttons .btn {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        margin: 0;
+        min-height: 44px;
+        font-size: 0.85rem;
+      }
+
+      /* Pastikan button dalam form sama persis dengan link */
+      .action-buttons form {
+        width: 100%;
+        display: flex;
+        margin: 0;
+      }
+
+      .action-buttons form button.btn {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .action-buttons {
+        gap: 0.4rem;
+      }
+
+      .action-buttons .btn {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.8rem;
+        min-height: 42px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .action-buttons .btn {
+        padding: 0.65rem 0.8rem;
+        font-size: 0.75rem;
+        min-height: 40px;
+      }
+    }
+
     /* Badge */
     .badge {
       padding: 0.5rem 1rem;
@@ -381,6 +445,25 @@
     .badge-booking {
       background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
       color: #fff;
+    }
+
+    /* No Results Message */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #64748b;
+    }
+
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .no-results h5 {
+      margin-bottom: 0.5rem;
+      color: #475569;
     }
 
     /* Filter Header Responsive */
@@ -464,15 +547,6 @@
       .table tbody td {
         padding: 0.75rem 0.5rem;
       }
-
-      .action-buttons {
-        flex-direction: column;
-        gap: 0.4rem;
-      }
-
-      .action-buttons .btn {
-        width: 100%;
-      }
     }
 
     @media (max-width: 576px) {
@@ -505,19 +579,19 @@
     <!-- Page Header -->
     <div class="page-header">
       <h3><i class="fas fa-calendar-alt"></i>Jadwal Ruangan</h3>
-      <p>Lihat dan kelala semua jadwal reguler & booking ruangan</p>
+      <p>Lihat dan kelola semua jadwal reguler & booking ruangan</p>
     </div>
 
     <!-- Filter Section -->
     <div class="filter-section">
       <div class="btn-group">
-        <a href="?filter=all" class="filter-btn <?= ($filter ?? 'all') == 'all' ? 'active' : '' ?>">
+        <a href="#" class="filter-btn active" data-filter="all">
           <i class="fas fa-list me-1"></i>Semua Jadwal
         </a>
-        <a href="?filter=reguler" class="filter-btn <?= ($filter ?? '') == 'reguler' ? 'active' : '' ?>">
+        <a href="#" class="filter-btn" data-filter="reguler">
           <i class="fas fa-calendar-check me-1"></i>Reguler
         </a>
-        <a href="?filter=booking" class="filter-btn <?= ($filter ?? '') == 'booking' ? 'active' : '' ?>">
+        <a href="#" class="filter-btn" data-filter="booking">
           <i class="fas fa-bookmark me-1"></i>Booking
         </a>
       </div>
@@ -537,25 +611,20 @@
 
     <!-- Search Section -->
     <div class="search-section">
-      <form method="get" action="" class="search-form">
+      <div class="search-form">
         <div class="search-input-group">
           <i class="fas fa-search search-icon"></i>
           <input type="text" 
-                 name="search" 
+                 id="searchInput" 
                  class="search-input" 
-                 placeholder="Cari ruangan..." 
+                 placeholder="Cari ruangan, kegiatan, atau peminjam..." 
                  value="<?= esc($search ?? '') ?>"
                  autocomplete="off">
         </div>
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i>Cari
+        <button type="button" id="clearSearch" class="clear-search" style="<?= !empty($search) ? 'display: flex;' : 'display: none;' ?>">
+          <i class="fas fa-times"></i>Clear
         </button>
-        <?php if (!empty($search)): ?>
-          <a href="?" class="clear-search">
-            <i class="fas fa-times"></i>Clear
-          </a>
-        <?php endif; ?>
-      </form>
+      </div>
     </div>
 
     <!-- Alerts -->
@@ -592,7 +661,7 @@
               </tr>
             </thead>
 
-            <tbody>
+            <tbody id="tableBody">
               <?php if (!empty($jadwal)): ?>
                 <?php foreach ($jadwal as $j): ?>
                   <?php
@@ -618,7 +687,11 @@
                     $jamSelesai = $j['jam_selesai'] ?? (!empty($tglSelesai) ? date('H:i', strtotime($tglSelesai)) : '-');
                   ?>
 
-                  <tr class="<?= esc($rowClass) ?>">
+                  <tr class="jadwal-row <?= esc($rowClass) ?>" 
+                      data-ruang="<?= strtolower(esc($j['nama_ruang'] ?? '')) ?>"
+                      data-kegiatan="<?= strtolower(esc($j['nama_kegiatan'] ?? $j['nama_reguler'] ?? $j['keterangan'] ?? '')) ?>"
+                      data-peminjam="<?= strtolower(esc($j['peminjam'] ?? '')) ?>"
+                      data-status="<?= strtolower(esc($j['status'] ?? '')) ?>">
                     <td><strong><?= esc($j['nama_ruang'] ?? '-') ?></strong></td>
                     <td><?= esc($j['nama_kegiatan'] ?? $j['nama_reguler'] ?? $j['keterangan'] ?? '-') ?></td>
                     <td><?= esc($j['peminjam'] ?? '-') ?></td>
@@ -668,7 +741,13 @@
                 </tr>
               <?php endif; ?>
             </tbody>
-          </table>
+        </table>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results">
+          <i class="fas fa-search"></i>
+          <h5>Tidak ada hasil ditemukan</h5>
+          <p class="mb-0">Coba gunakan kata kunci yang berbeda</p>
         </div>
       </div>
     </div>
@@ -677,9 +756,154 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
-    // Auto focus search input
+    // Search functionality - AUTO FILTER TANPA RELOAD
     document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.querySelector('input[name="search"]');
+      const searchInput = document.getElementById('searchInput');
+      const clearSearch = document.getElementById('clearSearch');
+      const jadwalRows = document.querySelectorAll('.jadwal-row');
+      const noResults = document.getElementById('noResults');
+      const tableBody = document.getElementById('tableBody');
+      const filterButtons = document.querySelectorAll('.filter-btn');
+
+      let currentFilter = '<?= $filter ?? "all" ?>';
+      let currentSearch = '<?= esc($search ?? "") ?>';
+
+      // Initialize search input value
+      if (searchInput && currentSearch) {
+        searchInput.value = currentSearch;
+      }
+
+      // Set active filter button berdasarkan URL
+      filterButtons.forEach(btn => {
+        if (btn.dataset.filter === currentFilter) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Filter by status
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          currentFilter = this.dataset.filter;
+          
+          // Update active state
+          filterButtons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update URL tanpa reload
+          updateURL();
+          filterJadwal();
+        });
+      });
+
+      // Auto search on typing - TANPA RELOAD
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          currentSearch = this.value.toLowerCase().trim();
+          
+          // Show/hide clear button
+          if (clearSearch) {
+            if (currentSearch.length > 0) {
+              clearSearch.style.display = 'flex';
+            } else {
+              clearSearch.style.display = 'none';
+            }
+          }
+          
+          // Update URL tanpa reload
+          updateURL();
+          filterJadwal();
+        });
+
+        // Enter key untuk submit traditional (fallback)
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            // Untuk kompatibilitas, tetap bisa submit form jika diperlukan
+            document.getElementById('searchForm')?.submit();
+          }
+        });
+      }
+
+      // Clear search
+      if (clearSearch) {
+        clearSearch.addEventListener('click', function() {
+          if (searchInput) {
+            searchInput.value = '';
+          }
+          currentSearch = '';
+          this.style.display = 'none';
+          
+          // Update URL tanpa reload
+          updateURL();
+          filterJadwal();
+        });
+      }
+
+      function filterJadwal() {
+        let visibleRows = 0;
+        let hasData = jadwalRows.length > 0;
+        
+        if (hasData) {
+          jadwalRows.forEach(row => {
+            const ruang = row.dataset.ruang || '';
+            const kegiatan = row.dataset.kegiatan || '';
+            const peminjam = row.dataset.peminjam || '';
+            const status = row.dataset.status || '';
+            
+            // Check search match
+            const matchesSearch = currentSearch === '' || 
+              ruang.includes(currentSearch) || 
+              kegiatan.includes(currentSearch) || 
+              peminjam.includes(currentSearch);
+            
+            // Check filter match
+            const matchesFilter = currentFilter === 'all' || status === currentFilter;
+            
+            // Show/hide row berdasarkan kedua kondisi
+            if (matchesSearch && matchesFilter) {
+              row.style.display = '';
+              visibleRows++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        }
+
+        // Show/hide no results message
+        if (noResults && tableBody) {
+          if (visibleRows === 0 && hasData) {
+            noResults.style.display = 'block';
+            tableBody.style.display = 'none';
+          } else {
+            noResults.style.display = 'none';
+            tableBody.style.display = '';
+          }
+        }
+      }
+
+      // Update URL tanpa reload page
+      function updateURL() {
+        const params = new URLSearchParams();
+        
+        if (currentSearch) {
+          params.set('search', currentSearch);
+        }
+        
+        if (currentFilter && currentFilter !== 'all') {
+          params.set('filter', currentFilter);
+        }
+        
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      // Initialize filter pada load
+      filterJadwal();
+
+      // Auto focus search input
       if (searchInput && !searchInput.value) {
         searchInput.focus();
       }
@@ -688,9 +912,10 @@
     // Clear search with escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        const searchInput = document.querySelector('input[name="search"]');
+        const searchInput = document.getElementById('searchInput');
         if (searchInput && searchInput.value) {
-          window.location.href = '?';
+          searchInput.value = '';
+          searchInput.dispatchEvent(new Event('input'));
         }
       }
     });
