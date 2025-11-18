@@ -36,16 +36,29 @@ class JadwalController extends BaseController
     public function index()
 {
     $filter = $this->request->getGet('filter') ?? 'all';
+    $search = $this->request->getGet('search') ?? '';
+    
     $jadwalModel = new \App\Models\JadwalModel();
     $peminjamanModel = new \App\Models\PeminjamanModel();
 
     // 🔹 Ambil jadwal reguler
-    $jadwals = $jadwalModel
+    $jadwalQuery = $jadwalModel
         ->select('jadwal_reguler.*, room.nama_room, user.username')
         ->join('room', 'room.id_room = jadwal_reguler.id_room', 'left')
         ->join('user', 'user.id_user = jadwal_reguler.id_user', 'left')
         ->where('jadwal_reguler.tanggal_selesai >=', date('Y-m-d H:i:s'))
-        ->where("jadwal_reguler.nama_reguler NOT LIKE 'Booking-%'")
+        ->where("jadwal_reguler.nama_reguler NOT LIKE 'Booking-%'");
+
+    // 🔹 Filter search untuk jadwal reguler
+    if (!empty($search)) {
+        $jadwalQuery->groupStart()
+            ->like('room.nama_room', $search)
+            ->orLike('jadwal_reguler.nama_reguler', $search)
+            ->orLike('user.username', $search)
+            ->groupEnd();
+    }
+
+    $jadwals = $jadwalQuery
         ->orderBy('jadwal_reguler.tanggal_mulai', 'ASC')
         ->findAll();
 
@@ -58,12 +71,23 @@ class JadwalController extends BaseController
         'Acc','acc'
     ];
 
-    $peminjamans = $peminjamanModel
+    $peminjamanQuery = $peminjamanModel
         ->select('booking.*, room.nama_room, user.username')
         ->join('room', 'room.id_room = booking.id_room', 'left')
         ->join('user', 'user.id_user = booking.id_user', 'left')
         ->whereIn('booking.status', $acceptedStatuses)
-        ->where('booking.tanggal_selesai >=', date('Y-m-d H:i:s'))
+        ->where('booking.tanggal_selesai >=', date('Y-m-d H:i:s'));
+
+    // 🔹 Filter search untuk booking
+    if (!empty($search)) {
+        $peminjamanQuery->groupStart()
+            ->like('room.nama_room', $search)
+            ->orLike('booking.keterangan', $search)
+            ->orLike('user.username', $search)
+            ->groupEnd();
+    }
+
+    $peminjamans = $peminjamanQuery
         ->orderBy('booking.tanggal_mulai', 'ASC')
         ->findAll();
 
@@ -103,6 +127,16 @@ class JadwalController extends BaseController
         }
     }
 
+    // 🔍 Filter manual untuk search (backup filter)
+    if (!empty($search)) {
+        $searchLower = strtolower($search);
+        $gabungan = array_filter($gabungan, function($item) use ($searchLower) {
+            return strpos(strtolower($item['nama_ruang']), $searchLower) !== false ||
+                   strpos(strtolower($item['nama_kegiatan']), $searchLower) !== false ||
+                   strpos(strtolower($item['peminjam']), $searchLower) !== false;
+        });
+    }
+
     // Urutkan berdasar waktu mulai
     usort($gabungan, function ($a, $b) {
         return strtotime($a['tanggal_mulai']) <=> strtotime($b['tanggal_mulai']);
@@ -111,6 +145,7 @@ class JadwalController extends BaseController
     return view('jadwal/index', [
         'jadwal' => $gabungan,
         'filter' => $filter,
+        'search' => $search,
         'user'   => session()->get('user'),
     ]);
 }

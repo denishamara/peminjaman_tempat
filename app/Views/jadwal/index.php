@@ -113,6 +113,88 @@
       box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
+    /* Search Section */
+    .search-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-group {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 3rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      background: #fff;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .clear-search {
+      color: #64748b;
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .clear-search:hover {
+      color: #dc3545;
+      background: rgba(220, 53, 69, 0.1);
+    }
+
     /* Card Modern */
     .card {
       border: none;
@@ -355,6 +437,24 @@
         flex: 1;
       }
 
+      .search-section {
+        padding: 1rem;
+      }
+
+      .search-form {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .search-input-group {
+        min-width: 100%;
+      }
+
+      .search-btn, .clear-search {
+        width: 100%;
+        justify-content: center;
+      }
+
       .table {
         font-size: 0.85rem;
         min-width: 700px;
@@ -405,7 +505,7 @@
     <!-- Page Header -->
     <div class="page-header">
       <h3><i class="fas fa-calendar-alt"></i>Jadwal Ruangan</h3>
-      <p>Lihat dan kelola semua jadwal reguler & booking ruangan</p>
+      <p>Lihat dan kelala semua jadwal reguler & booking ruangan</p>
     </div>
 
     <!-- Filter Section -->
@@ -433,6 +533,29 @@
           </a>
         <?php endif; ?>
       </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <form method="get" action="" class="search-form">
+        <div class="search-input-group">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" 
+                 name="search" 
+                 class="search-input" 
+                 placeholder="Cari ruangan..." 
+                 value="<?= esc($search ?? '') ?>"
+                 autocomplete="off">
+        </div>
+        <button type="submit" class="search-btn">
+          <i class="fas fa-search"></i>Cari
+        </button>
+        <?php if (!empty($search)): ?>
+          <a href="?" class="clear-search">
+            <i class="fas fa-times"></i>Clear
+          </a>
+        <?php endif; ?>
+      </form>
     </div>
 
     <!-- Alerts -->
@@ -538,6 +661,9 @@
                   <td colspan="<?= (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])) ? '8' : '7' ?>" class="text-center text-muted py-4">
                     <i class="fas fa-inbox fs-1 d-block mb-2" style="opacity: 0.3;"></i>
                     <p class="mb-0">Tidak ada jadwal ditemukan.</p>
+                    <?php if (!empty($search)): ?>
+                      <small class="text-muted">Coba dengan kata kunci lain</small>
+                    <?php endif; ?>
                   </td>
                 </tr>
               <?php endif; ?>
@@ -549,5 +675,25 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Auto focus search input
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.querySelector('input[name="search"]');
+      if (searchInput && !searchInput.value) {
+        searchInput.focus();
+      }
+    });
+
+    // Clear search with escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput && searchInput.value) {
+          window.location.href = '?';
+        }
+      }
+    });
+  </script>
 </body>
 </html>

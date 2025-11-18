@@ -42,7 +42,9 @@ class PeminjamanController extends BaseController
     $rules = [
         'id_room'         => 'required|numeric',
         'tanggal_mulai'   => 'required',
+        'jam_mulai'       => 'required',
         'tanggal_selesai' => 'required',
+        'jam_selesai'     => 'required',
         'keterangan'      => 'permit_empty|max_length[255]',
     ];
 
@@ -50,21 +52,26 @@ class PeminjamanController extends BaseController
         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
     }
 
+    // Gabungkan tanggal dan jam
     $idRoom         = $this->request->getPost('id_room');
-    $tanggalMulai   = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_mulai')));
-    $tanggalSelesai = date('Y-m-d H:i:s', strtotime($this->request->getPost('tanggal_selesai')));
+    $tanggalMulai   = $this->request->getPost('tanggal_mulai') . ' ' . $this->request->getPost('jam_mulai') . ':00';
+    $tanggalSelesai = $this->request->getPost('tanggal_selesai') . ' ' . $this->request->getPost('jam_selesai') . ':00';
+
+    // Konversi ke format datetime
+    $tanggalMulaiFormatted = date('Y-m-d H:i:s', strtotime($tanggalMulai));
+    $tanggalSelesaiFormatted = date('Y-m-d H:i:s', strtotime($tanggalSelesai));
 
     // 🛑 Cegah waktu sebelum sekarang
-    if (strtotime($tanggalMulai) < time()) {
+    if (strtotime($tanggalMulaiFormatted) < time()) {
         return redirect()->back()->withInput()->with('errors', [
-            'Tanggal mulai tidak boleh sebelum waktu sekarang.'
+            'tanggal_mulai' => 'Tanggal mulai tidak boleh sebelum waktu sekarang.'
         ]);
     }
 
     // 🛑 Cegah tanggal selesai sebelum tanggal mulai
-    if (strtotime($tanggalSelesai) <= strtotime($tanggalMulai)) {
+    if (strtotime($tanggalSelesaiFormatted) <= strtotime($tanggalMulaiFormatted)) {
         return redirect()->back()->withInput()->with('errors', [
-            'Tanggal selesai harus lebih besar dari tanggal mulai.'
+            'tanggal_selesai' => 'Tanggal selesai harus lebih besar dari tanggal mulai.'
         ]);
     }
 
@@ -78,12 +85,12 @@ class PeminjamanController extends BaseController
     $conflict = $this->bookingModel
         ->where('id_room', $idRoom)
         ->where('status !=', 'Ditolak')
-        ->where("NOT (tanggal_selesai <= '$tanggalMulai' OR tanggal_mulai >= '$tanggalSelesai')")
+        ->where("NOT (tanggal_selesai <= '$tanggalMulaiFormatted' OR tanggal_mulai >= '$tanggalSelesaiFormatted')")
         ->first();
 
     if ($conflict) {
         return redirect()->back()->withInput()->with('errors', [
-            'Waktu yang dipilih bentrok dengan peminjaman lain di ruangan tersebut.'
+            'id_room' => 'Waktu yang dipilih bentrok dengan peminjaman lain di ruangan tersebut.'
         ]);
     }
 
@@ -91,8 +98,8 @@ class PeminjamanController extends BaseController
     $keterangan = $this->request->getPost('keterangan');
     $bentrokJadwal = $this->jadwalModel->getTimeConflicts([
         'id_room'         => $idRoom,
-        'tanggal_mulai'   => $tanggalMulai,
-        'tanggal_selesai' => $tanggalSelesai,
+        'tanggal_mulai'   => $tanggalMulaiFormatted,
+        'tanggal_selesai' => $tanggalSelesaiFormatted,
     ]);
 
     if (!empty($bentrokJadwal)) {
@@ -117,8 +124,8 @@ class PeminjamanController extends BaseController
     $data = [
         'id_user'         => $user['id_user'],
         'id_room'         => $idRoom,
-        'tanggal_mulai'   => $tanggalMulai,
-        'tanggal_selesai' => $tanggalSelesai,
+        'tanggal_mulai'   => $tanggalMulaiFormatted,
+        'tanggal_selesai' => $tanggalSelesaiFormatted,
         'status'          => 'Proses',
         'keterangan'      => $keterangan,
     ];

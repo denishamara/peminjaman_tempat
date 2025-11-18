@@ -136,6 +136,34 @@
             min-height: 120px;
         }
 
+        /* Date and Time Row */
+        .datetime-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .date-group,
+        .time-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .time-separator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
         /* Choices.js Custom Styling */
         .choices__inner {
             background: #f8fafc;
@@ -251,6 +279,15 @@
                 margin-bottom: 1.25rem;
             }
 
+            .datetime-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .time-input-group {
+                grid-template-columns: 1fr 1fr;
+            }
+
             .btn-submit {
                 padding: 0.9rem;
                 font-size: 1rem;
@@ -344,7 +381,7 @@
                 <?= csrf_field() ?>
 
                 <?php 
-                $now = date('Y-m-d\TH:i');
+                $today = date('Y-m-d');
                 // Ambil ruang_id dari URL parameter
                 $ruangIdFromUrl = $_GET['ruang_id'] ?? '';
                 ?>
@@ -366,37 +403,76 @@
                     </select>
                 </div>
 
-                <!-- Tanggal Mulai -->
+                <!-- Tanggal & Jam Mulai -->
                 <div class="form-group">
-                    <label for="tanggal_mulai" class="form-label">
+                    <label class="form-label">
                         <i class="bi bi-calendar-check"></i>
                         Tanggal & Jam Mulai
                     </label>
-                    <input 
-                        type="datetime-local" 
-                        name="tanggal_mulai" 
-                        id="tanggal_mulai" 
-                        class="form-control"
-                        required
-                        min="<?= $now ?>"
-                        value="<?= old('tanggal_mulai') ? date('Y-m-d\TH:i', strtotime(old('tanggal_mulai'))) : '' ?>"
-                    >
+                    <div class="datetime-row">
+                        <!-- Tanggal Mulai -->
+                        <div class="date-group">
+                            <label for="tanggal_mulai" class="form-label small-label">Tanggal Mulai</label>
+                            <input 
+                                type="date" 
+                                name="tanggal_mulai" 
+                                id="tanggal_mulai" 
+                                class="form-control"
+                                required
+                                min="<?= $today ?>"
+                                value="<?= old('tanggal_mulai') ?>"
+                            >
+                        </div>
+
+                        <!-- Jam Mulai -->
+                        <div class="time-group">
+                            <label for="jam_mulai" class="form-label small-label">Jam Mulai</label>
+                            <input 
+                                type="time" 
+                                name="jam_mulai" 
+                                id="jam_mulai" 
+                                class="form-control"
+                                required
+                                value="<?= old('jam_mulai') ?>"
+                            >
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Tanggal Selesai -->
+                <!-- Tanggal & Jam Selesai -->
                 <div class="form-group">
-                    <label for="tanggal_selesai" class="form-label">
+                    <label class="form-label">
                         <i class="bi bi-calendar-x"></i>
                         Tanggal & Jam Selesai
                     </label>
-                    <input 
-                        type="datetime-local" 
-                        name="tanggal_selesai" 
-                        id="tanggal_selesai" 
-                        class="form-control"
-                        required
-                        value="<?= old('tanggal_selesai') ? date('Y-m-d\TH:i', strtotime(old('tanggal_selesai'))) : '' ?>"
-                    >
+                    <div class="datetime-row">
+                        <!-- Tanggal Selesai -->
+                        <div class="date-group">
+                            <label for="tanggal_selesai" class="form-label small-label">Tanggal Selesai</label>
+                            <input 
+                                type="date" 
+                                name="tanggal_selesai" 
+                                id="tanggal_selesai" 
+                                class="form-control"
+                                required
+                                min="<?= $today ?>"
+                                value="<?= old('tanggal_selesai') ?>"
+                            >
+                        </div>
+
+                        <!-- Jam Selesai -->
+                        <div class="time-group">
+                            <label for="jam_selesai" class="form-label small-label">Jam Selesai</label>
+                            <input 
+                                type="time" 
+                                name="jam_selesai" 
+                                id="jam_selesai" 
+                                class="form-control"
+                                required
+                                value="<?= old('jam_selesai') ?>"
+                            >
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Keterangan -->
@@ -434,11 +510,11 @@
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
-    // Ambil ruang_id dari URL
-    const ruangIdFromUrl = getUrlParameter('ruang_id');
-    
-    // Jika ada ruang_id di URL, set dropdown secara otomatis
     document.addEventListener('DOMContentLoaded', function() {
+        // Ambil ruang_id dari URL
+        const ruangIdFromUrl = getUrlParameter('ruang_id');
+        
+        // Jika ada ruang_id di URL, set dropdown secara otomatis
         if (ruangIdFromUrl) {
             const ruangSelect = document.getElementById('ruangSelect');
             ruangSelect.value = ruangIdFromUrl;
@@ -447,23 +523,9 @@
             if (typeof ruangChoices !== 'undefined') {
                 ruangChoices.setChoiceByValue(ruangIdFromUrl);
             }
-            
-            // Tampilkan pesan bahwa ruangan sudah dipilih
-            console.log('Ruangan dengan ID', ruangIdFromUrl, 'telah dipilih secara otomatis');
         }
 
-        // Validasi tanggal dinamis
-        const mulaiInput = document.getElementById('tanggal_mulai');
-        const selesaiInput = document.getElementById('tanggal_selesai');
-        
-        mulaiInput.addEventListener('change', () => {
-            selesaiInput.min = mulaiInput.value;
-            if (selesaiInput.value && selesaiInput.value < mulaiInput.value) {
-                selesaiInput.value = '';
-            }
-        });
-
-        // Inisialisasi Choices.js untuk dropdown (jika digunakan)
+        // Inisialisasi Choices.js untuk dropdown
         if (typeof Choices !== 'undefined') {
             const ruangChoices = new Choices('#ruangSelect', {
                 searchEnabled: true,
@@ -477,6 +539,73 @@
                 ruangChoices.setChoiceByValue(oldValue);
             }
         }
+
+        // Date validation
+        const tanggalMulaiInput = document.getElementById('tanggal_mulai');
+        const tanggalSelesaiInput = document.getElementById('tanggal_selesai');
+        const jamMulaiInput = document.getElementById('jam_mulai');
+        const jamSelesaiInput = document.getElementById('jam_selesai');
+
+        tanggalMulaiInput.addEventListener('change', function() {
+            // Set tanggal selesai min to tanggal mulai
+            tanggalSelesaiInput.min = this.value;
+            
+            // If tanggal selesai is before tanggal mulai, reset it
+            if (tanggalSelesaiInput.value && tanggalSelesaiInput.value < this.value) {
+                tanggalSelesaiInput.value = this.value;
+            }
+
+            // If same date, validate time
+            if (tanggalSelesaiInput.value === this.value) {
+                validateTimeOnSameDate();
+            }
+        });
+
+        tanggalSelesaiInput.addEventListener('change', function() {
+            // If same date as mulai, validate time
+            if (this.value === tanggalMulaiInput.value) {
+                validateTimeOnSameDate();
+            }
+        });
+
+        // Time validation when dates are the same
+        function validateTimeOnSameDate() {
+            if (tanggalMulaiInput.value === tanggalSelesaiInput.value) {
+                if (jamMulaiInput.value && jamSelesaiInput.value && jamMulaiInput.value >= jamSelesaiInput.value) {
+                    // Auto-adjust end time to be after start time
+                    const startTime = new Date(`2000-01-01T${jamMulaiInput.value}`);
+                    startTime.setHours(startTime.getHours() + 1);
+                    const endTime = startTime.toTimeString().slice(0, 5);
+                    jamSelesaiInput.value = endTime;
+                }
+            }
+        }
+
+        // Also validate when time inputs change
+        jamMulaiInput.addEventListener('change', validateTimeOnSameDate);
+        jamSelesaiInput.addEventListener('change', validateTimeOnSameDate);
+    });
+
+    // Form submission - combine date and time
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const tanggalMulai = document.getElementById('tanggal_mulai').value;
+        const jamMulai = document.getElementById('jam_mulai').value;
+        const tanggalSelesai = document.getElementById('tanggal_selesai').value;
+        const jamSelesai = document.getElementById('jam_selesai').value;
+
+        // Create hidden inputs for combined datetime
+        const hiddenMulai = document.createElement('input');
+        hiddenMulai.type = 'hidden';
+        hiddenMulai.name = 'tanggal_mulai_combined';
+        hiddenMulai.value = `${tanggalMulai} ${jamMulai}:00`;
+
+        const hiddenSelesai = document.createElement('input');
+        hiddenSelesai.type = 'hidden';
+        hiddenSelesai.name = 'tanggal_selesai_combined';
+        hiddenSelesai.value = `${tanggalSelesai} ${jamSelesai}:00`;
+
+        this.appendChild(hiddenMulai);
+        this.appendChild(hiddenSelesai);
     });
 </script>
 
