@@ -294,6 +294,27 @@
       letter-spacing: 0.5px;
       padding: 1rem;
       border: none;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* PERBAIKAN: Header dengan ikon di atas teks */
+    .table thead th .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+
+    .table thead th .header-icon {
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .table thead th .header-text {
+      font-size: 0.75rem;
+      line-height: 1.2;
     }
 
     .table tbody td {
@@ -648,15 +669,55 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="text-center">
               <tr>
-                <th><i class="fas fa-door-open me-1"></i>Ruangan</th>
-                <th><i class="fas fa-info-circle me-1"></i>Kegiatan</th>
-                <th><i class="fas fa-user me-1"></i>Peminjam</th>
-                <th><i class="fas fa-calendar-day me-1"></i>Tanggal</th>
-                <th><i class="fas fa-clock me-1"></i>Jam Mulai</th>
-                <th><i class="fas fa-clock me-1"></i>Jam Selesai</th>
-                <th><i class="fas fa-tag me-1"></i>Status</th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-door-open header-icon"></i>
+                    <span class="header-text">Ruangan</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-info-circle header-icon"></i>
+                    <span class="header-text">Kegiatan</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-user header-icon"></i>
+                    <span class="header-text">Peminjam</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-calendar-day header-icon"></i>
+                    <span class="header-text">Tanggal</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-clock header-icon"></i>
+                    <span class="header-text">Jam Mulai</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-clock header-icon"></i>
+                    <span class="header-text">Jam Selesai</span>
+                  </div>
+                </th>
+                <th>
+                  <div class="header-content">
+                    <i class="fas fa-tag header-icon"></i>
+                    <span class="header-text">Status</span>
+                  </div>
+                </th>
                 <?php if (!empty($user) && in_array($user['role'], ['administrator', 'petugas'])): ?>
-                  <th><i class="fas fa-cog me-1"></i>Aksi</th>
+                  <th>
+                    <div class="header-content">
+                      <i class="fas fa-cog header-icon"></i>
+                      <span class="header-text">Aksi</span>
+                    </div>
+                  </th>
                 <?php endif; ?>
               </tr>
             </thead>

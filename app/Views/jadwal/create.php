@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Jadwal Reguler</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-    <link href="<?= base_url('css/style.css') ?>" rel="stylesheet"> html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Jadwal Reguler</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
@@ -21,18 +12,22 @@
         .main-content {
             margin-left: 260px;
             padding: 30px;
+            transition: margin-left 0.3s ease;
         }
 
-        /* Utility class */
-        @media (min-width: 768px) {
-            .w-md-auto {
-                width: auto !important;
-            }
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
+        /* Sesi Grid Layout */
         .sesi-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 0.75rem;
         }
         
@@ -44,6 +39,7 @@
             cursor: pointer;
             display: flex;
             align-items: flex-start;
+            background: #fff;
         }
         
         .sesi-checkbox input {
@@ -55,11 +51,13 @@
             margin-left: 0.5rem;
             cursor: pointer;
             margin-bottom: 0;
+            flex: 1;
         }
         
         .sesi-checkbox:hover {
             border-color: #3b82f6;
             background-color: #f0f7ff;
+            transform: translateY(-2px);
         }
         
         .sesi-checkbox input:checked ~ label {
@@ -70,6 +68,108 @@
         .sesi-checkbox input:checked {
             background-color: #3b82f6;
             border-color: #3b82f6;
+        }
+
+        /* Form Styling */
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Button Styling */
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #6b7280;
+            color: #6b7280;
+            background: transparent;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #6b7280;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* PERBAIKAN: Tombol Kembali yang lebih proporsional */
+        .btn-kembali {
+            padding: 0.6rem 1.25rem;
+            font-size: 0.9rem;
+            border: 2px solid #6b7280;
+            color: #6b7280;
+            background: transparent;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-kembali:hover {
+            background: #6b7280;
+            color: #fff;
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+
+        /* Alert Styling */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Input Group Styling */
+        .input-group-text {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-right: none;
+            color: #64748b;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+        }
+
+        /* Text Muted */
+        .text-muted {
+            color: #6b7280 !important;
+            font-size: 0.875rem;
         }
 
         /* Responsive Styles */
@@ -103,7 +203,12 @@
 
             .btn {
                 font-size: 0.875rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .btn-kembali {
                 padding: 0.5rem 1rem;
+                font-size: 0.85rem;
             }
 
             .form-label {
@@ -112,6 +217,7 @@
 
             .form-control, .form-select {
                 font-size: 0.95rem;
+                padding: 0.75rem;
             }
 
             small.text-muted {
@@ -120,7 +226,12 @@
 
             .input-group-text {
                 font-size: 0.9rem;
-                padding: 0.5rem 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .sesi-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
             }
         }
 
@@ -134,7 +245,7 @@
             }
 
             h2 {
-                font-size: 1.15rem !important;
+                font-size: 1.25rem !important;
             }
 
             p.text-muted {
@@ -144,11 +255,12 @@
             .btn {
                 width: 100%;
                 font-size: 0.875rem;
-                padding: 0.5rem 0.75rem;
+                padding: 0.75rem;
             }
 
-            .btn i {
-                font-size: 0.85rem;
+            .btn-kembali {
+                width: auto;
+                padding: 0.6rem 1rem;
             }
 
             .form-label {
@@ -156,22 +268,18 @@
                 margin-bottom: 0.5rem;
             }
 
-            .form-label i {
-                font-size: 0.85rem;
-            }
-
             .form-control, .form-select {
                 font-size: 0.875rem;
-                padding: 0.5rem 0.75rem;
+                padding: 0.75rem;
             }
 
             .sesi-grid {
                 grid-template-columns: 1fr;
-                gap: 0.6rem;
+                gap: 0.5rem;
             }
 
             .sesi-checkbox {
-                padding: 0.6rem 0.75rem;
+                padding: 0.75rem;
             }
 
             .sesi-checkbox label {
@@ -185,24 +293,21 @@
 
             .input-group-text {
                 font-size: 0.85rem;
-                padding: 0.5rem 0.7rem;
+                padding: 0.75rem;
             }
 
             .row > .col-md-6 {
-                margin-bottom: 0.75rem;
+                margin-bottom: 1rem;
             }
 
             .d-flex.gap-3 {
                 gap: 0.75rem !important;
+                flex-direction: column;
             }
 
             .alert {
                 font-size: 0.875rem;
                 padding: 0.75rem;
-            }
-
-            .alert i {
-                font-size: 0.9rem;
             }
         }
 
@@ -216,10 +321,15 @@
             }
 
             h2 {
-                font-size: 1.05rem !important;
+                font-size: 1.15rem !important;
             }
 
             .sesi-checkbox label {
+                font-size: 0.8rem;
+            }
+
+            .btn-kembali {
+                padding: 0.5rem 0.8rem;
                 font-size: 0.8rem;
             }
         }
@@ -232,7 +342,7 @@
         <!-- Page Header -->
         <div class="glass-card p-4 mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
+                <div class="flex-grow-1">
                     <h2 class="fw-bold mb-2" style="font-size: 1.75rem;">
                         <i class="fas fa-calendar-plus text-primary me-2"></i>Tambah Jadwal Reguler
                     </h2>
@@ -240,8 +350,9 @@
                         <i class="fas fa-info-circle me-1"></i>Buat jadwal baru untuk peminjaman ruangan reguler
                     </p>
                 </div>
-                <a href="<?= base_url('jadwal/index') ?>" class="btn btn-outline-secondary w-100 w-md-auto">
-                    <i class="fas fa-arrow-left me-2"></i>Kembali
+                <!-- PERBAIKAN: Tombol Kembali yang lebih proporsional -->
+                <a href="<?= base_url('jadwal/index') ?>" class="btn-kembali">
+                    <i class="fas fa-arrow-left me-1"></i>Kembali
                 </a>
             </div>
         </div>
@@ -272,7 +383,9 @@
                     </label>
                     <input type="text" name="nama_reguler" class="form-control" 
                            placeholder="Contoh: Matematika" required>
-                    <small class="text-muted">Masukkan nama kegiatan atau mata pelajaran</small>
+                    <small class="text-muted mt-1 d-block">
+                        <i class="fas fa-info-circle me-1"></i>Masukkan nama kegiatan atau mata pelajaran
+                    </small>
                 </div>
 
                 <div class="row">
@@ -310,7 +423,9 @@
                     </label>
                     <input type="date" name="tanggal" id="tanggal" class="form-control" required
                         min="<?= date('Y-m-d') ?>">
-                    <small class="text-muted">Pilih tanggal pelaksanaan kegiatan</small>
+                    <small class="text-muted mt-1 d-block">
+                        <i class="fas fa-info-circle me-1"></i>Pilih tanggal pelaksanaan kegiatan
+                    </small>
                 </div>
 
                 <!-- Pilih Sesi -->
@@ -337,7 +452,7 @@
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <small class="text-muted">
+                    <small class="text-muted mt-1 d-block">
                         <i class="fas fa-lightbulb me-1"></i>Pilih satu atau lebih sesi yang berurutan
                     </small>
                 </div>
@@ -359,7 +474,7 @@
                                min="0" value="0" placeholder="0">
                         <span class="input-group-text">minggu ke depan</span>
                     </div>
-                    <small class="text-muted">
+                    <small class="text-muted mt-1 d-block">
                         <i class="fas fa-info-circle me-1"></i>Isi 0 jika tidak ingin diulang otomatis setiap minggu
                     </small>
                 </div>
@@ -367,7 +482,7 @@
                 <input type="hidden" name="keterangan" value="Reguler">
 
                 <!-- Action Buttons -->
-                <div class="d-flex gap-3 mt-4 pt-3 border-top">
+                <div class="d-flex flex-column flex-sm-row gap-3 mt-4 pt-3 border-top">
                     <button type="submit" class="btn btn-primary flex-fill">
                         <i class="fas fa-save me-2"></i>Simpan Jadwal
                     </button>
