@@ -715,10 +715,10 @@
         <div class="col-md-4">
           <div class="feature-card">
             <div class="feature-icon">
-              <i class="bi bi-bell"></i>
+              <i class="bi bi-headset"></i>
             </div>
-            <h5>Notifikasi Otomatis</h5>
-            <p>Terima update status peminjaman Anda melalui notifikasi langsung di dashboard.</p>
+            <h5>Bantuan Cepat</h5>
+            <p>Butuh bantuan segera? Hubungi petugas kami untuk pertanyaan urgent terkait peminjaman.</p>
           </div>
         </div>
 
